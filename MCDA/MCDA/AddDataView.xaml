@@ -1,0 +1,74 @@
+﻿<UserControl x:Class="MCDA.AddDataView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" mc:Ignorable="d" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" d:DesignHeight="500" d:DesignWidth="400">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <TabControl Name="tabControl1" Grid.Column="0">
+            <TabItem Header="Layer" Name="layerTabItem">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <ListView Name="layerListView" ItemsSource="{Binding Path=Layer}" HorizontalContentAlignment="Stretch" DataContext="{Binding}">
+                        <ListView.View>
+                            <GridView>
+                                <GridViewColumn  Header="Active"  Width="Auto">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <RadioButton Name="layerCheckBox" IsChecked="{Binding Path=IsSelected, Mode=TwoWay}" />
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                                <GridViewColumn  Header="Layer"  Width="200">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Name="layerLabel"  Text="{Binding Path=LayerName, Mode=OneWay}"/>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                            </GridView>
+                        </ListView.View>
+                    </ListView >
+                </Grid>
+            </TabItem>
+            <TabItem Header="Criteria" Name="criteriaTabItem">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+
+                    <ListView Name="criteriaListView"  ItemsSource="{Binding Path=Fields}" HorizontalContentAlignment="Stretch" DataContext="{Binding}">
+                        <ListView.View>
+                            <GridView>
+                                <GridViewColumn  Header="Active"  Width="Auto">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <CheckBox Name="criteriaCheckBox" IsChecked="{Binding Path=IsSelected, Mode=TwoWay}"/>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                                <GridViewColumn  Header="Criteria"  Width="150">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Label Name="criteriaLabel"  Content="{Binding Path=FieldName, Mode=OneWay}" />
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                                <GridViewColumn  Header="Owner"  Width="150">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Label Name="criteriaLabel"  Content="{Binding Path=Layer.LayerName, Mode=OneWay}" />
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                            </GridView>
+                        </ListView.View>
+                    </ListView >
+                </Grid>
+            </TabItem>
+        </TabControl>
+    </Grid>
+</UserControl>

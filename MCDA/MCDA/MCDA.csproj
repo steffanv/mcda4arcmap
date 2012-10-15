@@ -102,6 +102,7 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AbstractToolViewModel.cs" />
     <Compile Include="AddDataViewModel.cs" />
     <Compile Include="AHPToolBtn.cs" />
     <Compile Include="CollectionExtension.cs" />
@@ -109,6 +110,13 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Config.esriaddinx</DependentUpon>
     </Compile>
+    <Compile Include="ConfigBtn.cs" />
+    <Compile Include="ConfigSingleton.cs" />
+    <Compile Include="ConfigView.xaml.cs">
+      <DependentUpon>ConfigView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ConfigViewModel.cs" />
+    <Compile Include="EnumToBooleanConverter.cs" />
     <Compile Include="Export.cs" />
     <Compile Include="Field.cs" />
     <Compile Include="ITool.cs" />
@@ -135,6 +143,11 @@
     <Compile Include="ToolFactory.cs" />
     <Compile Include="ToolFeatureClassLinkTracker.cs" />
     <Compile Include="Util.cs" />
+    <Compile Include="VisualizationBtn.cs" />
+    <Compile Include="VisualizationView.xaml.cs">
+      <DependentUpon>VisualizationView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="VisualizationViewModel.cs" />
     <Compile Include="WLCToolParameter.cs" />
     <Compile Include="TransformationStrategyFactory.cs" />
     <Compile Include="WeightDistributionStrategyFactory.cs" />
@@ -181,11 +194,19 @@
       <SubType>Code</SubType>
     </Compile>
     <AddInContent Include="Images\AddDataWindow.png" />
+    <Page Include="ConfigView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="OWAToolView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="StandardizationSelectionView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="VisualizationView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -252,6 +273,14 @@
     <Resource Include="Images\toolbargraphics\Export.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
+    <AddInContent Include="Images\ConfigBtn.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </AddInContent>
+    <AddInContent Include="Images\ConfigView.png" />
+    <AddInContent Include="Images\VisualizationBtn.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </AddInContent>
+    <AddInContent Include="Images\VisualizationView.png" />
     <Content Include="README.txt" />
   </ItemGroup>
   <ItemGroup>

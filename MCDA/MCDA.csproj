@@ -57,7 +57,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="ESRI.ArcGIS.ADF, Version=10.1.0.0, Culture=neutral, PublicKeyToken=8fc3cc631e44ad86, processorArchitecture=x86" />
+    <Reference Include="ESRI.ArcGIS.ADF.Connection.Local, Version=10.1.0.0, Culture=neutral, PublicKeyToken=8fc3cc631e44ad86, processorArchitecture=x86" />
     <Reference Include="ESRI.ArcGIS.ADF.Local, Version=10.1.0.0, Culture=neutral, PublicKeyToken=8fc3cc631e44ad86, processorArchitecture=MSIL" />
     <Reference Include="ESRI.ArcGIS.Carto, Version=10.1.0.0, Culture=neutral, PublicKeyToken=8fc3cc631e44ad86, processorArchitecture=MSIL">
       <EmbedInteropTypes>False</EmbedInteropTypes>
@@ -119,6 +119,7 @@
     <Compile Include="EnumToBooleanConverter.cs" />
     <Compile Include="Export.cs" />
     <Compile Include="Field.cs" />
+    <Compile Include="IDeepCloneable.cs" />
     <Compile Include="ITool.cs" />
     <Compile Include="IToolParameter.cs" />
     <Compile Include="AbstractToolTemplate.cs" />
@@ -126,6 +127,7 @@
     <Compile Include="IWeightDistributeStrategy.cs" />
     <Compile Include="Layer.cs" />
     <Compile Include="NotifyPropertyChangeExtension.cs" />
+    <Compile Include="ObjectExtension.cs" />
     <Compile Include="OWAToolBtn.cs" />
     <Compile Include="OWAToolView.xaml.cs">
       <DependentUpon>OWAToolView.xaml</DependentUpon>

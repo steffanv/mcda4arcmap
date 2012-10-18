@@ -9,12 +9,16 @@ namespace MCDA.ViewModel
     abstract class AbstractToolViewModel
     {
 
-        public abstract void UpdateDrag();
-        public abstract void UpdateRealtime();
-        public abstract void UpdateAnimation();
+        protected virtual void BeforeUpdate(){}
+        protected abstract void UpdateDrag();
+        protected abstract void UpdateRealtime();
+        protected abstract void UpdateAnimation();
+        protected virtual void AfterUpdate(){}
 
         public void Update()
         {
+            BeforeUpdate();
+
             switch (ConfigSingleton.Instance.SelectedRenderoption)
             {
 
@@ -24,7 +28,7 @@ namespace MCDA.ViewModel
                 case RenderOption.AnimationLike:
                     UpdateAnimation();
                     break;
-                case RenderOption.RealTime:
+                case RenderOption.Realtime:
                     UpdateRealtime();
                     break;
                 default:
@@ -32,6 +36,8 @@ namespace MCDA.ViewModel
                     break;
 
             }
+
+            AfterUpdate();
    
         }
 

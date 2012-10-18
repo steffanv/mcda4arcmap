@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Data;
 
-namespace MCDA.ViewModel
+namespace MCDA.Model
 {
     //from http://stackoverflow.com/questions/397556/how-to-bind-radiobuttons-to-an-enum
     public class EnumToBooleanConverter : IValueConverter

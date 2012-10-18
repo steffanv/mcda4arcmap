@@ -7,9 +7,10 @@ using System.ComponentModel;
 
 namespace MCDA.Model
 {
-   public class WLCToolParameter : INotifyPropertyChanged, IToolParameter
-   {
 
+   public class WLCToolParameter : INotifyPropertyChanged, IToolParameter, IDeepClonable<WLCToolParameter>
+   {
+        
         public event PropertyChangedEventHandler PropertyChanged;
         
         private bool _isBenefitCriterion = false;
@@ -17,8 +18,7 @@ namespace MCDA.Model
         private double _weight = 0;
         private string _columnName;
         private bool _isOID = false;
-        private bool _scaledWeight;
-
+       
         private static IToolParameter _lastWeightChangedToolParameter;
 
         private static bool _isPropertiesLocked;
@@ -104,6 +104,19 @@ namespace MCDA.Model
             {
                 _weight = value * 100;
             }
+        }
+
+        public WLCToolParameter DeepClone()
+        {
+            WLCToolParameter copy = new WLCToolParameter();
+
+            copy._columnName = _columnName;
+            copy._isBenefitCriterion = _isBenefitCriterion;
+            copy._isLocked = _isLocked;
+            copy._isOID = _isOID;
+            copy._weight = _weight;
+
+            return copy;
         }
    }
 }

@@ -8,7 +8,7 @@ using MCDA.Model;
 
 namespace MCDA.Entity
 {
-  
+   
     public class WLCParameter : INotifyPropertyChanged
     {
 
@@ -40,7 +40,12 @@ namespace MCDA.Entity
         public IList<WLCToolParameter> ToolParameter
         {
             get { return _listOfParameter.Where(t => !t.IsOID).ToList(); }
-            set { PropertyChanged.ChangeAndNotify(ref _listOfParameter, value, () => ToolParameter);  }
+            set {
+
+                _listOfParameter.ForEach(p => p.PropertyChanged -= new PropertyChangedEventHandler(p_PropertyChanged));
+                PropertyChanged.ChangeAndNotify(ref _listOfParameter, value, () => ToolParameter);
+                _listOfParameter.ForEach(p => p.PropertyChanged += new PropertyChangedEventHandler(p_PropertyChanged));
+            }
         }
 
     }

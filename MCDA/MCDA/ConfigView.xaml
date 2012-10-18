@@ -1,7 +1,7 @@
 ﻿<UserControl x:Class="MCDA.ConfigView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="clr-namespace:MCDA.ViewModel"
+    xmlns:local="clr-namespace:MCDA.Model"
     Height="300" Width="300">
     <Grid>
         <TabControl Name="tabControl1" Grid.Column="0" Grid.Row="1">
@@ -20,12 +20,12 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
-                        <RadioButton Grid.Row="0" GroupName="1" IsChecked="{Binding Path=RenderOptions, Converter={StaticResource enumToBooleanConverter}, ConverterParameter=AfterSliderDrag}">After Slider Drag</RadioButton>
-                        <RadioButton Grid.Row="1" GroupName="1" IsChecked="{Binding Path=RenderOptions, Converter={StaticResource enumToBooleanConverter}, ConverterParameter=AnimationLike}">Animation Like</RadioButton>
-                        <RadioButton Grid.Row="2" GroupName="1" IsChecked="{Binding Path=RenderOptions, Converter={StaticResource enumToBooleanConverter}, ConverterParameter=Realtime}">Realtime</RadioButton>
-                        <TextBox Grid.Row="0" Grid.Column="1" TextWrapping="Wrap" IsReadOnly="True">Refreshes the view after dragging the slider (fast). </TextBox>
-                        <TextBox Grid.Row="1" Grid.Column="1" TextWrapping="Wrap" IsReadOnly="True">Refresehs the view after dragging the slider for a limited amount of ticks (medium). </TextBox>
-                        <TextBox Grid.Row="2" Grid.Column="1" TextWrapping="Wrap" IsReadOnly="True">Refreshes the view for every slider tick (slow). </TextBox>
+                        <RadioButton Grid.Row="0" GroupName="1" IsChecked="{Binding Path=RenderOptions, Converter={StaticResource enumToBooleanConverter}, ConverterParameter={x:Static local:RenderOption.AfterSliderDrag}}">After Slider Drag</RadioButton>
+                        <RadioButton Grid.Row="1" GroupName="1" IsChecked="{Binding Path=RenderOptions, Converter={StaticResource enumToBooleanConverter}, ConverterParameter={x:Static local:RenderOption.AnimationLike}}">Animation Like</RadioButton>
+                        <RadioButton Grid.Row="2" GroupName="1" IsChecked="{Binding Path=RenderOptions, Converter={StaticResource enumToBooleanConverter}, ConverterParameter={x:Static local:RenderOption.Realtime}}">Realtime</RadioButton>
+                        <TextBox Grid.Row="0" Grid.Column="1" TextWrapping="Wrap" IsReadOnly="True" BorderThickness="0">Refreshes the view after dragging the slider (fast). </TextBox>
+                        <TextBox Grid.Row="1" Grid.Column="1" TextWrapping="Wrap" IsReadOnly="True" BorderThickness="0">Refresehs the view after dragging the slider for a limited amount of ticks (medium). </TextBox>
+                        <TextBox Grid.Row="2" Grid.Column="1" TextWrapping="Wrap" IsReadOnly="True" BorderThickness="0">Refreshes the view for every slider tick (slow). </TextBox>
                     </Grid>
                 </GroupBox>
             </TabItem>         

@@ -15,14 +15,15 @@ using Microsoft.Win32;
 
 namespace MCDA.ViewModel
 {
-    class WLCToolViewModel : INotifyPropertyChanged
+    class WLCToolViewModel : AbstractToolViewModel,  INotifyPropertyChanged
     {
        public event PropertyChangedEventHandler PropertyChanged;
 
        private MCDAExtension _mcdaExtension;
-       private WLCTool _wlcTool;
+       private WLCTool _wlcTool; 
        private DataTable _wlcResultDataTable;
        private BindingList<WLCToolParameter> _toolParameter;
+       private IList<List<WLCToolParameter>> _toolParameterStorageForAnimationLikeUpdate = new List<List<WLCToolParameter>>();
 
        private ICommand _standardizationSelectionCommand;
        private ICommand _sendToInMemoryWorkspaceCommand;
@@ -31,6 +32,7 @@ namespace MCDA.ViewModel
 
        private bool _isLocked = false;
        private bool _isSendToInMemoryWorkspaceCommand = false;
+       private bool _isSliderDraged = false;
      
        public WLCToolViewModel()
        {
@@ -40,70 +42,119 @@ namespace MCDA.ViewModel
 
            _wlcResultDataTable = _wlcTool.Data;
 
-            _mcdaExtension.PropertyChanged += new PropertyChangedEventHandler(_mcdaExtension_PropertyChanged);
+            _mcdaExtension.PropertyChanged += new PropertyChangedEventHandler(MCDAExtension_PropertyChanged);
 
             _toolParameter = new BindingList<WLCToolParameter>(_wlcTool.WLCParameter.ToolParameter);
 
-            _toolParameter.ListChanged += new ListChangedEventHandler(_toolParameter_ListChanged);
+            _toolParameter.ListChanged += new ListChangedEventHandler(ToolParameter_ListChanged);
 
             PropertyChanged.Notify(() => WLCParameter);
             PropertyChanged.Notify(() => WLCResult);
 
        }
 
-       void _toolParameter_ListChanged(object sender, ListChangedEventArgs e)
+       void ToolParameter_ListChanged(object sender, ListChangedEventArgs e)
        {
-               UpdateParametersWithoutJoin();
+           base.Update();     
        }
 
-       private void UpdateParametersWithoutJoin()
-       {
-          
-           _wlcTool.Run();
-           _wlcResultDataTable = _wlcTool.Data;
-
-           if (_isSendToInMemoryWorkspaceCommand)
-               //ToolFeatureClassLinkTracker.Instance.JoinToolResultByOID(_wlcTool, _wlcTool.Data);
-           
-           PropertyChanged.Notify(() => WLCParameter);
-           PropertyChanged.Notify(() => WLCResult);
-
-       }
-
-       void _mcdaExtension_PropertyChanged(object sender, PropertyChangedEventArgs e)
+       void MCDAExtension_PropertyChanged(object sender, PropertyChangedEventArgs e)
        {
            if (_isLocked)
                return;
 
-           UpdateIncludingNewDataFromModel();
+           _wlcTool = ToolFactory.NewWLCTool();
+
+           _wlcResultDataTable = _wlcTool.Data;
+
+           _mcdaExtension.PropertyChanged += new PropertyChangedEventHandler(MCDAExtension_PropertyChanged);
+
+           _toolParameter = new BindingList<WLCToolParameter>(_wlcTool.WLCParameter.ToolParameter);
+
+           _toolParameter.ListChanged += new ListChangedEventHandler(ToolParameter_ListChanged);
+
+           PropertyChanged.Notify(() => WLCParameter);
+           PropertyChanged.Notify(() => WLCResult);
        }
 
-        //called fromt the code behind page if slider is draged
+        //called from the code behind page if slider is draged
        public void SliderChangedEvent()
+       {
+           _isSliderDraged = true;
+           //base.Update();
+       }
+
+       protected override void UpdateDrag()
+       {
+           if (!_isSliderDraged)
+               return;
+
+          _wlcTool.Run();
+          _wlcResultDataTable = _wlcTool.Data;
+
+          if (_isSendToInMemoryWorkspaceCommand)
+              ToolFeatureClassLinkTracker.Instance.JoinToolResultByOID(_wlcTool, _wlcTool.Data);
+
+          _isSliderDraged = false;
+           
+       }
+
+       protected override void UpdateRealtime()
        {
            _wlcTool.Run();
            _wlcResultDataTable = _wlcTool.Data;
 
            if (_isSendToInMemoryWorkspaceCommand)
                ToolFeatureClassLinkTracker.Instance.JoinToolResultByOID(_wlcTool, _wlcTool.Data);
-
-           PropertyChanged.Notify(() => WLCParameter);
-           PropertyChanged.Notify(() => WLCResult);
        }
 
-       private void UpdateIncludingNewDataFromModel()
+       protected override void UpdateAnimation()
        {
-           _wlcTool = ToolFactory.NewWLCTool();
+           if (!_isSliderDraged)
+           {
+               List<WLCToolParameter> tList = new List<WLCToolParameter>();
 
-           _wlcResultDataTable = _wlcTool.Data;
+               for (int i = 0; i < _toolParameter.Count; i++)
+               {
+                   tList.Add(_toolParameter[i].DeepClone());
+               }
 
-           _mcdaExtension.PropertyChanged += new PropertyChangedEventHandler(_mcdaExtension_PropertyChanged);
+               _toolParameterStorageForAnimationLikeUpdate.Add(tList);
+           }
 
-           _toolParameter = new BindingList<WLCToolParameter>(_wlcTool.WLCParameter.ToolParameter);
+           else
+           {
+               BindingList<WLCToolParameter> latestToolParameter = _toolParameter;
 
-           _toolParameter.ListChanged += new ListChangedEventHandler(_toolParameter_ListChanged);
+               int steps = Convert.ToInt32(_toolParameterStorageForAnimationLikeUpdate.Count * 0.5f);
+               //take several steps...
+               for (int i = 0; i < _toolParameterStorageForAnimationLikeUpdate.Count; i = i+steps)
+               {
+                   _wlcTool.WLCParameter.ToolParameter = _toolParameterStorageForAnimationLikeUpdate[i];
+                   _wlcTool.Run();
+                   _wlcResultDataTable = _wlcTool.Data;
 
-           PropertyChanged.Notify(() => WLCParameter);
+                   if (_isSendToInMemoryWorkspaceCommand)
+                       ToolFeatureClassLinkTracker.Instance.JoinToolResultByOID(_wlcTool, _wlcTool.Data);
+               }
+
+               //make sure we add the latest one
+
+               _wlcTool.WLCParameter.ToolParameter = latestToolParameter;
+               _wlcTool.Run();
+               _wlcResultDataTable = _wlcTool.Data;
+
+               if (_isSendToInMemoryWorkspaceCommand)
+                    ToolFeatureClassLinkTracker.Instance.JoinToolResultByOID(_wlcTool, _wlcTool.Data);
+  
+               _isSliderDraged = false;
+
+               _toolParameterStorageForAnimationLikeUpdate.Clear();
+           }
+       }
+
+       protected override void AfterUpdate()
+       {
            PropertyChanged.Notify(() => WLCResult);
        }
 
@@ -115,7 +166,6 @@ namespace MCDA.ViewModel
        public DataView WLCResult
        {
            get { return _wlcResultDataTable.DefaultView; }
-
        }
 
        public bool IsLocked
@@ -192,7 +242,7 @@ namespace MCDA.ViewModel
            if (!_isLocked)
            {
                ToolFeatureClassLinkTracker.Instance.RemoveLink(_wlcTool);
-               UpdateIncludingNewDataFromModel();
+               this.MCDAExtension_PropertyChanged(this, null);
            }
 
            PropertyChanged.Notify(() => IsLocked);
@@ -270,13 +320,12 @@ namespace MCDA.ViewModel
 
                _wlcTool.TransformationStrategy = standardizationSelectionViewModel.SelectedTransformationStrategy;
 
-               UpdateParametersWithoutJoin();
+               base.Update();
 
            };
 
            wpfWindow.ShowDialog();
  
        }
-
     }
 }

@@ -56,14 +56,12 @@ namespace MCDA
             }
         }
 
-        
-        // <!-- ValueChanged="weightSlider_ValueChanged" Thumb.DragStarted="weightSlider_DragStarted" Thumb.DragCompleted="weightSlider_DragCompleted"-->
         private bool dragStarted = false;
 
         private void weightSlider_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
         {
             WLCToolViewModel viewmodel = (WLCToolViewModel)DataContext;
-            viewmodel.SliderChangedEvent();
+            viewmodel.UpdateAllowedEvent();
             
             this.dragStarted = false;
 
@@ -75,10 +73,18 @@ namespace MCDA
 
         private void weightSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
+            /*
             if (!dragStarted)
             {
                 //work
             }
+             * */
+        }
+
+        private void benefitCriteriaCheckBox_Click(object sender, RoutedEventArgs e)
+        {
+            WLCToolViewModel viewmodel = (WLCToolViewModel)DataContext;
+            viewmodel.UpdateAllowedEvent();
         }
     }
 }

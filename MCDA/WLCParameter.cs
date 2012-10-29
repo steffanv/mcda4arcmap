@@ -21,7 +21,7 @@ namespace MCDA.Entity
         {
             _listOfParameter = listOfParameter;
 
-            _listOfParameter.ForEach(p => p.PropertyChanged +=new PropertyChangedEventHandler(p_PropertyChanged));
+            _listOfParameter.ForEach(p => p.WeightPropertyChanged +=new PropertyChangedEventHandler(p_PropertyChanged));
 
         }
 
@@ -42,9 +42,9 @@ namespace MCDA.Entity
             get { return _listOfParameter.Where(t => !t.IsOID).ToList(); }
             set {
 
-                _listOfParameter.ForEach(p => p.PropertyChanged -= new PropertyChangedEventHandler(p_PropertyChanged));
+                _listOfParameter.ForEach(p => p.WeightPropertyChanged -= new PropertyChangedEventHandler(p_PropertyChanged));
                 PropertyChanged.ChangeAndNotify(ref _listOfParameter, value, () => ToolParameter);
-                _listOfParameter.ForEach(p => p.PropertyChanged += new PropertyChangedEventHandler(p_PropertyChanged));
+                _listOfParameter.ForEach(p => p.WeightPropertyChanged += new PropertyChangedEventHandler(p_PropertyChanged));
             }
         }
 

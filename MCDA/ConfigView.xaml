@@ -24,7 +24,7 @@
                         <RadioButton Grid.Row="1" GroupName="1" IsChecked="{Binding Path=RenderOptions, Converter={StaticResource enumToBooleanConverter}, ConverterParameter={x:Static local:RenderOption.AnimationLike}}">Animation Like</RadioButton>
                         <RadioButton Grid.Row="2" GroupName="1" IsChecked="{Binding Path=RenderOptions, Converter={StaticResource enumToBooleanConverter}, ConverterParameter={x:Static local:RenderOption.Realtime}}">Realtime</RadioButton>
                         <TextBox Grid.Row="0" Grid.Column="1" TextWrapping="Wrap" IsReadOnly="True" BorderThickness="0">Refreshes the view after dragging the slider (fast). </TextBox>
-                        <TextBox Grid.Row="1" Grid.Column="1" TextWrapping="Wrap" IsReadOnly="True" BorderThickness="0">Refresehs the view after dragging the slider for a limited amount of ticks (medium). </TextBox>
+                        <TextBox Grid.Row="1" Grid.Column="1" TextWrapping="Wrap" IsReadOnly="True" BorderThickness="0">Refreshs the view after dragging the slider for a limited amount of ticks (medium). </TextBox>
                         <TextBox Grid.Row="2" Grid.Column="1" TextWrapping="Wrap" IsReadOnly="True" BorderThickness="0">Refreshes the view for every slider tick (slow). </TextBox>
                     </Grid>
                 </GroupBox>

@@ -32,7 +32,7 @@ namespace MCDA.ViewModel
 
        private bool _isLocked = false;
        private bool _isSendToInMemoryWorkspaceCommand = false;
-       private bool _isSliderDraged = false;
+       private bool _isUpdateAllowed = false;
      
        public WLCToolViewModel()
        {
@@ -46,16 +46,29 @@ namespace MCDA.ViewModel
 
             _toolParameter = new BindingList<WLCToolParameter>(_wlcTool.WLCParameter.ToolParameter);
 
-            _toolParameter.ListChanged += new ListChangedEventHandler(ToolParameter_ListChanged);
+            _toolParameter.ForEach(t => t.BenefitPropertyChanged += new PropertyChangedEventHandler(BenefitCriterionChanged));
+            _toolParameter.ForEach(t => t.WeightPropertyChanged += new PropertyChangedEventHandler(WeightChanged));
+            //_toolParameter.ListChanged += new ListChangedEventHandler(ToolParameter_ListChanged);
 
             PropertyChanged.Notify(() => WLCParameter);
             PropertyChanged.Notify(() => WLCResult);
 
        }
 
+        /*
        void ToolParameter_ListChanged(object sender, ListChangedEventArgs e)
        {
            base.Update();     
+       }*/
+
+       void WeightChanged(object sender, PropertyChangedEventArgs e)
+       {
+           base.Update();
+       }
+
+       void BenefitCriterionChanged(object sender, PropertyChangedEventArgs e)
+       {
+           UpdateRealtime();
        }
 
        void MCDAExtension_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -71,22 +84,24 @@ namespace MCDA.ViewModel
 
            _toolParameter = new BindingList<WLCToolParameter>(_wlcTool.WLCParameter.ToolParameter);
 
-           _toolParameter.ListChanged += new ListChangedEventHandler(ToolParameter_ListChanged);
+           _toolParameter.ForEach(t => t.BenefitPropertyChanged += new PropertyChangedEventHandler(BenefitCriterionChanged));
+           _toolParameter.ForEach(t => t.WeightPropertyChanged += new PropertyChangedEventHandler(WeightChanged));
 
            PropertyChanged.Notify(() => WLCParameter);
            PropertyChanged.Notify(() => WLCResult);
        }
 
-        //called from the code behind page if slider is draged
-       public void SliderChangedEvent()
+        //called from the code behind page if something changed
+       public void UpdateAllowedEvent()
        {
-           _isSliderDraged = true;
-           //base.Update();
+           _isUpdateAllowed = true;
+           base.Update();
+
        }
 
        protected override void UpdateDrag()
        {
-           if (!_isSliderDraged)
+           if (!_isUpdateAllowed)
                return;
 
           _wlcTool.Run();
@@ -95,7 +110,7 @@ namespace MCDA.ViewModel
           if (_isSendToInMemoryWorkspaceCommand)
               ToolFeatureClassLinkTracker.Instance.JoinToolResultByOID(_wlcTool, _wlcTool.Data);
 
-          _isSliderDraged = false;
+          _isUpdateAllowed = false;
            
        }
 
@@ -110,7 +125,7 @@ namespace MCDA.ViewModel
 
        protected override void UpdateAnimation()
        {
-           if (!_isSliderDraged)
+           if (!_isUpdateAllowed)
            {
                List<WLCToolParameter> tList = new List<WLCToolParameter>();
 
@@ -126,16 +141,19 @@ namespace MCDA.ViewModel
            {
                BindingList<WLCToolParameter> latestToolParameter = _toolParameter;
 
-               int steps = Convert.ToInt32(_toolParameterStorageForAnimationLikeUpdate.Count * 0.5f);
-               //take several steps...
-               for (int i = 0; i < _toolParameterStorageForAnimationLikeUpdate.Count; i = i+steps)
+               if (_toolParameterStorageForAnimationLikeUpdate.Count > 0)
                {
-                   _wlcTool.WLCParameter.ToolParameter = _toolParameterStorageForAnimationLikeUpdate[i];
-                   _wlcTool.Run();
-                   _wlcResultDataTable = _wlcTool.Data;
+                   int steps = (int) Math.Sqrt(_toolParameterStorageForAnimationLikeUpdate.Count);
+                   //take several steps...
+                   for (int i = 0; i < _toolParameterStorageForAnimationLikeUpdate.Count; i = i + steps)
+                   {
+                       _wlcTool.WLCParameter.ToolParameter = _toolParameterStorageForAnimationLikeUpdate[i];
+                       _wlcTool.Run();
+                       _wlcResultDataTable = _wlcTool.Data;
 
-                   if (_isSendToInMemoryWorkspaceCommand)
-                       ToolFeatureClassLinkTracker.Instance.JoinToolResultByOID(_wlcTool, _wlcTool.Data);
+                       if (_isSendToInMemoryWorkspaceCommand)
+                           ToolFeatureClassLinkTracker.Instance.JoinToolResultByOID(_wlcTool, _wlcTool.Data);
+                   }
                }
 
                //make sure we add the latest one
@@ -147,7 +165,7 @@ namespace MCDA.ViewModel
                if (_isSendToInMemoryWorkspaceCommand)
                     ToolFeatureClassLinkTracker.Instance.JoinToolResultByOID(_wlcTool, _wlcTool.Data);
   
-               _isSliderDraged = false;
+               _isUpdateAllowed = false;
 
                _toolParameterStorageForAnimationLikeUpdate.Clear();
            }

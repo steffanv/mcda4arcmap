@@ -119,13 +119,14 @@
     <Compile Include="EnumToBooleanConverter.cs" />
     <Compile Include="Export.cs" />
     <Compile Include="Field.cs" />
+    <Compile Include="FieldTypeOID.cs" />
     <Compile Include="IDeepCloneable.cs" />
     <Compile Include="ITool.cs" />
     <Compile Include="IToolParameter.cs" />
     <Compile Include="AbstractToolTemplate.cs" />
     <Compile Include="ITransformationStrategy.cs" />
     <Compile Include="IWeightDistributeStrategy.cs" />
-    <Compile Include="Layer.cs" />
+    <Compile Include="Feature.cs" />
     <Compile Include="NotifyPropertyChangeExtension.cs" />
     <Compile Include="ObjectExtension.cs" />
     <Compile Include="OWAToolBtn.cs" />

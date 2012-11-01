@@ -16,7 +16,7 @@ namespace MCDA.ViewModel
     {
        public event PropertyChangedEventHandler PropertyChanged;
 
-       private BindingList<Layer> _layer;
+       private BindingList<Feature> _features;
        private BindingList<Field> _fields = new BindingList<Field>();
 
        private MCDAExtension mcdaExtension;
@@ -25,71 +25,42 @@ namespace MCDA.ViewModel
         {
             mcdaExtension = MCDAExtension.GetExtension();
 
-            _layer = new BindingList<Layer>(mcdaExtension.AvailableFeatureLayer);
+            _features = new BindingList<Feature>(mcdaExtension.AvailableFeatureLayer);
 
-            _layer.ListChanged += new ListChangedEventHandler(_layer_ListChanged);
-            _fields.ListChanged += new ListChangedEventHandler(_fields_ListChanged);
-           
-            mcdaExtension.PropertyChanged += new PropertyChangedEventHandler(mcdaExtension_PropertyChanged);
+            mcdaExtension.PropertyChanged += new PropertyChangedEventHandler(mcdaExtensionPropertyChanged);
 
-            
+            //call because the extension could already have a selected feature and thus fiels
+            mcdaExtensionPropertyChanged(this,null);
+  
         }
 
-        public BindingList<Layer> Layer
+        void mcdaExtensionPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {         
+            _features = new BindingList<Feature>(mcdaExtension.AvailableFeatureLayer);
+
+            Feature feature = _features.Where(l => l.IsSelected).FirstOrDefault();
+
+            if (feature != null)
+            {
+                List<Field> field = feature.Fields.Where(f => f.IsNumber).ToList();
+
+                _fields = new BindingList<Field>(field);
+            }
+
+            PropertyChanged.Notify(() => Layer);
+            PropertyChanged.Notify(() => Fields);
+        }
+
+        public BindingList<Feature> Layer
         {
-            get { return _layer; }
-            set { _layer = value; }
+            get { return _features; }
+            set { _features = value; }
         }
 
         public BindingList<Field> Fields
         {
             get { return _fields; }
             set { _fields = value; }
-        }
-
-        void _fields_ListChanged(object sender, ListChangedEventArgs e)
-        {
-            Update();
-        }
-
-        void _layer_ListChanged(object sender, ListChangedEventArgs e)
-        {
-            Update();
-        }
-
-       
-
-       /// <summary>
-       /// Updates and binds the new list of layer from the model to the view.
-       /// </summary>
-       /// <param name="sender"></param>
-       /// <param name="e"></param>
-        void mcdaExtension_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-           
-            Update();
-
-          
-        }
-      
-        private void Update()
-        {
-
-            _layer.ListChanged -= new ListChangedEventHandler(_layer_ListChanged);
-
-            _layer = new BindingList<Layer>(mcdaExtension.AvailableFeatureLayer);
-
-            _layer.ListChanged += new ListChangedEventHandler(_layer_ListChanged);
-
-            _fields.ListChanged -= new ListChangedEventHandler(_fields_ListChanged);
-            _fields = new BindingList<Field>();
-           
-            _layer.Where(l => l.IsSelected).ForEach(l => l.Fields.Where(f => f.IsNumber).ForEach(f => _fields.Add(f)));
-
-            _fields.ListChanged += new ListChangedEventHandler(_fields_ListChanged);
-
-            PropertyChanged.Notify(() => Layer);
-            PropertyChanged.Notify(() => Fields);
         }
     }
 }

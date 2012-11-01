@@ -15,13 +15,13 @@ namespace MCDA.ViewModel
 
        private MCDAExtension mcdaExtension;
        private BindingList<Field> _fields = new BindingList<Field>();
-       private BindingList<Layer> _layer = new BindingList<Layer>();
+       private BindingList<Feature> _layer = new BindingList<Feature>();
 
        public OWAToolViewModel()
        {
            mcdaExtension = MCDAExtension.GetExtension();
 
-           _layer = new BindingList<Layer>(mcdaExtension.AvailableLayer.Where(l => l.IsFeatureLayer).ToList());
+           _layer = new BindingList<Feature>(mcdaExtension.AvailableLayer.Where(l => l.IsFeatureLayer).ToList());
 
            //register for events from the model to view always the latest list
            mcdaExtension.PropertyChanged += new PropertyChangedEventHandler(mcdaExtension_PropertyChanged);
@@ -45,7 +45,7 @@ namespace MCDA.ViewModel
       
        void mcdaExtension_PropertyChanged(object sender, PropertyChangedEventArgs e)
        {
-           _layer = new BindingList<Layer>(mcdaExtension.AvailableLayer.Where(l => l.IsFeatureLayer).ToList());
+           _layer = new BindingList<Feature>(mcdaExtension.AvailableLayer.Where(l => l.IsFeatureLayer).ToList());
 
            FillFieldList();
            PropertyChanged.Notify(() => Fields);

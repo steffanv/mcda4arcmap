@@ -319,14 +319,21 @@ namespace MCDA.Model
                 feature = featureCursor.NextFeature();
 
                 int fieldIndex = fc.FindField(tool.DefaultResultColumnName);
-                int oidIndex = fc.FindField("OBJECTID");
+
+                int oidIndex = fc.FindField(fc.OIDFieldName);
 
                 while (feature != null)
                 {
 
                     int oid = Convert.ToInt32(feature.get_Value(oidIndex));
-                    DataRow[] dRow = dataTable.Select("OBJECTID =" + oid);
-                    feature.set_Value(fieldIndex, dRow[0][tool.DefaultResultColumnName]);
+                    EnumerableRowCollection<DataRow> dataRows = dataTable.AsEnumerable().Where(dr => dr.Field<FieldTypeOID>(fc.OIDFieldName).OID == oid);
+
+                    DataRow dRow = dataRows.FirstOrDefault();
+
+                    //DataRow[] dRow = dataTable.Select(fc.OIDFieldName.+ "=" + oid);
+                    //feature.set_Value(fieldIndex, dRow[0][tool.DefaultResultColumnName]);
+                    feature.set_Value(fieldIndex, dRow[tool.DefaultResultColumnName]);
+
                     feature.Store();
                     //featureCursor.UpdateFeature(feature);
                     feature = featureCursor.NextFeature();

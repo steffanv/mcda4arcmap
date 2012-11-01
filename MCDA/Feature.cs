@@ -9,7 +9,7 @@ using System.Threading;
 
 namespace MCDA.Model
 {
-    public class Layer : INotifyPropertyChanged
+    public class Feature : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -23,7 +23,7 @@ namespace MCDA.Model
         private ESRI.ArcGIS.Carto.ILayer _layer;
 
 
-        public Layer(ESRI.ArcGIS.Carto.ILayer layer)
+        public Feature(ESRI.ArcGIS.Carto.ILayer layer)
         {
             _layer = layer;
             _layerName = layer.Name;
@@ -88,15 +88,8 @@ namespace MCDA.Model
 
         public IList<Field> Fields
         {
-            get
-            {
-                return _fields;
-            }
-           private set{;}
-           
-               // PropertyChanged.ChangeAndNotify(ref _fields, value, () => Fields);
-            
-
+            get{ return _fields; }
+         
         }
 
         public void RegisterListenerForEveryMemberOfFields()

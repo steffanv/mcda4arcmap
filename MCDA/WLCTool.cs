@@ -90,11 +90,7 @@ namespace MCDA.Model
             }
 
 
-            //TODO this is tooo scary I schould fix this.
-
-            //int oidIndex = _workingDataTable.Columns.IndexOf("OBJECTID");
-
-            //DataTable dtWithoutOID = _workingDataTable.Copy();
+            //we ensure that the oid is not part of the calculation by using only columns with the type double
 
             foreach (DataRow currentDataRow in _workingDataTable.Rows)
                  {

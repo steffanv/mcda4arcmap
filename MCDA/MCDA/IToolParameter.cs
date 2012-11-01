@@ -10,6 +10,7 @@ namespace MCDA.Model
         event PropertyChangedEventHandler WeightPropertyChanged;
 
         IToolParameter LastWeightChangedToolParameter { get; set; }
+
         bool IsPropertiesLocked { get; set; }
 
         string ColumnName { get; set; }

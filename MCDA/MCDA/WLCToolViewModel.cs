@@ -80,8 +80,6 @@ namespace MCDA.ViewModel
 
            _wlcResultDataTable = _wlcTool.Data;
 
-           _mcdaExtension.PropertyChanged += new PropertyChangedEventHandler(MCDAExtension_PropertyChanged);
-
            _toolParameter = new BindingList<WLCToolParameter>(_wlcTool.WLCParameter.ToolParameter);
 
            _toolParameter.ForEach(t => t.BenefitPropertyChanged += new PropertyChangedEventHandler(BenefitCriterionChanged));

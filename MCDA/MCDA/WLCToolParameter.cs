@@ -41,8 +41,8 @@ namespace MCDA.Model
 
        public double NonLockableWeight { 
 
-           get{return _weight;} 
-           set{PropertyChanged.ChangeAndNotify(ref _weight, value, () => Weight);}
+           get{return _weight;}
+           set { PropertyChanged.ChangeAndNotify(ref _weight, value, () => Weight);}
        }
 
         public WLCToolParameter(string columnName )
@@ -64,7 +64,7 @@ namespace MCDA.Model
         public bool IsLocked
         {
             get { return _isLocked; }
-            set { if(_isPropertiesLocked){ return;} PropertyChanged.ChangeAndNotify(ref  _isLocked, value, () => IsLocked); }
+            set { if (_isPropertiesLocked) { return; } PropertyChanged.ChangeAndNotify(ref  _isLocked, value, () => IsLocked); }
 
         }
         public string ColumnName
@@ -75,37 +75,22 @@ namespace MCDA.Model
 
         public IToolParameter LastWeightChangedToolParameter
         {
-            get
-            {
-                return _lastWeightChangedToolParameter;
-            }
-            set
-            {
-                _lastWeightChangedToolParameter = value;
-            }
+            get { return _lastWeightChangedToolParameter;}
+            set { _lastWeightChangedToolParameter = value; }
         }
 
 
         public bool IsOID
         {
-            get
-            {
-                return _isOID;
-            }
+            get { return _isOID;}
             set { PropertyChanged.ChangeAndNotify(ref  _isOID, value, () => IsOID); }
         }
 
 
         public double ScaledWeight
         {
-            get
-            {
-                return _weight / 100;
-            }
-            set
-            {
-                _weight = value * 100;
-            }
+            get { return _weight / 100;}
+            set { _weight = value * 100;}
         }
 
         public WLCToolParameter DeepClone()

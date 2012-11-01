@@ -15,9 +15,9 @@ namespace MCDA.Model
         private bool _isOID = false;
         private ESRI.ArcGIS.Geodatabase.IField _field;
         private bool _isNumber = false;
-        private Layer _layer;
+        private Feature _layer;
 
-        public Field(ESRI.ArcGIS.Geodatabase.IField field, Layer layer)
+        public Field(ESRI.ArcGIS.Geodatabase.IField field, Feature layer)
         {
             _layer = layer;
             _field = field;
@@ -44,7 +44,7 @@ namespace MCDA.Model
             get { return _isNumber; }
         }
 
-        public Layer Layer{
+        public Feature Layer{
 
             get { return _layer; }
         }

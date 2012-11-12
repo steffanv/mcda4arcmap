@@ -16,7 +16,7 @@ namespace MCDA.ViewModel
     {
        public event PropertyChangedEventHandler PropertyChanged;
 
-       private BindingList<Feature> _features;
+       private BindingList<Layer> _layer;
        private BindingList<Field> _fields = new BindingList<Field>();
 
        private MCDAExtension mcdaExtension;
@@ -25,20 +25,20 @@ namespace MCDA.ViewModel
         {
             mcdaExtension = MCDAExtension.GetExtension();
 
-            _features = new BindingList<Feature>(mcdaExtension.AvailableFeatureLayer);
+            _layer = new BindingList<Layer>(mcdaExtension.AvailableFeatureLayer);
 
             mcdaExtension.PropertyChanged += new PropertyChangedEventHandler(mcdaExtensionPropertyChanged);
 
-            //call because the extension could already have a selected feature and thus fiels
+            //call because the extension could already have a selected feature and thus fields
             mcdaExtensionPropertyChanged(this,null);
   
         }
 
         void mcdaExtensionPropertyChanged(object sender, PropertyChangedEventArgs e)
         {         
-            _features = new BindingList<Feature>(mcdaExtension.AvailableFeatureLayer);
+            _layer = new BindingList<Layer>(mcdaExtension.AvailableFeatureLayer);
 
-            Feature feature = _features.Where(l => l.IsSelected).FirstOrDefault();
+            Layer feature = _layer.Where(l => l.IsSelected).FirstOrDefault();
 
             if (feature != null)
             {
@@ -46,15 +46,19 @@ namespace MCDA.ViewModel
 
                 _fields = new BindingList<Field>(field);
             }
+            else
+            {
+                _fields = new BindingList<Field>();
+            }
 
             PropertyChanged.Notify(() => Layer);
             PropertyChanged.Notify(() => Fields);
         }
 
-        public BindingList<Feature> Layer
+        public BindingList<Layer> Layer
         {
-            get { return _features; }
-            set { _features = value; }
+            get { return _layer; }
+            set { _layer = value; }
         }
 
         public BindingList<Field> Fields

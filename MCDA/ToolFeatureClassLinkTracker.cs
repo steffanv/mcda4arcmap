@@ -11,11 +11,14 @@ using ESRI.ArcGIS.Editor;
 using System.Data;
 using ESRI.ArcGIS.Display;
 using ESRI.ArcGIS.ADF;
+using System.ComponentModel;
 
 namespace MCDA.Model
 {
-    class ToolFeatureClassLinkTracker
+    class ToolFeatureClassLinkTracker : INotifyPropertyChanged
     {
+        public event PropertyChangedEventHandler PropertyChanged;
+
         private static ToolFeatureClassLinkTracker _instance;
 
         private IDictionary<AbstractToolTemplate,MCDAWorkspaceContainer> _dictionaryOfLinks= new Dictionary<AbstractToolTemplate,MCDAWorkspaceContainer>();
@@ -332,7 +335,7 @@ namespace MCDA.Model
 
                     //DataRow[] dRow = dataTable.Select(fc.OIDFieldName.+ "=" + oid);
                     //feature.set_Value(fieldIndex, dRow[0][tool.DefaultResultColumnName]);
-                    feature.set_Value(fieldIndex, dRow[tool.DefaultResultColumnName]);
+                    //feature.set_Value(fieldIndex, dRow[tool.DefaultResultColumnName]);
 
                     feature.Store();
                     //featureCursor.UpdateFeature(feature);
@@ -381,6 +384,11 @@ namespace MCDA.Model
         private void StopEditing(ESRI.ArcGIS.Geodatabase.IWorkspace workspaceToEdit)
         {
             _editor.StopEditing(true);
+        }
+
+        public IList<MCDAWorkspaceContainer> GetAllMCDAWorkspaceContainerFromShadowWorkspace()
+        {
+            return _dictionaryOfLinks.Values.ToList();
         }
     }
 

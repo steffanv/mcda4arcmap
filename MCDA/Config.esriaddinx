@@ -6,7 +6,7 @@
   <Image>Images\MCDA Add-in.png</Image>
   <Author>Steffan Voss</Author>
   <Company>Ryerson University</Company>
-  <Date>10/13/2012</Date>
+  <Date>11/8/2012</Date>
   <Targets>
     <Target name="Desktop" version="10.1" />
   </Targets>
@@ -36,8 +36,14 @@
         <DockableWindow id="Ryerson_University_MCDA_ConfigView" class="ConfigView+AddinImpl" caption="Configuration" image="Images\ConfigView.png">
           <InitialPlacement height="300" width="300" state="unpinned" position="float" />
         </DockableWindow>
-        <DockableWindow id="Ryerson_University_MCDA_VisualizationView" class="VisualizationView+AddinImpl" caption="Visualization" image="Images\VisualizationView.png">
-          <InitialPlacement height="300" width="300" state="unpinned" position="top" />
+        <DockableWindow id="Ryerson_University_MCDA_VisualizationView" class="VisualizationView+AddinImpl" caption="My Dockable Window" image="Images\VisualizationView_1.png">
+          <InitialPlacement height="300" width="300" state="pinned" position="left" />
+        </DockableWindow>
+        <DockableWindow id="Ryerson_University_MCDA_VisualizationView_1" class="VisualizationView+AddinImpl" caption="My Dockable Window" image="Images\VisualizationView_2.png">
+          <InitialPlacement height="300" width="300" state="pinned" position="left" />
+        </DockableWindow>
+        <DockableWindow id="Ryerson_University_MCDA_VisualizationView_2" class="VisualizationView+AddinImpl" caption="My Dockable Window" image="Images\VisualizationView.png">
+          <InitialPlacement height="300" width="300" state="pinned" position="left" />
         </DockableWindow>
       </DockableWindows>
       <Toolbars>

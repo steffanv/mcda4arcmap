@@ -9,7 +9,7 @@ using System.Threading;
 
 namespace MCDA.Model
 {
-    public class Feature : INotifyPropertyChanged
+    public class Layer : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -22,8 +22,10 @@ namespace MCDA.Model
         private IList<Field> _fields;
         private ESRI.ArcGIS.Carto.ILayer _layer;
 
+        private static Layer _lastSelectedLayer;
 
-        public Feature(ESRI.ArcGIS.Carto.ILayer layer)
+
+        public Layer(ESRI.ArcGIS.Carto.ILayer layer)
         {
             _layer = layer;
             _layerName = layer.Name;
@@ -83,12 +85,23 @@ namespace MCDA.Model
         public bool IsSelected { 
 
             get{ return _isSelected; }
-            set { PropertyChanged.ChangeAndNotify(ref _isSelected, value, () => IsSelected); }
+            set {
+
+                if (value)
+                    _lastSelectedLayer = this;
+
+                PropertyChanged.ChangeAndNotify(ref _isSelected, value, () => IsSelected);
+            }
+        }
+
+        public static Layer LastSelectedLayer{
+
+            get { return _lastSelectedLayer; }
         }
 
         public IList<Field> Fields
         {
-            get{ return _fields; }
+            get{ return _fields.OrderBy(f => f.FieldName).ToList(); }
          
         }
 

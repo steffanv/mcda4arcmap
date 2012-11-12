@@ -17,7 +17,7 @@
                                 <GridViewColumn  Header="Active"  Width="Auto">
                                     <GridViewColumn.CellTemplate>
                                         <DataTemplate>
-                                            <RadioButton Name="featureCheckBox" GroupName="featureRadioButtonGroup" IsChecked="{Binding Path=IsSelected, Mode=TwoWay}" />
+                                            <RadioButton Name="isSelectedRadioButton" IsChecked="{Binding Path=IsSelected, Mode=TwoWay}" />
                                         </DataTemplate>
                                     </GridViewColumn.CellTemplate>
                                 </GridViewColumn>

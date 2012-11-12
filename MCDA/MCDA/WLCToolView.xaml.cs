@@ -86,5 +86,11 @@ namespace MCDA
             WLCToolViewModel viewmodel = (WLCToolViewModel)DataContext;
             viewmodel.UpdateAllowedEvent();
         }
+
+        private void weightSliderTextblock_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+            WLCToolViewModel viewmodel = (WLCToolViewModel)DataContext;
+            viewmodel.UpdateAllowedEvent();
+        }
     }
 }

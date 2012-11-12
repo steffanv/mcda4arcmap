@@ -17,6 +17,7 @@ using MCDA.Model;
 using System.Data;
 using MCDA.Entity;
 using ESRI.ArcGIS.DataSourcesGDB;
+using ESRI.ArcGIS;
 
 namespace MCDA
 {
@@ -28,15 +29,15 @@ namespace MCDA
 
         private static MCDAExtension _extension;
 
-        private IList<MCDA.Model.Feature> _listOfAvailableLayer = new List<MCDA.Model.Feature>();
+        private IList<MCDA.Model.Layer> _listOfAvailableLayer = new List<MCDA.Model.Layer>();
         private IList<String> _listOfSelectedUniqueLayerNamesForPersistence = new List<string>();
 
         private IActiveViewEvents_Event _activeViewEvents;
 
 
-        public IList<MCDA.Model.Feature> AvailableLayer
+        public IList<MCDA.Model.Layer> AvailableLayer
         {
-            get { return _listOfAvailableLayer; }
+            get { return _listOfAvailableLayer.OrderBy(f => f.LayerName).ToList(); }
             set { PropertyChanged.ChangeAndNotify(ref _listOfAvailableLayer, value, () => AvailableLayer); RegisterListenerForEveryMemberOfListOfAvailableLayer(); }
         }
 
@@ -48,15 +49,23 @@ namespace MCDA
             _listOfAvailableLayer.ForEach(l => l.PropertyChanged +=new PropertyChangedEventHandler(l_PropertyChanged));
         }
 
+        /// <summary>
+        /// A single layer in the list of "AvailableLayer" has changed.
+        /// This method also ensures that only one layer is selected at every time.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void l_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        { 
+        {
+            _listOfAvailableLayer.Where(l => Layer.LastSelectedLayer != l).ForEach(l => l.IsSelected = false);
+
             PropertyChanged.Notify(() => AvailableLayer);
         }
         #endregion
 
-        public IList<MCDA.Model.Feature> AvailableFeatureLayer
+        public IList<MCDA.Model.Layer> AvailableFeatureLayer
         {
-            get { return AvailableLayer.Where(l => l.IsFeatureLayer).ToList(); }
+            get { return AvailableLayer.Where(l => l.IsFeatureLayer).ToList().OrderBy(f => f.LayerName).ToList(); }
            // set { ;/* PropertyChanged.Notify(() => AvailableFeatureLayer);*/ }
         }
 
@@ -85,6 +94,17 @@ namespace MCDA
         {
             _extension = this;
 
+            if (!RuntimeManager.Bind(ProductCode.Engine))
+            {
+                if (!RuntimeManager.Bind(ProductCode.Desktop))
+                {
+                    ESRI.ArcGIS.Framework.IMessageDialog msgBox = new ESRI.ArcGIS.Framework.MessageDialogClass();
+                    msgBox.DoModal("Unable to bind to ArcGIS runtime. Application will be shut down.", "", "Yes", "No", ArcMap.Application.hWnd);
+                    //MessageBox.Show("Unable to bind to ArcGIS runtime. Application will be shut down.");
+                    return;
+                }
+            }
+           
             IMap map = ArcMap.Document.ActiveView.FocusMap;
 
             _activeViewEvents = map as IActiveViewEvents_Event;
@@ -103,7 +123,7 @@ namespace MCDA
         private void Reset()
         {
            
-            AvailableLayer = new List<MCDA.Model.Feature>();
+            AvailableLayer = new List<MCDA.Model.Layer>();
         }
 
         #region events
@@ -179,7 +199,7 @@ namespace MCDA
         public MCDA.Model.Field GetOIDFieldFromSelectedFeature()
         {
 
-            Model.Feature selectedFeature = _listOfAvailableLayer.FirstOrDefault(f => f.IsSelected);
+            Model.Layer selectedFeature = _listOfAvailableLayer.FirstOrDefault(f => f.IsSelected);
 
             if (selectedFeature == null)
                 return null;
@@ -188,7 +208,7 @@ namespace MCDA
 
         }
 
-        public IList<MCDA.Model.Field> GetFieldsFromSelectedLayerWhichAreNumeric(IList<MCDA.Model.Feature> layer)
+        public IList<MCDA.Model.Field> GetFieldsFromSelectedLayerWhichAreNumeric(IList<MCDA.Model.Layer> layer)
         {
 
             IList<MCDA.Model.Field> fieldList = new List<MCDA.Model.Field>();
@@ -198,7 +218,7 @@ namespace MCDA
             return fieldList;
         }
 
-        public DataTable GetDataTableForParameterSet<T>(IList<T> toolParameter) where T : IToolParameter, new()
+        public DataTable GetDataTableForParameterSet<T>(IList<T> toolParameter) where T : IToolParameter
         {
 
            IList<MCDA.Model.Field> listOfFields = GetListOfFieldsFromToolParameter(toolParameter);
@@ -208,7 +228,6 @@ namespace MCDA
             //add columns
            foreach (MCDA.Model.Field currentField in listOfFields)
            {
-               
                dataTable.Columns.Add(currentField.FieldName, typeof(double));
            }
 
@@ -218,7 +237,6 @@ namespace MCDA
             //in fact no feature can be selected, thus we have to take care about potential null
             if (oidField != null)
             {
-
                 dataTable.Columns.Add(oidField.FieldName, typeof(FieldTypeOID));
 
                 //and to make it easier add the oidField to the rest of the fields
@@ -234,6 +252,7 @@ namespace MCDA
                IList<double> column = GetValuesOfField(currentField);
                tableData.Add(column);
 
+               //each column has the data of all rows in the column
                expectedNumbersOfRow = column.Count;
            }
 
@@ -294,7 +313,7 @@ namespace MCDA
                 ICursor cursor = feature.Table.Search(null, true);
 
                 IRow row = null;
-
+            
                 while ((row = cursor.NextRow()) != null)
                 {
                     //we have to cast explicitly ... https://connect.microsoft.com/VisualStudio/feedback/details/534288/ilist-dynamic-cannot-call-a-method-add-without-casting
@@ -304,6 +323,23 @@ namespace MCDA
             //}
 
             return listOfValuesFromField;
+        }
+
+        public static IList<IField> GetListOfFieldsFromFeatureClass(IFeatureClass featureClass)
+        {
+            IList<IField> fieldsList = new List<IField>();
+            
+            IFields fields = featureClass.Fields;
+
+            for (int i = 0; i <= fields.FieldCount - 1; i++)
+            {
+                if (fields.get_Field(i).Type <= esriFieldType.esriFieldTypeDouble)
+                {
+                    fieldsList.Add(fields.get_Field(i));
+                }
+            }
+
+            return fieldsList;
         }
 
         /*
@@ -369,10 +405,10 @@ namespace MCDA
 
         #region private ArcObjects stuff
 
-        private IList<MCDA.Model.Feature> GetListOfLayerFromActiveView(ESRI.ArcGIS.Carto.IActiveView activeView)
+        private IList<MCDA.Model.Layer> GetListOfLayerFromActiveView(ESRI.ArcGIS.Carto.IActiveView activeView)
         {
 
-            IList<MCDA.Model.Feature> layerList = new List<MCDA.Model.Feature>();
+            IList<MCDA.Model.Layer> layerList = new List<MCDA.Model.Layer>();
 
             ESRI.ArcGIS.Carto.IMap map = activeView.FocusMap;
            
@@ -383,7 +419,7 @@ namespace MCDA
             for (System.Int32 i = 0; i < numberOfLayers; i++)
             {
 
-                layerList.Add(new MCDA.Model.Feature(map.get_Layer(i)));
+                layerList.Add(new MCDA.Model.Layer(map.get_Layer(i)));
             }
             
             return layerList;

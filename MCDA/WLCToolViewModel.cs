@@ -48,18 +48,14 @@ namespace MCDA.ViewModel
 
             _toolParameter.ForEach(t => t.BenefitPropertyChanged += new PropertyChangedEventHandler(BenefitCriterionChanged));
             _toolParameter.ForEach(t => t.WeightPropertyChanged += new PropertyChangedEventHandler(WeightChanged));
-            //_toolParameter.ListChanged += new ListChangedEventHandler(ToolParameter_ListChanged);
-
+           
             PropertyChanged.Notify(() => WLCParameter);
             PropertyChanged.Notify(() => WLCResult);
 
-       }
+           //we have to call our own update method to make sure we have a result column
+            MCDAExtension_PropertyChanged(this, null);
 
-        /*
-       void ToolParameter_ListChanged(object sender, ListChangedEventArgs e)
-       {
-           base.Update();     
-       }*/
+       }
 
        void WeightChanged(object sender, PropertyChangedEventArgs e)
        {
@@ -77,6 +73,7 @@ namespace MCDA.ViewModel
                return;
 
            _wlcTool = ToolFactory.NewWLCTool();
+           _wlcTool.Run();
 
            _wlcResultDataTable = _wlcTool.Data;
 
@@ -106,7 +103,7 @@ namespace MCDA.ViewModel
           _wlcResultDataTable = _wlcTool.Data;
 
           if (_isSendToInMemoryWorkspaceCommand)
-              ToolFeatureClassLinkTracker.Instance.JoinToolResultByOID(_wlcTool, _wlcTool.Data);
+              _mcdaExtension.JoinToolResultByOID(_wlcTool, _wlcTool.Data);
 
           _isUpdateAllowed = false;
            
@@ -118,7 +115,7 @@ namespace MCDA.ViewModel
            _wlcResultDataTable = _wlcTool.Data;
 
            if (_isSendToInMemoryWorkspaceCommand)
-               ToolFeatureClassLinkTracker.Instance.JoinToolResultByOID(_wlcTool, _wlcTool.Data);
+               _mcdaExtension.JoinToolResultByOID(_wlcTool, _wlcTool.Data);
        }
 
        protected override void UpdateAnimation()
@@ -150,18 +147,17 @@ namespace MCDA.ViewModel
                        _wlcResultDataTable = _wlcTool.Data;
 
                        if (_isSendToInMemoryWorkspaceCommand)
-                           ToolFeatureClassLinkTracker.Instance.JoinToolResultByOID(_wlcTool, _wlcTool.Data);
+                           _mcdaExtension.JoinToolResultByOID(_wlcTool, _wlcTool.Data);
                    }
                }
 
                //make sure we add the latest one
-
                _wlcTool.WLCParameter.ToolParameter = latestToolParameter;
                _wlcTool.Run();
                _wlcResultDataTable = _wlcTool.Data;
 
                if (_isSendToInMemoryWorkspaceCommand)
-                    ToolFeatureClassLinkTracker.Instance.JoinToolResultByOID(_wlcTool, _wlcTool.Data);
+                   _mcdaExtension.JoinToolResultByOID(_wlcTool, _wlcTool.Data);
   
                _isUpdateAllowed = false;
 
@@ -246,18 +242,29 @@ namespace MCDA.ViewModel
        {
            _isLocked = !_isLocked;
 
-           if(_isLocked)
-           ToolFeatureClassLinkTracker.Instance.EstablishLink(_wlcTool);
-
            if (!_isLocked && _isSendToInMemoryWorkspaceCommand)
            {
-               //TODO dlg
-               DoSendToInMemoryWorkspaceCommand();
+               ESRI.ArcGIS.Framework.IMessageDialog msgBox = new ESRI.ArcGIS.Framework.MessageDialogClass();
+               bool userResult = msgBox.DoModal("Unlocking", "Unlocking also removes the existing in memory connection.", "Yes", "No", ArcMap.Application.hWnd);
+
+               //if the user hit no we have to set the lock state back to locked
+               if (!userResult)
+               {
+                   _isLocked = !_isLocked;
+                   return;
+               }
+               if (userResult)
+                   //simulate another send to in memory workspace command
+                   //this actually unlinks everything
+                   DoSendToInMemoryWorkspaceCommand();
            }
+
+           if(_isLocked)
+               _mcdaExtension.EstablishLink(_wlcTool);
 
            if (!_isLocked)
            {
-               ToolFeatureClassLinkTracker.Instance.RemoveLink(_wlcTool);
+               _mcdaExtension.RemoveLink(_wlcTool);
                this.MCDAExtension_PropertyChanged(this, null);
            }
 
@@ -289,13 +296,12 @@ namespace MCDA.ViewModel
 
            if (_isSendToInMemoryWorkspaceCommand)
            {
-               ToolFeatureClassLinkTracker.Instance.JoinToolResultByOID(_wlcTool, _wlcTool.Data);
-               ToolFeatureClassLinkTracker.Instance.DisplayLink(_wlcTool);
+               _mcdaExtension.JoinToolResultByOID(_wlcTool, _wlcTool.Data);
+               _mcdaExtension.DisplayLink(_wlcTool);
            }
 
            if (!_isSendToInMemoryWorkspaceCommand)
-               ToolFeatureClassLinkTracker.Instance.RemoveLink(_wlcTool);
-
+               _mcdaExtension.RemoveLink(_wlcTool);
 
            PropertyChanged.Notify(() => IsSendToInMemoryWorkspaceCommand);
        }

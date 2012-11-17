@@ -15,6 +15,7 @@ using ESRI.ArcGIS.Controls;
 using ESRI.ArcGIS.Display;
 using Xceed.Wpf.Toolkit;
 using MCDA.ViewModel;
+using MCDA.Model;
 
 namespace MCDA
 {
@@ -24,73 +25,68 @@ namespace MCDA
   /// </summary>
     public partial class VisualizationView : UserControl
     {
-        private ColorPicker cp = new ColorPicker();
-        private ColorPicker cp2 = new ColorPicker();
+        private ColorPicker _startColorColorPicker = new ColorPicker();
+        private ColorPicker _endColorColorPicker = new ColorPicker();
+
+        private VisualizationViewModel viewModel;
 
         public VisualizationView()
         {
             InitializeComponent();
 
+            InitialiazeColorPicker(); 
+
             DataContext = new VisualizationViewModel();
 
-            InitialiazeColorPicker();
+            viewModel = (VisualizationViewModel) DataContext;
+
+            viewModel.PropertyChanged += new System.ComponentModel.PropertyChangedEventHandler(viewModelPropertyChanged);
+
+        }
+
+        void viewModelPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            //we use this so far only for the histogram
+            if (viewModel.SelectedMCDAWorkspaceContainer == null || viewModel.SelectedMCDAWorkspaceContainer.ClassBreaksRendererContainer == null || !viewModel.SelectedMCDAWorkspaceContainer.ClassBreaksRendererContainer.IsComplete())
+                return;
+
+            double[] data;
+            int[] freq;
+
+            Classification.Histogram(viewModel.SelectedMCDAWorkspaceContainer.FeatureClass, viewModel.SelectedIField, out data, out freq);
+
+            historgram.Data = data;
+            historgram.Frequency = freq;
+
+            double[] classes = Classification.Classify(viewModel.SelectedClassificationMethod, viewModel.SelectedMCDAWorkspaceContainer.FeatureClass, viewModel.SelectedIField, viewModel.SelectedNumberOfClasses);
+
+            historgram.Breaks = classes;
         }
 
         private void InitialiazeColorPicker()
         {
-            cp.SelectedColorChanged += new RoutedPropertyChangedEventHandler<Color>(cp_SelectedColorChanged);
-            cp2.SelectedColorChanged += new RoutedPropertyChangedEventHandler<Color>(cp_SelectedColorChanged);
+            Binding startColorBinding = new Binding("SelectedStartColor");
+            _startColorColorPicker.SetBinding(ColorPicker.SelectedColorProperty, startColorBinding);
 
-            dockPanel1.Children.Add(cp);
-            dockPanel1.Children.Add(cp2);
+            Binding endColorBinding = new Binding("SelectedEndColor");
+            _endColorColorPicker.SetBinding(ColorPicker.SelectedColorProperty, endColorBinding);
 
-            colorRampRectangle.Fill = new LinearGradientBrush(cp.SelectedColor, cp2.SelectedColor, 0d);
+            _startColorColorPicker.VerticalAlignment = System.Windows.VerticalAlignment.Stretch;
+            _endColorColorPicker.VerticalAlignment = System.Windows.VerticalAlignment.Stretch;
+
+            _startColorColorPicker.SelectedColorChanged += new RoutedPropertyChangedEventHandler<Color>(ColorPickerSelectedColorChanged);
+            _endColorColorPicker.SelectedColorChanged += new RoutedPropertyChangedEventHandler<Color>(ColorPickerSelectedColorChanged);
+
+            dockPanel1.Children.Add(_startColorColorPicker);
+            dockPanel2.Children.Add(_endColorColorPicker);
+
+            colorRampRectangle.Fill = new LinearGradientBrush(_startColorColorPicker.SelectedColor, _endColorColorPicker.SelectedColor, 0d);
         }
 
-        void cp_SelectedColorChanged(object sender, RoutedPropertyChangedEventArgs<Color> e)
+        void ColorPickerSelectedColorChanged(object sender, RoutedPropertyChangedEventArgs<Color> e)
         {
-            colorRampRectangle.Fill = new LinearGradientBrush(cp.SelectedColor, cp2.SelectedColor, 0d);
+            colorRampRectangle.Fill = new LinearGradientBrush(_startColorColorPicker.SelectedColor, _endColorColorPicker.SelectedColor, 0d);
         }
-
-        //private void CreateSymbology()
-        //{
-        //    //System.Windows.Forms.Form form = new System.Windows.Forms.Form();
-
-        //    //System.Resources.ResourceManager resources = new System.Resources.ResourceManager(typeof(VisualizationView));
-
-        //    _axSymbologyControl = new ESRI.ArcGIS.Controls.AxSymbologyControl();
-
-        //    _axSymbologyControl.CreateControl();
-
-        //   // symbologyHost.Child = _axSymbologyControl;
-
-        //    //_axSymbologyControl.ContainingControl = this;
-        //    _axSymbologyControl.Location = new System.Drawing.Point(8, 16);
-        //    _axSymbologyControl.Size = new System.Drawing.Size(272, 265);
-        //    //_axSymbologyControl.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("_axSymbologyControl.OcxState")));
-
-        //    symbologyHost.Child = _axSymbologyControl;
-
-        //    //Get the ArcGIS install location
-        //    string sInstall = ESRI.ArcGIS.RuntimeManager.ActiveRuntime.Path;
-
-        //    //Load the ESRI.ServerStyle file into the SymbologyControl
-        //    _axSymbologyControl.LoadStyleFile(sInstall + @"\Styles\ESRI.ServerStyle");
-
-        //    //Set the style class
-        //    _axSymbologyControl.StyleClass = esriSymbologyStyleClass.esriStyleClassColorRamps;
-
-        //    //Select the color ramp item
-        //    //_axSymbologyControl.GetStyleClass(_axSymbologyControl.StyleClass).SelectItem(0);
-
-        //    _axSymbologyControl.OnItemSelected += new ESRI.ArcGIS.Controls.ISymbologyControlEvents_Ax_OnItemSelectedEventHandler(_axSymbologyControl_OnItemSelected);
-        //}
-
-        //private void _axSymbologyControl_OnItemSelected(object sender, ESRI.ArcGIS.Controls.ISymbologyControlEvents_OnItemSelectedEvent e)
-        //{
-        //    //Get the selected item
-        //    m_styleGalleryItem = (IStyleGalleryItem)e.styleGalleryItem;
-        //}
 
       /// <summary>
       /// Implementation class of the dockable window add-in. It is responsible for 

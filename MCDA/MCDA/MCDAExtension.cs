@@ -18,14 +18,13 @@ using System.Data;
 using MCDA.Entity;
 using ESRI.ArcGIS.DataSourcesGDB;
 using ESRI.ArcGIS;
+using ESRI.ArcGIS.ADF;
 
 namespace MCDA
 {
     public class MCDAExtension : ESRI.ArcGIS.Desktop.AddIns.Extension, INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
-        public event PropertyChangedEventHandler ItemAdded;
-        public event PropertyChangedEventHandler ItemDeleted;
 
         private static MCDAExtension _extension;
 
@@ -33,6 +32,13 @@ namespace MCDA
         private IList<String> _listOfSelectedUniqueLayerNamesForPersistence = new List<string>();
 
         private IActiveViewEvents_Event _activeViewEvents;
+
+        private IDictionary<AbstractToolTemplate,MCDAWorkspaceContainer> _dictionaryOfLinks= new Dictionary<AbstractToolTemplate,MCDAWorkspaceContainer>();
+
+        private IWorkspace _shadowWorkspace;
+
+        //private MCDA.MCDAExtension _mcdaExtension = MCDA.MCDAExtension.GetExtension();
+        //private IEditor _editor;
 
 
         public IList<MCDA.Model.Layer> AvailableLayer
@@ -66,7 +72,6 @@ namespace MCDA
         public IList<MCDA.Model.Layer> AvailableFeatureLayer
         {
             get { return AvailableLayer.Where(l => l.IsFeatureLayer).ToList().OrderBy(f => f.LayerName).ToList(); }
-           // set { ;/* PropertyChanged.Notify(() => AvailableFeatureLayer);*/ }
         }
 
         public static MCDAExtension GetExtension()
@@ -94,17 +99,8 @@ namespace MCDA
         {
             _extension = this;
 
-            if (!RuntimeManager.Bind(ProductCode.Engine))
-            {
-                if (!RuntimeManager.Bind(ProductCode.Desktop))
-                {
-                    ESRI.ArcGIS.Framework.IMessageDialog msgBox = new ESRI.ArcGIS.Framework.MessageDialogClass();
-                    msgBox.DoModal("Unable to bind to ArcGIS runtime. Application will be shut down.", "", "Yes", "No", ArcMap.Application.hWnd);
-                    //MessageBox.Show("Unable to bind to ArcGIS runtime. Application will be shut down.");
-                    return;
-                }
-            }
-           
+            _shadowWorkspace = CreateInMemoryWorkspace();
+
             IMap map = ArcMap.Document.ActiveView.FocusMap;
 
             _activeViewEvents = map as IActiveViewEvents_Event;
@@ -118,15 +114,8 @@ namespace MCDA
   
         }
 
-       
-
-        private void Reset()
-        {
-           
-            AvailableLayer = new List<MCDA.Model.Layer>();
-        }
-
         #region events
+
         bool Events_BeforeCloseDocument()
         {
                 // Return true to stop document from closing
@@ -147,7 +136,7 @@ namespace MCDA
             _activeViewEvents.ItemAdded += new IActiveViewEvents_ItemAddedEventHandler(ArcMap_ItemAdded);
             _activeViewEvents.ItemDeleted += new IActiveViewEvents_ItemDeletedEventHandler(ArcMap_ItemDeleted);
 
-            Reset();
+            AvailableLayer = new List<MCDA.Model.Layer>();
 
         }
 
@@ -163,22 +152,23 @@ namespace MCDA
             _activeViewEvents.ItemAdded += new IActiveViewEvents_ItemAddedEventHandler(ArcMap_ItemAdded);
             _activeViewEvents.ItemDeleted += new IActiveViewEvents_ItemDeletedEventHandler(ArcMap_ItemDeleted);
 
-            Reset();
+            AvailableLayer = new List<MCDA.Model.Layer>();
         }
 
         void ArcMap_ItemDeleted(object Item)
         {
-            AvailableLayer = GetListOfLayerFromActiveView(ArcMap.Document.ActiveView);
+           
+            RefreshAvailableLayerListAfterAddOrDelete(ArcMap.Document.ActiveView);
 
-            ItemAdded.Notify(() => AvailableLayer);
+            PropertyChanged.Notify(() => AvailableLayer);
 
         }
 
         private void ArcMap_ItemAdded(object item)
         {
-            AvailableLayer = GetListOfLayerFromActiveView(ArcMap.Document.ActiveView);
+            RefreshAvailableLayerListAfterAddOrDelete(ArcMap.Document.ActiveView);
 
-            ItemAdded.Notify(() => AvailableLayer);
+            PropertyChanged.Notify(() => AvailableLayer);
         }
         #endregion
 
@@ -234,6 +224,8 @@ namespace MCDA
             //add the oid column
             MCDA.Model.Field oidField = GetOIDFieldFromSelectedFeature();
 
+            //we have to take care about FID oid fields http://gis.stackexchange.com/questions/40833/arcobjects-bug-in-oid-field-duplication-while-duplicating-feature-class
+            bool isOIDFieldNameFID = false;
             //in fact no feature can be selected, thus we have to take care about potential null
             if (oidField != null)
             {
@@ -241,6 +233,9 @@ namespace MCDA
 
                 //and to make it easier add the oidField to the rest of the fields
                 listOfFields.Add(oidField);
+
+                if(oidField.FieldName.Equals("FID"))
+                    isOIDFieldNameFID = true;
             }
 
             //get data for rows
@@ -256,6 +251,8 @@ namespace MCDA
                expectedNumbersOfRow = column.Count;
            }
 
+           bool isOIDFieldStartsByZero = false;
+
            //add row
            for (int i = 0; i < expectedNumbersOfRow; i++)
            {
@@ -266,8 +263,21 @@ namespace MCDA
                    //we have the oid column
                    if (dataTable.Columns[y].DataType == typeof(FieldTypeOID))
                    {
+                       //the first row
+                       if (i == 0)
+                       {
+                           if((int)tableData[y][i] ==0)
+                             isOIDFieldStartsByZero = true;
+                       }
+                       //if the column is FID we have to change the ids 0...x to 1...x+1 because this change will be made after the featureclass is copied into the in memory workspace
+                       if (isOIDFieldNameFID && isOIDFieldStartsByZero)
+                       {
+                           row[y] = new FieldTypeOID() { OID = (int)tableData[y][i]+1 };
+                           continue;
+                       }
+
                        row[y] = new FieldTypeOID() { OID = (int) tableData[y][i] };
-                       continue;
+                         continue;
                    }
 
                    row[y] = tableData[y][i];
@@ -298,15 +308,13 @@ namespace MCDA
 
             //this should be always the case, as we have only fields from feature layer
             IFeatureLayer2 _featureLayer = field.Layer.FeatureLayer;
+
+            using (ComReleaser comReleaser = new ComReleaser())
+            {
           
             IFeatureCursor featureCursor = _featureLayer.FeatureClass.Search(null, true);
 
-            IFeature feature = null;
-
-            //while ((feature = featureCursor.NextFeature()) != null)
-            //{
-
-            feature = featureCursor.NextFeature();
+            IFeature feature = featureCursor.NextFeature();
 
                 int fieldIndex = feature.Table.FindField(field.FieldName);
 
@@ -317,10 +325,9 @@ namespace MCDA
                 while ((row = cursor.NextRow()) != null)
                 {
                     //we have to cast explicitly ... https://connect.microsoft.com/VisualStudio/feedback/details/534288/ilist-dynamic-cannot-call-a-method-add-without-casting
-
                     listOfValuesFromField.Add(Convert.ToDouble(row.get_Value(fieldIndex)));
                 }
-            //}
+            }
 
             return listOfValuesFromField;
         }
@@ -342,70 +349,9 @@ namespace MCDA
             return fieldsList;
         }
 
-        /*
-        //http://forums.esri.com/Thread.asp?c=93&f=993&t=208152
-        public IFeatureClass CreateFCFromExistingFC(IFeatureClass pTemplateFC, IWorkspace pWS, string sNewFCName)
-        {
-
-            IFeatureClass pNewFeatclass;
-
-            IFields pOutFields;
-            IFieldChecker pFieldChecker = new FieldCheckerClass();
-            pFieldChecker.ValidateWorkspace = pWS;
-
-            IEnumFieldError pErrorEnum;
-            IFields pNewFields;
-            IFieldsEdit pNewFieldsEdit;
-            pNewFields = new FieldsClass();
-            pNewFieldsEdit = (IFieldsEdit)pNewFields;
-            pNewFieldsEdit.FieldCount_2 = pTemplateFC.Fields.FieldCount;
-
-            IClone pClone;
-            IField pCloneField;
-            IField pObjectIDField;
-            IFieldEdit pObjectIDFieldEdit;
-
-            for (int j = 0; j < pTemplateFC.Fields.FieldCount; j++)
-            {
-                if (pTemplateFC.Fields.get_Field(j).Type == esriFieldType.esriFieldTypeOID)
-                {
-                    pObjectIDField = new FieldClass();
-                    pObjectIDFieldEdit = (IFieldEdit)pObjectIDField;
-                    pObjectIDFieldEdit.Name_2 = "ObjectID";
-                    pObjectIDFieldEdit.Type_2 = esriFieldType.esriFieldTypeOID;
-                    pNewFieldsEdit.set_Field(j, pObjectIDField);
-                }
-                else
-                {
-                    pClone = (IClone)pTemplateFC.Fields.get_Field(j);
-                    pCloneField = (IField)pClone.Clone();
-                    pNewFieldsEdit.set_Field(j, pCloneField);
-                }
-            }
-
-           
-
-            pFieldChecker.Validate(pNewFields, out pErrorEnum, out pOutFields);
-
-            IUID pUID = pTemplateFC.CLSID;
-            string sShapeFieldName = "Shape";
-
-            IFeatureWorkspace pFeatureWS = (IFeatureWorkspace)pWS;
-            pNewFeatclass = pFeatureWS.CreateFeatureClass(sNewFCName, pOutFields, (UID)pUID, null, esriFeatureType.esriFTSimple, sShapeFieldName, "");
-
-            IFeatureLayer fl = new FeatureLayerClass();
-            fl.FeatureClass = pNewFeatclass;
-
-            fl.Name = "tha fl";
-            ArcMap.Document.ActiveView.FocusMap.AddLayer(fl);
-
-            return pNewFeatclass;
-        }
-        */
-
         #region private ArcObjects stuff
 
-        private IList<MCDA.Model.Layer> GetListOfLayerFromActiveView(ESRI.ArcGIS.Carto.IActiveView activeView)
+        private IList<MCDA.Model.Layer>  GetListOfLayerFromActiveView(ESRI.ArcGIS.Carto.IActiveView activeView)
         {
 
             IList<MCDA.Model.Layer> layerList = new List<MCDA.Model.Layer>();
@@ -425,7 +371,275 @@ namespace MCDA
             return layerList;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="activeView"></param>
+        private void RefreshAvailableLayerListAfterAddOrDelete(ESRI.ArcGIS.Carto.IActiveView activeView)
+        {
+            if (_listOfAvailableLayer == null)
+                return;
+
+            IList<MCDA.Model.Layer> layerList = new List<MCDA.Model.Layer>();
+
+            ESRI.ArcGIS.Carto.IMap map = activeView.FocusMap;
+
+            // Get the number of layers
+            int numberOfLayers = map.LayerCount;
+
+            IList<ILayer> newLayerList = new List<ILayer>();
+
+            // Loop through the layers and get the correct layer index
+            for (int i = 0; i < numberOfLayers; i++)
+            {
+                newLayerList.Add(map.get_Layer(i));
+            }
+
+            //remove
+            for(int i = _listOfAvailableLayer.Count -1; i >= 0; i--)
+            {
+                if (!newLayerList.Any(l => l == _listOfAvailableLayer[i].ESRILayer))
+                    _listOfAvailableLayer.RemoveAt(i);   
+            }
+
+            //add
+            foreach (ILayer currentNewLayer in newLayerList)
+            {
+                //is the new layer part in the mcda layer list?
+                if(!_listOfAvailableLayer.Any(l => l.ESRILayer == currentNewLayer))
+                    _listOfAvailableLayer.Add(new MCDA.Model.Layer(currentNewLayer));
+            }
+
+            //and do not forget to register the new layer
+            RegisterListenerForEveryMemberOfListOfAvailableLayer();
+        }
+
         #endregion
+
+
+        public IDictionary<AbstractToolTemplate, MCDAWorkspaceContainer> LinkDictionary
+        {
+            get {return _dictionaryOfLinks; }
+        }
+
+        private IWorkspace CreateInMemoryWorkspace()
+        {
+            IWorkspaceFactory newWorkspaceFactory = new InMemoryWorkspaceFactoryClass();
+            IWorkspaceName wName = newWorkspaceFactory.Create("", "MCDAWorkspace", null, 0);
+            IName name = (IName)wName;
+            IWorkspace inmemWor = (IWorkspace)name.Open();
+
+            return inmemWor;
+        }
+
+        private IFeatureClass CopyFeatureClassIntoNewWorkspace(IFeatureClass inFeatureClass, IWorkspace outWorkspace, string newName)
+        {
+            // get FeatureClassName for input
+            IDataset inDataset = inFeatureClass as IDataset;
+            IFeatureClassName inFeatureClassName = inDataset.FullName as IFeatureClassName;
+            IWorkspace inWorkspace = inDataset.Workspace;
+
+            // get WorkSpaceName for output
+            IDataset outDataset = outWorkspace as IDataset;
+            IWorkspaceName outWorkspaceName = outDataset.FullName as IWorkspaceName;
+
+            // Create new FeatureClassName
+            IFeatureClassName outFeatureClassName = new FeatureClassNameClass();
+            // Assign it a name and a workspace
+            IDatasetName datasetName = outFeatureClassName as IDatasetName;
+            datasetName.Name = newName == String.Empty ? (inFeatureClassName as IDatasetName).Name : newName;
+            datasetName.WorkspaceName = outWorkspaceName;
+
+            // Check for field conflicts.
+            IFieldChecker fieldChecker = new FieldCheckerClass();
+            IFields inFields = inFeatureClass.Fields;
+            IFields outFields;
+            IEnumFieldError enumFieldError;
+            fieldChecker.InputWorkspace = inWorkspace;
+            fieldChecker.ValidateWorkspace = outWorkspace;
+            fieldChecker.Validate(inFields, out enumFieldError, out outFields);
+            // Check enumFieldError for field naming confilcts
+
+            //Convert the data.
+            IFeatureDataConverter featureDataConverter = new FeatureDataConverterClass();
+            featureDataConverter.ConvertFeatureClass(inFeatureClassName, null, null,
+            outFeatureClassName, null, outFields, "", 100, 0);
+
+            IFeatureWorkspace pFeatureWS = (IFeatureWorkspace)outWorkspace;
+
+            return pFeatureWS.OpenFeatureClass(newName);
+        }
+
+       
+        public void DisplayLink(AbstractToolTemplate tool)
+        {
+            MCDAWorkspaceContainer mcdaWorkspaceContainer;
+           
+            if (!_dictionaryOfLinks.TryGetValue(tool, out mcdaWorkspaceContainer))
+                return;
+
+            IFeatureClass fc = mcdaWorkspaceContainer.FeatureClass;
+
+           IFeatureLayer fl = new FeatureLayerClass();
+           fl.FeatureClass = fc;
+
+           fl.Name = CreateLayerName(tool);
+
+           mcdaWorkspaceContainer.FeatureLayer = fl;
+          
+           IGeoFeatureLayer gFl = fl as IGeoFeatureLayer;
+
+           //DefineUniqueValueRenderer(gFl, tool.DefaultResultColumnName);
+
+           ArcMap.Document.ActiveView.FocusMap.AddLayer(fl);
+        }
+
+        public void RemoveLink(AbstractToolTemplate tool)
+        {
+            MCDAWorkspaceContainer mcdaWorkspaceContainer;
+            if (!_dictionaryOfLinks.TryGetValue(tool, out mcdaWorkspaceContainer))
+                return;
+
+            _dictionaryOfLinks.Remove(tool);
+
+            PropertyChanged.Notify(() => LinkDictionary);
+        }
+
+        private String CreateLayerName(AbstractToolTemplate tool)
+        {
+            return tool.ToString() + DateTime.Now.ToString("MMddHHmmssffff");
+        }
+
+        private String CreateTimeStamp()
+        {
+            return DateTime.Now.ToString("yyyyMMddHHmmssffff");
+        }
+
+        public IFeatureClass EstablishLink(AbstractToolTemplate tool)
+        {
+            IFeatureLayer2 fl = AvailableFeatureLayer.Where(l => l.IsSelected).ToList()[0].FeatureLayer;
+            IFeatureClass fc = fl.FeatureClass;
+
+           IFeatureClass fcCopy = CopyFeatureClassIntoNewWorkspace(fc, _shadowWorkspace, tool.ToString()+CreateTimeStamp());
+            _dictionaryOfLinks.Add(tool, new MCDAWorkspaceContainer(tool,fcCopy));
+
+            PropertyChanged.Notify(() => LinkDictionary);
+
+            return fcCopy;
+        }
+
+        public void JoinToolResultByOID(AbstractToolTemplate tool, DataTable dataTable)
+        {
+            
+            MCDAWorkspaceContainer mcdaWorkspaceContainer;
+            if (!_dictionaryOfLinks.TryGetValue(tool, out mcdaWorkspaceContainer))
+                return;
+
+            IFeatureClass fc = mcdaWorkspaceContainer.FeatureClass;
+
+            using (ComReleaser comReleaser = new ComReleaser())
+            {
+
+                if (fc.FindField(tool.DefaultResultColumnName) < 0)
+                {
+
+                    IField newField = new FieldClass();
+                    IFieldEdit newFieldEdit = (IFieldEdit)newField;
+                    newFieldEdit.Type_2 = esriFieldType.esriFieldTypeDouble;
+                    newFieldEdit.Name_2 = tool.DefaultResultColumnName;
+                    newFieldEdit.AliasName_2 = tool.DefaultResultColumnName;
+
+                    fc.AddField(newField);
+                }
+
+                // StartEditing(_shadowWorkspace);
+                // _editor.StartOperation();
+
+                IFeatureCursor featureCursor = fc.Update(null, true);
+
+                IFeature feature = null;
+
+                feature = featureCursor.NextFeature();
+
+                int fieldIndex = fc.FindField(tool.DefaultResultColumnName);
+
+                int oidIndex = fc.FindField(fc.OIDFieldName);
+
+                while (feature != null)
+                {
+
+                    int oid = Convert.ToInt32(feature.get_Value(oidIndex));
+                    EnumerableRowCollection<DataRow> dataRows = dataTable.AsEnumerable().Where(dr => dr.Field<FieldTypeOID>(fc.OIDFieldName).OID == oid);
+
+                    DataRow dRow = dataRows.FirstOrDefault();
+
+                    feature.set_Value(fieldIndex, dRow[tool.DefaultResultColumnName]);
+
+                    feature.Store();
+                    
+                    feature = featureCursor.NextFeature();
+                }
+
+            }
+
+           Render(mcdaWorkspaceContainer);
+
+           PropertyChanged.Notify(() => LinkDictionary);
+        }
+
+        public void Render(MCDAWorkspaceContainer mcdaWorkspaceContainer)
+        {
+            IGeoFeatureLayer geoFeatureLayer = mcdaWorkspaceContainer.FeatureLayer as IGeoFeatureLayer;
+
+            if (mcdaWorkspaceContainer.ClassBreaksRendererContainer != null && mcdaWorkspaceContainer.ClassBreaksRendererContainer.IsComplete())
+            {
+                geoFeatureLayer.Renderer = RendererFactory.newClassBreaksRenderer(mcdaWorkspaceContainer.ClassBreaksRendererContainer, mcdaWorkspaceContainer) as IFeatureRenderer;
+
+                PartialRefresh(mcdaWorkspaceContainer);
+                
+            }
+        }
+
+        private void PartialRefresh(MCDAWorkspaceContainer mcdaWorkspaceContainer)
+        {  
+            IActiveView av = (IActiveView)ArcMap.Document.FocusMap;
+
+            av.ContentsChanged();
+            ArcMap.Document.UpdateContents();
+
+            av.PartialRefresh(esriViewDrawPhase.esriViewGeography, mcdaWorkspaceContainer.FeatureLayer, null);
+ 
+        }
+        /*
+        private bool StartEditing(ESRI.ArcGIS.Geodatabase.IWorkspace workspaceToEdit)
+        {
+            //Get a reference to the editor.
+            UID uid = new UIDClass();
+            uid.Value = "esriEditor.Editor";
+            IEditor _editor = ArcMap.Application.FindExtensionByCLSID(uid) as IEditor;
+
+            //Check to see if a workspace is already being edited.
+            if (_editor.EditState == esriEditState.esriStateNotEditing)
+            {
+                _editor.StartEditing(workspaceToEdit);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        private void StopEditing(ESRI.ArcGIS.Geodatabase.IWorkspace workspaceToEdit)
+        {
+            _editor.StopEditing(true);
+        }
+        */
+        public IList<MCDAWorkspaceContainer> GetAllMCDAWorkspaceContainerFromShadowWorkspace()
+        {
+            return _dictionaryOfLinks.Values.ToList();
+        }
+   
 
         #region persistence
         protected override void OnSave(Stream outStrm)
@@ -460,5 +674,7 @@ namespace MCDA
         }
     }
      #endregion
+
+     
 
 }

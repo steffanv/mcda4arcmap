@@ -36,14 +36,8 @@
         <DockableWindow id="Ryerson_University_MCDA_ConfigView" class="ConfigView+AddinImpl" caption="Configuration" image="Images\ConfigView.png">
           <InitialPlacement height="300" width="300" state="unpinned" position="float" />
         </DockableWindow>
-        <DockableWindow id="Ryerson_University_MCDA_VisualizationView" class="VisualizationView+AddinImpl" caption="My Dockable Window" image="Images\VisualizationView_1.png">
-          <InitialPlacement height="300" width="300" state="pinned" position="left" />
-        </DockableWindow>
-        <DockableWindow id="Ryerson_University_MCDA_VisualizationView_1" class="VisualizationView+AddinImpl" caption="My Dockable Window" image="Images\VisualizationView_2.png">
-          <InitialPlacement height="300" width="300" state="pinned" position="left" />
-        </DockableWindow>
-        <DockableWindow id="Ryerson_University_MCDA_VisualizationView_2" class="VisualizationView+AddinImpl" caption="My Dockable Window" image="Images\VisualizationView.png">
-          <InitialPlacement height="300" width="300" state="pinned" position="left" />
+        <DockableWindow id="Ryerson_University_MCDA_VisualizationView" class="VisualizationView+AddinImpl" caption="Visualization" image="Images\VisualizationView.png">
+          <InitialPlacement height="300" width="300" state="unpinned" position="left" />
         </DockableWindow>
       </DockableWindows>
       <Toolbars>

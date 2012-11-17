@@ -49,6 +49,11 @@ namespace MCDA.Model
             RegisterListenerForEveryMemberOfFields();
         }
 
+        public ESRI.ArcGIS.Carto.ILayer ESRILayer
+        {
+            get { return _layer; }
+        }
+
         public static string toUniqueLayerName(ESRI.ArcGIS.Carto.IFeatureLayer2 featureLayer)
         {
 

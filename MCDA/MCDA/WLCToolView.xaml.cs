@@ -56,29 +56,10 @@ namespace MCDA
             }
         }
 
-        private bool dragStarted = false;
-
         private void weightSlider_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
         {
             WLCToolViewModel viewmodel = (WLCToolViewModel)DataContext;
-            viewmodel.UpdateAllowedEvent();
-            
-            this.dragStarted = false;
-
-        }
-        private void weightSlider_DragStarted(object sender, System.Windows.Controls.Primitives.DragStartedEventArgs e)
-        {
-            this.dragStarted = true;
-        }
-
-        private void weightSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-            /*
-            if (!dragStarted)
-            {
-                //work
-            }
-             * */
+            viewmodel.UpdateAllowedEvent();     
         }
 
         private void benefitCriteriaCheckBox_Click(object sender, RoutedEventArgs e)

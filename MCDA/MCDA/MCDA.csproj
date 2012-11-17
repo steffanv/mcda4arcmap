@@ -119,6 +119,7 @@
     <Compile Include="AbstractToolViewModel.cs" />
     <Compile Include="AddDataViewModel.cs" />
     <Compile Include="AHPToolBtn.cs" />
+    <Compile Include="Classification.cs" />
     <Compile Include="CollectionExtension.cs" />
     <Compile Include="Config.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -134,6 +135,9 @@
     <Compile Include="Export.cs" />
     <Compile Include="Field.cs" />
     <Compile Include="FieldTypeOID.cs" />
+    <Compile Include="Histogram.xaml.cs">
+      <DependentUpon>Histogram.xaml</DependentUpon>
+    </Compile>
     <Compile Include="IDeepCloneable.cs" />
     <Compile Include="ITool.cs" />
     <Compile Include="IToolParameter.cs" />
@@ -141,7 +145,9 @@
     <Compile Include="ITransformationStrategy.cs" />
     <Compile Include="IWeightDistributeStrategy.cs" />
     <Compile Include="Layer.cs" />
+    <Compile Include="MCDAWorkspaceContainer.cs" />
     <Compile Include="NotifyPropertyChangeExtension.cs" />
+    <Compile Include="NullToFalseCoverter.cs" />
     <Compile Include="ObjectExtension.cs" />
     <Compile Include="OWAToolBtn.cs" />
     <Compile Include="OWAToolView.xaml.cs">
@@ -152,13 +158,13 @@
     <Compile Include="MaximumScoreTransformationStrategy.cs" />
     <Compile Include="ProportionalDistributionStrategy.cs" />
     <Compile Include="RelayCommand.cs" />
+    <Compile Include="RendererFactory.cs" />
     <Compile Include="ScoreRangeTransformationStrategy.cs" />
     <Compile Include="StandardizationSelectionView.xaml.cs">
       <DependentUpon>StandardizationSelectionView.xaml</DependentUpon>
     </Compile>
     <Compile Include="StandardizationSelectionViewModel.cs" />
     <Compile Include="ToolFactory.cs" />
-    <Compile Include="ToolFeatureClassLinkTracker.cs" />
     <Compile Include="Util.cs" />
     <Compile Include="VisualizationBtn.cs" />
     <Compile Include="VisualizationView.xaml.cs">
@@ -213,6 +219,10 @@
     </Compile>
     <AddInContent Include="Images\AddDataWindow.png" />
     <Page Include="ConfigView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Histogram.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

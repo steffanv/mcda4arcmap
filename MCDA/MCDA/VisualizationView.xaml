@@ -1,9 +1,15 @@
 ﻿<UserControl x:Class="MCDA.VisualizationView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"        
-    Height="400" Width="300">
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"  
+    xmlns:local="clr-namespace:MCDA.Model"
+    xmlns:customControl="clr-namespace:MCDA"
+    Height="300" Width="300">
+    <UserControl.Resources>
+        <local:NullToFalseConverter x:Key="nullToFalseConverter" />
+    </UserControl.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
@@ -11,34 +17,55 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <ComboBox ItemsSource="{Binding Path=MCDAWorkspaceContainer, Mode=TwoWay}" DisplayMemberPath="MCDAWorkspaceContainer.FeatureLayer.Name" SelectedValue="{Binding Path=SelectedMCDAWorkspaceContainer, UpdateSourceTrigger=PropertyChanged}"  HorizontalAlignment="Left"  Name="comboBox1" VerticalAlignment="Top"  Grid.Column="0" Grid.Row="0" />
-        <ComboBox ItemsSource="{Binding Path=Fields, Mode=TwoWay}" DisplayMemberPath="Name" SelectedValue="{Binding Path=SelectedIField, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left"  Name="comboBox2" VerticalAlignment="Top"  Grid.Column="0" Grid.Row="1"/>
-        <TabControl   Name="tabControl1"   Grid.Column="0" Grid.Row="2">
+        <Label Content="Layer" Grid.Column="0" Grid.Row="0" />
+        <Label Content="Attribute" Grid.Column="1" Grid.Row="0" />
+        <ComboBox ItemsSource="{Binding Path=MCDAWorkspaceContainer, Mode=TwoWay}" DisplayMemberPath="FeatureLayer.Name" SelectedValue="{Binding Path=SelectedMCDAWorkspaceContainer, UpdateSourceTrigger=PropertyChanged}" Name="layerComboBox" Grid.Column="0" Grid.Row="1" />
+        <ComboBox ItemsSource="{Binding Path=Fields, Mode=TwoWay}" DisplayMemberPath="Name" SelectedValue="{Binding Path=SelectedIField, UpdateSourceTrigger=PropertyChanged}" Name="attributeComboBox" Grid.Column="1" Grid.Row="1"/>
+        <TabControl   Name="tabControl1"   Grid.ColumnSpan="2" Grid.Row="2">
             <TabItem Header="Color Ramp" Name="colorRamp">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="*"/>
-                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
-                    <DockPanel  LastChildFill="True" Name="dockPanel1" Grid.Column="0" Grid.Row="0" />
-                    <DockPanel  LastChildFill="True" Name="dockPanel2" Grid.Column="0" Grid.Row="1" />
-                    <Rectangle Name="colorRampRectangle" Grid.Column="0" Grid.Row="2" Width="200" Height="50">
-                      
-                    </Rectangle>
-                    
+                    <GroupBox Header="Negativ Color" Grid.Column="0" Grid.Row="0" Height="50">
+                        <DockPanel LastChildFill="True" Name="dockPanel1"  />
+                    </GroupBox>
+                    <GroupBox Header="Positiv Color" Grid.Column="0" Grid.Row="1" Height="50">
+                        <DockPanel LastChildFill="True" Name="dockPanel2"  />
+                    </GroupBox>
+                    <GroupBox Header="Linear Gradient" Grid.Column="0" Grid.Row="2">
+                        <Rectangle Name="colorRampRectangle"  VerticalAlignment="Stretch" HorizontalAlignment="Stretch" />
+                    </GroupBox>
                 </Grid>
             </TabItem>
-            <TabItem Header="Outlier Removal" Name="outlierRemoval">
+            <!--<TabItem Header="Outlier Removal" Name="outlierRemoval">
                 <Grid />
-            </TabItem>
+            </TabItem>-->
             <TabItem Header="Classification" Name="classification">
-                <Grid />
+                <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                    <Label  Content="Classification Method" Grid.Column="0" Grid.Row="0" />
+                    <Label  Content="Classes" Grid.Column="1" Grid.Row="0" />
+                    <ComboBox ItemsSource="{Binding Path=ListOfClassificationMethod, Mode=OneWay}" DisplayMemberPath="MethodName" SelectedValue="{Binding Path=SelectedClassificationMethod, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding SelectedValue, ElementName=attributeComboBox, Converter={StaticResource nullToFalseConverter}}" Name="classificationComboBox" Grid.Column="0" Grid.Row="1"/>
+                    <ComboBox ItemsSource="{Binding Path=NumberOfClasses, Mode=OneWay}" SelectedValue="{Binding Path=SelectedNumberOfClasses, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding SelectedValue, ElementName=attributeComboBox, Converter={StaticResource nullToFalseConverter}}" Name="classesComboBox" Grid.Column="1" Grid.Row="1"/>
+                    <GroupBox Header="Histogram" Grid.Row="2" Grid.ColumnSpan="2">
+                        <customControl:Histogram x:Name="historgram"/>
+                    </GroupBox>
+                </Grid>
             </TabItem>
-        </TabControl>
-        
+        </TabControl>    
     </Grid>
 </UserControl>

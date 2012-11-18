@@ -7,19 +7,24 @@ namespace MCDA.Model
 {
     public static class TransformationStrategyFactory
     {
-        public static ITransformationStrategy NewMaximumScoreTransformationStrategy()
-        {
+        public static ITransformationStrategy GetStrategy(TransformationStrategy transformationStrategy){
+
+            if(transformationStrategy == TransformationStrategy.MaximumScoreTransformationStrategy)
+                return new MaximumScoreTransformationStrategy();
+            if(transformationStrategy == TransformationStrategy.ScoreRangeTransformationStrategy)
+                return new ScoreRangeTransformationStrategy();
+            if(transformationStrategy == TransformationStrategy.DefaultTransformationStrategy)
+                return new MaximumScoreTransformationStrategy();
+
             return new MaximumScoreTransformationStrategy();
         }
+    }
 
-        public static ITransformationStrategy NewScoreRangeTransformationStrategy()
-        {
-            return new ScoreRangeTransformationStrategy();
-        }
+    public enum TransformationStrategy{
 
-        public static ITransformationStrategy DefaultTransformationStrategy()
-        {
-            return NewMaximumScoreTransformationStrategy();
-        }
+        MaximumScoreTransformationStrategy,
+        ScoreRangeTransformationStrategy,
+        DefaultTransformationStrategy
+
     }
 }

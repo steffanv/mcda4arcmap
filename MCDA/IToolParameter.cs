@@ -6,9 +6,6 @@ namespace MCDA.Model
     public interface IToolParameter
     {
 
-        event PropertyChangedEventHandler BenefitPropertyChanged;
-        event PropertyChangedEventHandler WeightPropertyChanged;
-
         IToolParameter LastWeightChangedToolParameter { get; set; }
 
         bool IsPropertiesLocked { get; set; }

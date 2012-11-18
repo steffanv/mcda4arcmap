@@ -9,6 +9,7 @@ namespace MCDA.Model
 {
     public static class ToolFactory
     {
+
         public static WLCTool NewWLCTool()
         {
             WLCParameter wlcParameter = MCDA.MCDAExtension.GetExtension().GetWLCParameterBasedOnSelectedFields();
@@ -18,5 +19,10 @@ namespace MCDA.Model
 
             return wlcTool;
         }
+    }
+
+    public enum Tool
+    {
+        WLCTool
     }
 }

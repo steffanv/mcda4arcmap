@@ -17,7 +17,7 @@
                 </Grid.RowDefinitions>
                 <!--<Canvas Height="100" Width="200">-->
                 <Polygon Stretch="Fill" Name="histogramPolygon" Points="{Binding HistogramPoints}" Fill="Black" Opacity="0.8" Grid.Row="0" />
-                <Polygon Stretch="Fill" Height="20" Name="breaksPolygon" Points="{Binding BreaksPoints}" Fill="Red" Opacity="0.8" Grid.Row="1" />
+                <Polygon Stretch="Fill" Height="10" Name="breaksPolygon" Points="{Binding BreaksPoints}" Fill="Red" Opacity="0.8" Grid.Row="1" />
                 <!--</Canvas>-->
             </Grid>
         </Border>

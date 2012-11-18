@@ -22,8 +22,14 @@ using ESRI.ArcGIS.ADF;
 
 namespace MCDA
 {
+    /// <summary>
+    /// The s
+    /// </summary>
     public class MCDAExtension : ESRI.ArcGIS.Desktop.AddIns.Extension, INotifyPropertyChanged
     {
+        /// <summary>
+        /// 
+        /// </summary>
         public event PropertyChangedEventHandler PropertyChanged;
 
         private static MCDAExtension _extension;
@@ -37,22 +43,30 @@ namespace MCDA
 
         private IWorkspace _shadowWorkspace;
 
-        //private MCDA.MCDAExtension _mcdaExtension = MCDA.MCDAExtension.GetExtension();
-        //private IEditor _editor;
-
-
+        #region properties
         public IList<MCDA.Model.Layer> AvailableLayer
         {
             get { return _listOfAvailableLayer.OrderBy(f => f.LayerName).ToList(); }
             set { PropertyChanged.ChangeAndNotify(ref _listOfAvailableLayer, value, () => AvailableLayer); RegisterListenerForEveryMemberOfListOfAvailableLayer(); }
         }
 
+        public IList<MCDA.Model.Layer> AvailableFeatureLayer
+        {
+            get { return AvailableLayer.Where(l => l.IsFeatureLayer).ToList().OrderBy(f => f.LayerName).ToList(); }
+        }
+
+        public IDictionary<AbstractToolTemplate, MCDAWorkspaceContainer> LinkDictionary
+        {
+            get { return _dictionaryOfLinks; }
+        }
+        #endregion
+
         #region eventhandling for _listOfAvailableLayer
         public void RegisterListenerForEveryMemberOfListOfAvailableLayer()
         {
             //unregister for all member to avoid unessary multiple call
-            _listOfAvailableLayer.ForEach(l => l.PropertyChanged -= new PropertyChangedEventHandler(l_PropertyChanged));
-            _listOfAvailableLayer.ForEach(l => l.PropertyChanged +=new PropertyChangedEventHandler(l_PropertyChanged));
+            _listOfAvailableLayer.ForEach(l => l.PropertyChanged -= new PropertyChangedEventHandler(AvailalbeLayerListMemberPropertyChanged));
+            _listOfAvailableLayer.ForEach(l => l.PropertyChanged +=new PropertyChangedEventHandler(AvailalbeLayerListMemberPropertyChanged));
         }
 
         /// <summary>
@@ -61,7 +75,7 @@ namespace MCDA
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void l_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        private void AvailalbeLayerListMemberPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             _listOfAvailableLayer.Where(l => Layer.LastSelectedLayer != l).ForEach(l => l.IsSelected = false);
 
@@ -69,11 +83,8 @@ namespace MCDA
         }
         #endregion
 
-        public IList<MCDA.Model.Layer> AvailableFeatureLayer
-        {
-            get { return AvailableLayer.Where(l => l.IsFeatureLayer).ToList().OrderBy(f => f.LayerName).ToList(); }
-        }
 
+        #region extension related methods
         public static MCDAExtension GetExtension()
         {
             if (_extension == null)
@@ -113,9 +124,9 @@ namespace MCDA
             ArcMap.Events.OpenDocument += new ESRI.ArcGIS.ArcMapUI.IDocumentEvents_OpenDocumentEventHandler(Events_OpenDocument);
   
         }
+        #endregion
 
         #region events
-
         bool Events_BeforeCloseDocument()
         {
                 // Return true to stop document from closing
@@ -125,7 +136,6 @@ namespace MCDA
         }
         void Events_NewDocument()
         {
-
             _activeViewEvents.ItemAdded -= new IActiveViewEvents_ItemAddedEventHandler(ArcMap_ItemAdded);
             _activeViewEvents.ItemDeleted -= new IActiveViewEvents_ItemDeletedEventHandler(ArcMap_ItemDeleted);
 
@@ -183,7 +193,7 @@ namespace MCDA
 
         /// <summary>
         /// Returns the field of the OID for the selected feature. However, it is possible that no feature is selected
-        /// or that no OID exists or both. In this the methods retuns <code>null</code>
+        /// or that no OID exists or both. In this the methods retuns null.
         /// </summary>
         /// <returns></returns>
         public MCDA.Model.Field GetOIDFieldFromSelectedFeature()
@@ -290,16 +300,9 @@ namespace MCDA
 
         }
 
-        private IList<MCDA.Model.Field> GetListOfFieldsFromToolParameter<T>(IList<T> toolParameter) where T : IToolParameter
+        public IList<MCDAWorkspaceContainer> GetAllMCDAWorkspaceContainerFromShadowWorkspace()
         {
-            IList<MCDA.Model.Field> listOfFields = new List<MCDA.Model.Field>();
-
-            foreach (IToolParameter currentToolParameter in toolParameter)
-            {
-                AvailableLayer.Where(l => l.IsSelected).ForEach(l => l.Fields.Where(f => f.FieldName.Equals(currentToolParameter.ColumnName)).ForEach(f => listOfFields.Add(f)));
-            }
-
-            return listOfFields;
+            return _dictionaryOfLinks.Values.ToList();
         }
 
         public IList<double> GetValuesOfField(MCDA.Model.Field field)
@@ -371,8 +374,20 @@ namespace MCDA
             return layerList;
         }
 
+        private IList<MCDA.Model.Field> GetListOfFieldsFromToolParameter<T>(IList<T> toolParameter) where T : IToolParameter
+        {
+            IList<MCDA.Model.Field> listOfFields = new List<MCDA.Model.Field>();
+
+            foreach (IToolParameter currentToolParameter in toolParameter)
+            {
+                AvailableLayer.Where(l => l.IsSelected).ForEach(l => l.Fields.Where(f => f.FieldName.Equals(currentToolParameter.ColumnName)).ForEach(f => listOfFields.Add(f)));
+            }
+
+            return listOfFields;
+        }
+
         /// <summary>
-        /// 
+        /// If the user adds or removes items from the TOC the method removes or add the changed items to the available layer list.
         /// </summary>
         /// <param name="activeView"></param>
         private void RefreshAvailableLayerListAfterAddOrDelete(ESRI.ArcGIS.Carto.IActiveView activeView)
@@ -412,14 +427,8 @@ namespace MCDA
 
             //and do not forget to register the new layer
             RegisterListenerForEveryMemberOfListOfAvailableLayer();
-        }
 
-        #endregion
-
-
-        public IDictionary<AbstractToolTemplate, MCDAWorkspaceContainer> LinkDictionary
-        {
-            get {return _dictionaryOfLinks; }
+            PropertyChanged.Notify(() => AvailableLayer);
         }
 
         private IWorkspace CreateInMemoryWorkspace()
@@ -469,8 +478,13 @@ namespace MCDA
 
             return pFeatureWS.OpenFeatureClass(newName);
         }
+        #endregion
 
-       
+        /// <summary>
+        /// In case the tool has a corresponding feature class in the in memory workspace it will be added
+        /// to the active view.
+        /// </summary>
+        /// <param name="tool"></param>
         public void DisplayLink(AbstractToolTemplate tool)
         {
             MCDAWorkspaceContainer mcdaWorkspaceContainer;
@@ -478,7 +492,7 @@ namespace MCDA
             if (!_dictionaryOfLinks.TryGetValue(tool, out mcdaWorkspaceContainer))
                 return;
 
-            IFeatureClass fc = mcdaWorkspaceContainer.FeatureClass;
+           IFeatureClass fc = mcdaWorkspaceContainer.FeatureClass;
 
            IFeatureLayer fl = new FeatureLayerClass();
            fl.FeatureClass = fc;
@@ -488,8 +502,6 @@ namespace MCDA
            mcdaWorkspaceContainer.FeatureLayer = fl;
           
            IGeoFeatureLayer gFl = fl as IGeoFeatureLayer;
-
-           //DefineUniqueValueRenderer(gFl, tool.DefaultResultColumnName);
 
            ArcMap.Document.ActiveView.FocusMap.AddLayer(fl);
         }
@@ -505,6 +517,19 @@ namespace MCDA
             PropertyChanged.Notify(() => LinkDictionary);
         }
 
+        public IFeatureClass EstablishLink(AbstractToolTemplate tool)
+        {
+            IFeatureLayer2 fl = AvailableFeatureLayer.Where(l => l.IsSelected).ToList()[0].FeatureLayer;
+            IFeatureClass fc = fl.FeatureClass;
+
+            IFeatureClass fcCopy = CopyFeatureClassIntoNewWorkspace(fc, _shadowWorkspace, tool.ToString() + CreateTimeStamp());
+            _dictionaryOfLinks.Add(tool, new MCDAWorkspaceContainer(tool, fcCopy));
+
+            PropertyChanged.Notify(() => LinkDictionary);
+
+            return fcCopy;
+        }
+
         private String CreateLayerName(AbstractToolTemplate tool)
         {
             return tool.ToString() + DateTime.Now.ToString("MMddHHmmssffff");
@@ -515,19 +540,14 @@ namespace MCDA
             return DateTime.Now.ToString("yyyyMMddHHmmssffff");
         }
 
-        public IFeatureClass EstablishLink(AbstractToolTemplate tool)
-        {
-            IFeatureLayer2 fl = AvailableFeatureLayer.Where(l => l.IsSelected).ToList()[0].FeatureLayer;
-            IFeatureClass fc = fl.FeatureClass;
+       
 
-           IFeatureClass fcCopy = CopyFeatureClassIntoNewWorkspace(fc, _shadowWorkspace, tool.ToString()+CreateTimeStamp());
-            _dictionaryOfLinks.Add(tool, new MCDAWorkspaceContainer(tool,fcCopy));
-
-            PropertyChanged.Notify(() => LinkDictionary);
-
-            return fcCopy;
-        }
-
+        /// <summary>
+        /// Joins the result table of the data table into the feature class of the tool by using the oid/fid.
+        /// Afterwards the method updates the view with the new result. This also includes the update of the class breaks renderer if set.
+        /// </summary>
+        /// <param name="tool"></param>
+        /// <param name="dataTable"></param>
         public void JoinToolResultByOID(AbstractToolTemplate tool, DataTable dataTable)
         {
             
@@ -587,19 +607,30 @@ namespace MCDA
            PropertyChanged.Notify(() => LinkDictionary);
         }
 
+        /// <summary>
+        /// If the optional <see cref="MCDA.Model.ClassBreaksRendererContainer"/> is set and includes all properties the method
+        /// creates a new class breaks renderer and performs a partial refresh.
+        /// </summary>
+        /// <param name="mcdaWorkspaceContainer"></param>
         public void Render(MCDAWorkspaceContainer mcdaWorkspaceContainer)
         {
-            IGeoFeatureLayer geoFeatureLayer = mcdaWorkspaceContainer.FeatureLayer as IGeoFeatureLayer;
-
-            if (mcdaWorkspaceContainer.ClassBreaksRendererContainer != null && mcdaWorkspaceContainer.ClassBreaksRendererContainer.IsComplete())
+            if (mcdaWorkspaceContainer != null)
             {
-                geoFeatureLayer.Renderer = RendererFactory.newClassBreaksRenderer(mcdaWorkspaceContainer.ClassBreaksRendererContainer, mcdaWorkspaceContainer) as IFeatureRenderer;
+                IGeoFeatureLayer geoFeatureLayer = mcdaWorkspaceContainer.FeatureLayer as IGeoFeatureLayer;
 
-                PartialRefresh(mcdaWorkspaceContainer);
-                
+                if (mcdaWorkspaceContainer.ClassBreaksRendererContainer != null && mcdaWorkspaceContainer.ClassBreaksRendererContainer.IsComplete())
+                {
+                    geoFeatureLayer.Renderer = RendererFactory.newClassBreaksRenderer(mcdaWorkspaceContainer.ClassBreaksRendererContainer, mcdaWorkspaceContainer) as IFeatureRenderer;
+
+                    PartialRefresh(mcdaWorkspaceContainer);
+                }
             }
         }
 
+        /// <summary>
+        /// Performs a partial refresh on the feature layer in the in memory workspace.
+        /// </summary>
+        /// <param name="mcdaWorkspaceContainer"></param>
         private void PartialRefresh(MCDAWorkspaceContainer mcdaWorkspaceContainer)
         {  
             IActiveView av = (IActiveView)ArcMap.Document.FocusMap;
@@ -610,6 +641,8 @@ namespace MCDA
             av.PartialRefresh(esriViewDrawPhase.esriViewGeography, mcdaWorkspaceContainer.FeatureLayer, null);
  
         }
+
+        #region workspace editing
         /*
         private bool StartEditing(ESRI.ArcGIS.Geodatabase.IWorkspace workspaceToEdit)
         {
@@ -635,10 +668,9 @@ namespace MCDA
             _editor.StopEditing(true);
         }
         */
-        public IList<MCDAWorkspaceContainer> GetAllMCDAWorkspaceContainerFromShadowWorkspace()
-        {
-            return _dictionaryOfLinks.Values.ToList();
-        }
+        #endregion
+
+       
    
 
         #region persistence
@@ -646,7 +678,7 @@ namespace MCDA
         { 
             var bf = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
 
-            //persist onlz the unique layer names of selected layer
+            //persist only the unique layer names of selected layer
             _listOfSelectedUniqueLayerNamesForPersistence = _listOfAvailableLayer.Where(l => l.IsSelected).Select(l => l.UniqueLayerName).ToList();
              
             bf.Serialize(outStrm, _listOfSelectedUniqueLayerNamesForPersistence);

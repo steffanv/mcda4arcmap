@@ -7,12 +7,13 @@ using ESRI.ArcGIS.Geodatabase;
 using ESRI.ArcGIS.esriSystem;
 using ESRI.ArcGIS.Display;
 using System.Windows.Media;
+using System.ComponentModel;
+using MCDA.Extensions;
 
 namespace MCDA.Model
 {
     public static class RendererFactory
     {
-
         public static IClassBreaksRenderer newClassBreaksRenderer(ClassBreaksRendererContainer classBreaksRendererContainer, MCDAWorkspaceContainer MCDAWorkspaceContainer)
         {
             double[] classificationResult = Classification.Classify(classBreaksRendererContainer.ClassificationMethod, MCDAWorkspaceContainer.FeatureClass, classBreaksRendererContainer.Field, classBreaksRendererContainer.NumberOfClasses);
@@ -69,39 +70,6 @@ namespace MCDA.Model
             }
 
             return classBreaksRenderer;
-        }
-
-       
-
-        public class ClassBreaksRendererContainer
-        {
-            //private Color startColor;
-            //private Color endColor;
-
-            //private IClassify classificationMethod;
-            //private int numberOfClasses;
-
-            //private MCDAWorkspaceContainer mcdaWorkspaceContainer;
-            //private IField field;
-
-            public Color StartColor { get; set; }
-            public Color EndColor { get; set; }
-
-            public IClassify ClassificationMethod { get; set; }
-            public int NumberOfClasses { get; set; }
-
-            //public MCDAWorkspaceContainer MCDAWorkspaceContainer { get; set; }
-            public IField Field { get; set; }
-
-            /// <summary>
-            /// Chechks if all required parameters are set.
-            /// </summary>
-            /// <returns></returns>
-            public bool IsComplete()
-            {
-                return StartColor != null && EndColor != null && ClassificationMethod != null && Field != null && NumberOfClasses > 0;
-            }
-
-        }
+        }     
     }
 }

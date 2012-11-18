@@ -4,14 +4,22 @@ using System.Linq;
 using System.Text;
 using ESRI.ArcGIS.Geodatabase;
 using ESRI.ArcGIS.Carto;
+using System.ComponentModel;
+using MCDA.Extensions;
 
 namespace MCDA.Model
 {
-    public class MCDAWorkspaceContainer
+    /// <summary>
+    /// A container for a tool and its 
+    /// </summary>
+    public class MCDAWorkspaceContainer : INotifyPropertyChanged
     {
+        public event PropertyChangedEventHandler PropertyChanged;
+
         private IFeatureClass _fc;
         private IFeatureLayer _fl;
         private AbstractToolTemplate _tool;
+        private ClassBreaksRendererContainer _classBreaksRendererContainer;
 
         public MCDAWorkspaceContainer(AbstractToolTemplate tool, IFeatureClass fc)
         {
@@ -22,22 +30,24 @@ namespace MCDA.Model
         public AbstractToolTemplate Tool
         {
             get { return _tool; }
-            set { _tool = value; }
         }
 
         public IFeatureClass FeatureClass
         {
-
             get { return _fc; }
-            set { _fc = value; }
         }
 
         public IFeatureLayer FeatureLayer
         {
             get { return _fl; }
-            set { _fl = value; }
+            set { PropertyChanged.ChangeAndNotify(ref _fl, value, () => FeatureLayer); }
         }
 
-        public MCDA.Model.RendererFactory.ClassBreaksRendererContainer ClassBreaksRendererContainer { get; set; }
+        public ClassBreaksRendererContainer ClassBreaksRendererContainer { 
+            
+            get { return _classBreaksRendererContainer; }
+            set { PropertyChanged.ChangeAndNotify(ref _classBreaksRendererContainer, value, () => ClassBreaksRendererContainer); } 
+        
+        }   
     }
 }

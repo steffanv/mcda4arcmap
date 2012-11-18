@@ -21,11 +21,11 @@ namespace MCDA.Entity
         {
             _listOfParameter = listOfParameter;
 
-            _listOfParameter.ForEach(p => p.WeightPropertyChanged +=new PropertyChangedEventHandler(p_PropertyChanged));
+            _listOfParameter.ForEach(p => p.RegisterPropertyHandler(w => w.Weight, WeightPropertyChanged));
 
         }
 
-        void p_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        void WeightPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             _weightDistributionStrategy.Distribute(_listOfParameter);
         }
@@ -42,9 +42,9 @@ namespace MCDA.Entity
             get { return _listOfParameter.Where(t => !t.IsOID).ToList(); }
             set {
 
-                _listOfParameter.ForEach(p => p.WeightPropertyChanged -= new PropertyChangedEventHandler(p_PropertyChanged));
+                _listOfParameter.ForEach(p => p.UnRegisterPropertyHandler(w => w.Weight, WeightPropertyChanged));
                 PropertyChanged.ChangeAndNotify(ref _listOfParameter, value, () => ToolParameter);
-                _listOfParameter.ForEach(p => p.WeightPropertyChanged += new PropertyChangedEventHandler(p_PropertyChanged));
+                _listOfParameter.ForEach(p => p.RegisterPropertyHandler(w => w.Weight, WeightPropertyChanged));
             }
         }
 

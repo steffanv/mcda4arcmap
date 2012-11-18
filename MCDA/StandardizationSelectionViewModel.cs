@@ -3,35 +3,47 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using MCDA.Model;
+using System.ComponentModel;
+using MCDA.Extensions;
 
 namespace MCDA.ViewModel
 {
-    class StandardizationSelectionViewModel
+    class StandardizationSelectionViewModel : INotifyPropertyChanged
     {
-        
-        private bool _isScoreRangeProcedure;
-        private bool _isMaximumScoreProcedure;
+        public event PropertyChangedEventHandler PropertyChanged;
+   
+        private TransformationStrategy _selectedTtransformationStrategy;
 
         public bool IsScoreRangeProcedure
         {
-            get { return _isScoreRangeProcedure; }
-            set { _isScoreRangeProcedure = value; }
+            get { return _selectedTtransformationStrategy == TransformationStrategy.ScoreRangeTransformationStrategy; }
+            set { _selectedTtransformationStrategy = TransformationStrategy.ScoreRangeTransformationStrategy;
+
+            PropertyChanged.Notify(() => IsMaximumScoreRangeProcedure);
+            PropertyChanged.Notify(() => IsScoreRangeProcedure);
+            }
+            
         }
         public bool IsMaximumScoreRangeProcedure
         {
-            get { return _isMaximumScoreProcedure; }
-            set { _isMaximumScoreProcedure = value;  }
+            get { return _selectedTtransformationStrategy == TransformationStrategy.MaximumScoreTransformationStrategy; }
+            set { _selectedTtransformationStrategy = TransformationStrategy.MaximumScoreTransformationStrategy;
+
+            PropertyChanged.Notify(() => IsMaximumScoreRangeProcedure);
+            PropertyChanged.Notify(() => IsScoreRangeProcedure);
+
+            }
         }
 
-        public ITransformationStrategy SelectedTransformationStrategy{
+        public TransformationStrategy SelectedTransformationStrategy{
 
-            get{
-                if (_isMaximumScoreProcedure)
-                    return TransformationStrategyFactory.NewMaximumScoreTransformationStrategy();
-                if (_isScoreRangeProcedure)
-                    return TransformationStrategyFactory.NewScoreRangeTransformationStrategy();
+            get{ return _selectedTtransformationStrategy; }
 
-                return TransformationStrategyFactory.DefaultTransformationStrategy();
+            set { _selectedTtransformationStrategy = value;
+
+            PropertyChanged.Notify(() => IsMaximumScoreRangeProcedure);
+            PropertyChanged.Notify(() => IsScoreRangeProcedure);
+
             }
         }
     }

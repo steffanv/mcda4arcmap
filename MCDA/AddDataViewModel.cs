@@ -19,24 +19,24 @@ namespace MCDA.ViewModel
        private BindingList<Layer> _layer;
        private BindingList<Field> _fields = new BindingList<Field>();
 
-       private MCDAExtension mcdaExtension;
+       private MCDAExtension _mcdaExtension;
 
         public AddDataViewModel() 
         {
-            mcdaExtension = MCDAExtension.GetExtension();
+            _mcdaExtension = MCDAExtension.GetExtension();
 
-            _layer = new BindingList<Layer>(mcdaExtension.AvailableFeatureLayer);
+            _layer = new BindingList<Layer>(_mcdaExtension.AvailableFeatureLayer);
 
-            mcdaExtension.PropertyChanged += new PropertyChangedEventHandler(mcdaExtensionPropertyChanged);
+            _mcdaExtension.RegisterPropertyHandler(x => x.AvailableLayer, MCDAExtensionPropertyChanged);
 
             //call because the extension could already have a selected feature and thus fields
-            mcdaExtensionPropertyChanged(this,null);
+            MCDAExtensionPropertyChanged(this,null);
   
         }
 
-        void mcdaExtensionPropertyChanged(object sender, PropertyChangedEventArgs e)
+        void MCDAExtensionPropertyChanged(object sender, PropertyChangedEventArgs e)
         {         
-            _layer = new BindingList<Layer>(mcdaExtension.AvailableFeatureLayer);
+            _layer = new BindingList<Layer>(_mcdaExtension.AvailableFeatureLayer);
 
             Layer feature = _layer.Where(l => l.IsSelected).FirstOrDefault();
 

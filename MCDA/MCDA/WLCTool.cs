@@ -13,7 +13,7 @@ namespace MCDA.Model
     {
         private DataTable _workingDataTable, _backupDataTable;
         private WLCParameter _wlcParameter;
-        private ITransformationStrategy _transformationStrategy;
+        private TransformationStrategy _transformationStrategy;
 
         private const string _wlcResultColumnName = "WLCResult";
         
@@ -23,9 +23,9 @@ namespace MCDA.Model
 
             _workingDataTable = _backupDataTable;
 
-            _wlcParameter = wlcParameter; 
+            _wlcParameter = wlcParameter;
 
-            _transformationStrategy = TransformationStrategyFactory.DefaultTransformationStrategy();
+            _transformationStrategy = Model.TransformationStrategy.MaximumScoreTransformationStrategy;
         }
 
         public DataTable Data
@@ -40,7 +40,7 @@ namespace MCDA.Model
             set { _wlcParameter = value; }
         }
 
-        public ITransformationStrategy TransformationStrategy
+        public TransformationStrategy TransformationStrategy
         {
             get { return _transformationStrategy; }
             set { _transformationStrategy = value; }
@@ -60,7 +60,7 @@ namespace MCDA.Model
 
             foreach(WLCToolParameter currentToolParameter in _wlcParameter.ToolParameter){
 
-                _transformationStrategy.Transform(_workingDataTable.Columns[currentToolParameter.ColumnName], currentToolParameter.IsBenefitCriterion);
+               TransformationStrategyFactory.GetStrategy(_transformationStrategy).Transform(_workingDataTable.Columns[currentToolParameter.ColumnName], currentToolParameter.IsBenefitCriterion);
             }
            
         }

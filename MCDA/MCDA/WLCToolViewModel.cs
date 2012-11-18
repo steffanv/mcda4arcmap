@@ -42,18 +42,18 @@ namespace MCDA.ViewModel
 
            _wlcResultDataTable = _wlcTool.Data;
 
-            _mcdaExtension.PropertyChanged += new PropertyChangedEventHandler(MCDAExtension_PropertyChanged);
+           _mcdaExtension.RegisterPropertyHandler(x => x.AvailableLayer, MCDAExtensionPropertyChanged);
 
-            _toolParameter = new BindingList<WLCToolParameter>(_wlcTool.WLCParameter.ToolParameter);
+           _toolParameter = new BindingList<WLCToolParameter>(_wlcTool.WLCParameter.ToolParameter);
 
-            _toolParameter.ForEach(t => t.BenefitPropertyChanged += new PropertyChangedEventHandler(BenefitCriterionChanged));
-            _toolParameter.ForEach(t => t.WeightPropertyChanged += new PropertyChangedEventHandler(WeightChanged));
+           _toolParameter.ForEach(t => t.RegisterPropertyHandler(b => b.IsBenefitCriterion,BenefitCriterionChanged));
+           _toolParameter.ForEach(t => t.RegisterPropertyHandler(w => w.Weight, WeightChanged));
            
             PropertyChanged.Notify(() => WLCParameter);
             PropertyChanged.Notify(() => WLCResult);
 
            //we have to call our own update method to make sure we have a result column
-            MCDAExtension_PropertyChanged(this, null);
+            MCDAExtensionPropertyChanged(this, null);
 
        }
 
@@ -67,7 +67,7 @@ namespace MCDA.ViewModel
            UpdateRealtime();
        }
 
-       void MCDAExtension_PropertyChanged(object sender, PropertyChangedEventArgs e)
+       void MCDAExtensionPropertyChanged(object sender, PropertyChangedEventArgs e)
        {
            if (_isLocked)
                return;
@@ -79,8 +79,8 @@ namespace MCDA.ViewModel
 
            _toolParameter = new BindingList<WLCToolParameter>(_wlcTool.WLCParameter.ToolParameter);
 
-           _toolParameter.ForEach(t => t.BenefitPropertyChanged += new PropertyChangedEventHandler(BenefitCriterionChanged));
-           _toolParameter.ForEach(t => t.WeightPropertyChanged += new PropertyChangedEventHandler(WeightChanged));
+           _toolParameter.ForEach(t => t.RegisterPropertyHandler(b => b.IsBenefitCriterion, BenefitCriterionChanged));
+           _toolParameter.ForEach(t => t.RegisterPropertyHandler(w => w.Weight, WeightChanged));
 
            PropertyChanged.Notify(() => WLCParameter);
            PropertyChanged.Notify(() => WLCResult);
@@ -265,7 +265,7 @@ namespace MCDA.ViewModel
            if (!_isLocked)
            {
                _mcdaExtension.RemoveLink(_wlcTool);
-               this.MCDAExtension_PropertyChanged(this, null);
+               this.MCDAExtensionPropertyChanged(this, null);
            }
 
            PropertyChanged.Notify(() => IsLocked);
@@ -331,6 +331,10 @@ namespace MCDA.ViewModel
 
            var wpfWindow = new StandardizationSelectionView();
 
+           StandardizationSelectionViewModel standardizationSelectionViewModel = wpfWindow.DataContext as StandardizationSelectionViewModel;
+
+           standardizationSelectionViewModel.SelectedTransformationStrategy = _wlcTool.TransformationStrategy;
+
            var helper = new WindowInteropHelper(wpfWindow);
 
            helper.Owner = parentHandle;
@@ -338,9 +342,12 @@ namespace MCDA.ViewModel
            wpfWindow.Closed += delegate(object sender, EventArgs e)
            {
 
-               StandardizationSelectionViewModel standardizationSelectionViewModel = wpfWindow.DataContext as StandardizationSelectionViewModel;
-
                _wlcTool.TransformationStrategy = standardizationSelectionViewModel.SelectedTransformationStrategy;
+
+               _wlcTool.Run();
+               _wlcResultDataTable = _wlcTool.Data;
+
+               _isUpdateAllowed = true;
 
                base.Update();
 

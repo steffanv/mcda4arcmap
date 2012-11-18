@@ -33,7 +33,7 @@ namespace MCDA.ViewModel
 
         private PointCollection _histogramPointCollection;
 
-        private MCDA.Model.RendererFactory.ClassBreaksRendererContainer _classBreaksRendererContainer = new MCDA.Model.RendererFactory.ClassBreaksRendererContainer();
+        private ClassBreaksRendererContainer _classBreaksRendererContainer = new ClassBreaksRendererContainer();
         private PointCollection _breaksPointCollection;
 
         public VisualizationViewModel()
@@ -45,13 +45,12 @@ namespace MCDA.ViewModel
 
             _listOfMCDAWorkspaceContainer = new BindingList<MCDAWorkspaceContainer>(_MCDAExtension.GetAllMCDAWorkspaceContainerFromShadowWorkspace());
           
-            _MCDAExtension.PropertyChanged += new PropertyChangedEventHandler(_MCDAExtensionPropertyChanged);
+            _MCDAExtension.RegisterPropertyHandler(x => x.LinkDictionary, _MCDAExtensionPropertyChanged);
 
         }
 
         void _MCDAExtensionPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-
             IList<MCDAWorkspaceContainer> _mcdaWorkspaceContainer = _MCDAExtension.GetAllMCDAWorkspaceContainerFromShadowWorkspace();
 
             //the selected container is still in the in memory workspace
@@ -139,7 +138,10 @@ namespace MCDA.ViewModel
                 _selectedNumberOfClasses = value;
                 _classBreaksRendererContainer.NumberOfClasses = value;
 
+                //for the histogram
                 PropertyChanged.Notify(() => SelectedNumberOfClasses);
+
+                Render();
             }
         }
 
@@ -150,6 +152,11 @@ namespace MCDA.ViewModel
                 
                 _selectedClassificationMethod = value;
                 _classBreaksRendererContainer.ClassificationMethod = value;
+
+                //for the histogram
+                PropertyChanged.Notify(() => SelectedClassificationMethod);
+
+                Render();
             }
         }
 
@@ -160,6 +167,8 @@ namespace MCDA.ViewModel
 
                 _selectedStartColor = value;
                 _classBreaksRendererContainer.StartColor = value;
+
+                Render();
             
             }
         }
@@ -169,13 +178,21 @@ namespace MCDA.ViewModel
             get { return _selectedEndColor; }
             set
             {
-
                 _selectedEndColor = value;
                 _classBreaksRendererContainer.EndColor = value;
+
+                Render();
 
             }
         }
 
+        private void Render()
+        {
+            if (_selectedNumberOfClasses > 1 && _selectedClassificationMethod != null)
+            {
+                _MCDAExtension.Render(_selectedMCDAWorkspaceContainer);
+            }
+        }
 
         private void SetFields()
         {
@@ -211,71 +228,5 @@ namespace MCDA.ViewModel
            
         }
 
-        //private void GenerateHistogram()
-        //{
-        //    if (_selectedMCDAWorkspaceContainer == null || !_selectedMCDAWorkspaceContainer.ClassBreaksRendererContainer.IsComplete())
-        //        return;
-
-        //    /*
-        //    double[] data;
-        //    int[] freq;
-
-        //    Classification.Histogram(_selectedMCDAWorkspaceContainer.FeatureClass, _selectedIField, out data, out freq);
-
-        //    int[] values = new int[101];
-
-        //    for (int i = 0; i < data.Length; i++)
-        //    {
-        //        int index = (int)Math.Round(data[i] * 100d, 0);
-
-        //        if (index > 100)
-        //            index = 100;
-
-        //        values[index] += freq[i];
-        //    }
-
-        //    values = Classification.SmoothHistogram(values);
-
-        //    int max = values.Max();
-
-        //    PointCollection points = new PointCollection();
-        //    // first point (lower-left corner)
-        //    points.Add(new Point(0, max));
-        //    // middle points
-        //    for (int i = 0; i < values.Length; i++){  
-        //    points.Add(new Point(i, max - values[i]));}
-        //    // last point (lower-right corner)
-        //    points.Add(new Point(values.Length - 1, max));
-            
-        //    _histogramPointCollection = points;
-
-        //    //break lines
-        //    double[] classes = Classification.Classify(_selectedClassificationMethod, _selectedMCDAWorkspaceContainer.FeatureClass, _selectedIField, _selectedNumberOfClasses);
-
-        //    int[] breaks = new int[classes.Length];
-
-        //    for (int j = 0; j < classes.Length; j++)
-        //    {
-
-        //        breaks[j] = (int)Math.Round(classes[j] * 100d, 0);
-        //    }
-
-        //    PointCollection breakPoints = new PointCollection();
-
-        //    for (int i = 0; i < breaks.Length; i++)
-        //    {     
-        //            breakPoints.Add(new Point(breaks[i], 50));
-        //            breakPoints.Add(new Point(breaks[i]+1, 50));
-        //            breakPoints.Add(new Point(breaks[i]+2, 50));             
-        //    }
-
-        //    _breaksPointCollection = breakPoints;
-
-        //    PropertyChanged.Notify(() => HistogramPoints);
-        //    PropertyChanged.Notify(() => BreaksPoints);
-        //    */
-
-        //    _MCDAExtension.Render(_selectedMCDAWorkspaceContainer);
-        //}
 	}
 }

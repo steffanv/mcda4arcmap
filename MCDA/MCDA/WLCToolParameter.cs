@@ -12,9 +12,7 @@ namespace MCDA.Model
    {
         
         public event PropertyChangedEventHandler PropertyChanged;
-        public event PropertyChangedEventHandler WeightPropertyChanged;
-        public event PropertyChangedEventHandler BenefitPropertyChanged;
-        
+
         private bool _isBenefitCriterion = false;
         private bool _isLocked = false;
         private double _weight = 0;
@@ -52,13 +50,13 @@ namespace MCDA.Model
         public bool IsBenefitCriterion
         {
             get { return _isBenefitCriterion; }
-            set { if(_isPropertiesLocked){ return;} BenefitPropertyChanged.ChangeAndNotify(ref _isBenefitCriterion, value, () => IsBenefitCriterion); }
+            set { if (_isPropertiesLocked) { return; } PropertyChanged.ChangeAndNotify(ref _isBenefitCriterion, value, () => IsBenefitCriterion); }
         }
 
         public double Weight
         {
             get { return _weight; }
-            set { if(_isPropertiesLocked){ return;} _lastWeightChangedToolParameter = this; WeightPropertyChanged.ChangeAndNotify(ref _weight, value, () => Weight); }
+            set { if (_isPropertiesLocked) { return; } _lastWeightChangedToolParameter = this; PropertyChanged.ChangeAndNotify(ref _weight, value, () => Weight); }
         }
 
         public bool IsLocked

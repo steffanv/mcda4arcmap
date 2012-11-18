@@ -40,11 +40,12 @@ namespace MCDA
 
             viewModel = (VisualizationViewModel) DataContext;
 
-            viewModel.PropertyChanged += new System.ComponentModel.PropertyChangedEventHandler(viewModelPropertyChanged);
+            viewModel.RegisterPropertyHandler(p => p.SelectedClassificationMethod, ViewModelPropertyChanged);
+            viewModel.RegisterPropertyHandler(p => p.SelectedNumberOfClasses, ViewModelPropertyChanged);
 
         }
 
-        void viewModelPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        void ViewModelPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             //we use this so far only for the histogram
             if (viewModel.SelectedMCDAWorkspaceContainer == null || viewModel.SelectedMCDAWorkspaceContainer.ClassBreaksRendererContainer == null || !viewModel.SelectedMCDAWorkspaceContainer.ClassBreaksRendererContainer.IsComplete())

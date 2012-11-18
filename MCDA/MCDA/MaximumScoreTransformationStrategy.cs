@@ -29,10 +29,7 @@ namespace MCDA.Model
                     }
                     else
                     {
-                        if (minValue != 0)
-                        {
-                            currentDataRow[columnIndex] = (1d / (double)currentDataRow.ItemArray[columnIndex]) / (1d / minValue);
-                        }
+                        currentDataRow[columnIndex] = 1d - ( (double) currentDataRow.ItemArray[columnIndex] / maxValue);
                     }
                 }
         }

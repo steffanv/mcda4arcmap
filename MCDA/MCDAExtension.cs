@@ -44,6 +44,15 @@ namespace MCDA
         private IWorkspace _shadowWorkspace;
 
         #region properties
+
+        /// <summary>
+        /// If non is selected the property returns null.
+        /// </summary>
+        public Layer SelectedLayer
+        {
+            get { return _listOfAvailableLayer.FirstOrDefault(l => l.IsSelected); }
+        }
+
         public IList<MCDA.Model.Layer> AvailableLayer
         {
             get { return _listOfAvailableLayer.OrderBy(f => f.LayerName).ToList(); }
@@ -206,6 +215,36 @@ namespace MCDA
 
             return selectedFeature.Fields.FirstOrDefault(f => f.IsOID);
 
+        }
+
+        /// <summary>
+        /// The method checks if the preferred name for the result column is alreadz in use and if so 
+        /// returns a non used by adding a number.
+        /// If the name is not used it returns the preferred name.
+        /// </summary>
+        /// <param name="preferredName"></param>
+        /// <returns></returns>
+        public string GetSuggestNameForResultColumn(string preferredName)
+        {
+            if (SelectedLayer == null || !SelectedLayer.Fields.Any(f => f.FieldName.Equals(preferredName)))
+                return preferredName;
+
+            int extension = 0;
+
+            while(SelectedLayer.Fields.Any(f => f.FieldName.Equals(preferredName)))
+            {
+                //remove what we tried before
+                if (extension > 0)
+                {
+                    preferredName = preferredName.Remove(preferredName.Length - (extension - 1).ToString().Length);
+                }
+
+                extension++;
+                preferredName += extension;          
+            }
+
+            return preferredName + extension;
+           
         }
 
         public IList<MCDA.Model.Field> GetFieldsFromSelectedLayerWhichAreNumeric(IList<MCDA.Model.Layer> layer)

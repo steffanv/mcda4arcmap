@@ -194,6 +194,9 @@ namespace MCDA.ViewModel
             }
         }
 
+        /// <summary>
+        /// Offers the fields to the user which have the name of the tools result column.
+        /// </summary>
         private void SetFields()
         {
             if (_selectedMCDAWorkspaceContainer == null || _selectedMCDAWorkspaceContainer.FeatureClass == null)
@@ -202,7 +205,7 @@ namespace MCDA.ViewModel
             }
             else{
 
-            _listOfFields = new BindingList<IField>( MCDAExtension.GetListOfFieldsFromFeatureClass(_selectedMCDAWorkspaceContainer.FeatureClass));
+            _listOfFields = new BindingList<IField>( MCDAExtension.GetListOfFieldsFromFeatureClass(_selectedMCDAWorkspaceContainer.FeatureClass).Where(f => f.Name.Equals(_selectedMCDAWorkspaceContainer.Tool.DefaultResultColumnName)).ToList());
             }
 
             PropertyChanged.Notify(() => Fields);

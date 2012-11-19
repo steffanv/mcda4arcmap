@@ -15,7 +15,7 @@ namespace MCDA.Model
         private WLCParameter _wlcParameter;
         private TransformationStrategy _transformationStrategy;
 
-        private const string _wlcResultColumnName = "WLCResult";
+        private string _wlcResultColumnName = "WLCResult";
         
         public WLCTool(DataTable dataTable, WLCParameter wlcParameter)
         {
@@ -28,10 +28,15 @@ namespace MCDA.Model
             _transformationStrategy = Model.TransformationStrategy.MaximumScoreTransformationStrategy;
         }
 
+        /// <summary>
+        /// If the tool is set to locked changes from the outside like the selected layer which impact the result column name are
+        /// no longer possible.
+        /// </summary>
+        public bool IsLocked { get; set; }
+
         public DataTable Data
         {
             get { return _workingDataTable.Copy(); }
-            set { ;}
         }
 
         public WLCParameter WLCParameter
@@ -54,10 +59,40 @@ namespace MCDA.Model
 
         }
 
-        protected override void PerformScaling()
+        protected override void PerformPreConditions()
         {
             _workingDataTable = _backupDataTable.Copy();
 
+            //the tool does no react on ouside changes like new fields, because the result column name is set
+            //this is important because it has to be the same as in the in memory workspace to perform the join
+            if (!IsLocked)
+            {
+                string oldResultColumnName = _wlcResultColumnName;
+                //if name changed remove the old column and add a new one
+                string newResultColumnName = MCDA.MCDAExtension.GetExtension().GetSuggestNameForResultColumn(DefaultResultColumnName);
+
+                //nothing changes and the result column exist
+                if (newResultColumnName.Equals(oldResultColumnName) && _workingDataTable.Columns.IndexOf(oldResultColumnName) != -1)
+                    return;
+
+                //remove old column
+                if (_workingDataTable.Columns.IndexOf(oldResultColumnName) != -1)
+                {
+
+                    _workingDataTable.Columns.Remove(oldResultColumnName);
+                }
+
+                //add new one
+                DefaultResultColumnName = newResultColumnName;
+
+                _workingDataTable.Columns.Add(new DataColumn(DefaultResultColumnName, typeof(double)));
+            }
+  
+        }
+
+        protected override void PerformScaling()
+        {
+            
             foreach(WLCToolParameter currentToolParameter in _wlcParameter.ToolParameter){
 
                TransformationStrategyFactory.GetStrategy(_transformationStrategy).Transform(_workingDataTable.Columns[currentToolParameter.ColumnName], currentToolParameter.IsBenefitCriterion);
@@ -77,26 +112,17 @@ namespace MCDA.Model
                 }
             }
 
-            int wlcRankIndex = 0;
-            if (_workingDataTable.Columns.Contains(_wlcResultColumnName))
-            {
-                wlcRankIndex = _workingDataTable.Columns.IndexOf(_wlcResultColumnName);
-
-            }
-            else
-            {
-                _workingDataTable.Columns.Add(new DataColumn(_wlcResultColumnName, typeof(double)));
-                wlcRankIndex = _workingDataTable.Columns.IndexOf(_wlcResultColumnName);
-            }
-
-
+            int wlcRankIndex = _workingDataTable.Columns.IndexOf(_wlcResultColumnName);
+             
             //we ensure that the oid is not part of the calculation by using only columns with the type double
-
+            //there is a custon OID type for OIDs
             foreach (DataRow currentDataRow in _workingDataTable.Rows)
                  {
                 
                      double sum = currentDataRow.ItemArray.Where(o => o.GetType() == typeof(double)).Sum(o => (double)o);
 
+                     //the trick is that the result table is still without a value? or at least 0 for the result column
+                      //and 0 is the neutral element for the + operator
                      currentDataRow[wlcRankIndex] = sum;
                  }
         }
@@ -110,6 +136,8 @@ namespace MCDA.Model
         public override string DefaultResultColumnName
         {
             get { return _wlcResultColumnName; }
+            set { _wlcResultColumnName = value; }
         }
+   
     }
 }

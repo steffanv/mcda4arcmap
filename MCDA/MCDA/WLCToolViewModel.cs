@@ -183,8 +183,12 @@ namespace MCDA.ViewModel
        public bool IsLocked
        {
            get{ return _isLocked;}
-           set { _isLocked = value; }
+           set { _isLocked = value;
+
+           _wlcTool.IsLocked = value;
+           }
        }
+
        public bool IsSendToInMemoryWorkspaceCommand
        {
            get { return _isSendToInMemoryWorkspaceCommand;}

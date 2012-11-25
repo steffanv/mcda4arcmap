@@ -6,6 +6,8 @@ using MCDA.Extensions;
 using System.ComponentModel;
 using System.Data;
 using MCDA.Entity;
+using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace MCDA.Model
 {
@@ -92,6 +94,8 @@ namespace MCDA.Model
 
         protected override void PerformScaling()
         {
+            if (_workingDataTable.Rows.Count == 0 || _wlcParameter.ToolParameter.Count == 0)
+                return;
             
             foreach(WLCToolParameter currentToolParameter in _wlcParameter.ToolParameter){
 
@@ -100,8 +104,73 @@ namespace MCDA.Model
            
         }
 
+        private void AddWeightsToData(DataTable dataTable)
+        {
+            foreach (WLCToolParameter currentToolParameter in _wlcParameter.ToolParameter)
+            {
+                int columnIndex = dataTable.Columns.IndexOf(currentToolParameter.ColumnName);
+
+                foreach (DataRow currentDataRow in dataTable.Rows)
+                {
+                    currentDataRow[columnIndex] = Math.Round(Convert.ToDouble(currentDataRow.ItemArray[columnIndex]) * currentToolParameter.ScaledWeight, 10);
+                }
+            }
+
+            CalculateResult(dataTable);
+        }
+
+        private void CalculateResult(DataTable dataTable) {
+
+            int wlcRankIndex = _workingDataTable.Columns.IndexOf(_wlcResultColumnName);
+
+            foreach (DataRow currentDataRow in dataTable.Rows)
+                 {
+                
+                     double sum = currentDataRow.ItemArray.Where(o => o.GetType() == typeof(double)).Sum(o => (double)o);
+
+                     //the trick is that the result table is still without a value? or at least 0 for the result column
+                      //and 0 is the neutral element for the + operator
+                     currentDataRow[wlcRankIndex] = sum;
+                 }
+        
+        }
+
         protected override void PerformAlgorithm()
         {
+            if (_workingDataTable.Rows.Count == 0 || _wlcParameter.ToolParameter.Count == 0)
+                return;
+
+            Stopwatch sw = Stopwatch.StartNew();
+            
+            //DataTable schema = _workingDataTable.Clone();
+            //DataTable schema2 = _workingDataTable.Clone();
+
+            IList<DataTable> listOfDataTables = new List<DataTable>();
+
+            for(int i = 0; i < _workingDataTable.Rows.Count; i+=100){
+
+                DataTable temp = _workingDataTable.Clone();
+               IEnumerable<DataRow> tempDataRow = _workingDataTable.Select().Skip(i).Take(100);
+
+               tempDataRow.CopyToDataTable(temp, LoadOption.OverwriteChanges);
+
+               listOfDataTables.Add(temp);
+            }
+
+            /*
+            IEnumerable<DataRow> dataRows = _workingDataTable.Select().Take(_workingDataTable.Rows.Count / 2);
+            IEnumerable<DataRow> dataRows2 = _workingDataTable.Select().Skip(_workingDataTable.Rows.Count / 2).Take(_workingDataTable.Rows.Count -( _workingDataTable.Rows.Count / 2));
+
+            dataRows.CopyToDataTable(schema, LoadOption.OverwriteChanges);
+            dataRows2.CopyToDataTable(schema2, LoadOption.OverwriteChanges);
+
+            listOfDataTables.Add(schema);
+            listOfDataTables.Add(schema2);
+            */
+
+            Parallel.ForEach(listOfDataTables, dataTable => AddWeightsToData(dataTable));
+            
+            /*
             foreach(WLCToolParameter currentToolParameter in _wlcParameter.ToolParameter){
 
                 int columnIndex = _workingDataTable.Columns.IndexOf(currentToolParameter.ColumnName);
@@ -111,11 +180,14 @@ namespace MCDA.Model
                     currentDataRow[columnIndex] = Math.Round( Convert.ToDouble(currentDataRow.ItemArray[columnIndex]) * currentToolParameter.ScaledWeight,10);
                 }
             }
+            
 
             int wlcRankIndex = _workingDataTable.Columns.IndexOf(_wlcResultColumnName);
              
             //we ensure that the oid is not part of the calculation by using only columns with the type double
             //there is a custon OID type for OIDs
+
+            
             foreach (DataRow currentDataRow in _workingDataTable.Rows)
                  {
                 
@@ -125,6 +197,22 @@ namespace MCDA.Model
                       //and 0 is the neutral element for the + operator
                      currentDataRow[wlcRankIndex] = sum;
                  }
+             
+            */
+
+            DataTable targetSchema = _workingDataTable.Clone();
+
+            for (int i = 0; i < listOfDataTables.Count; i++)
+            {
+                targetSchema.Merge(listOfDataTables[i]);
+            }
+
+
+            _workingDataTable = targetSchema;
+
+            sw.Stop();
+
+            Console.WriteLine("Time taken: {0}ms", sw.Elapsed.TotalMilliseconds);
         }
 
         public override string ToString(){

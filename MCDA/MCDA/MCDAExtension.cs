@@ -56,7 +56,7 @@ namespace MCDA
         public IList<MCDA.Model.Layer> AvailableLayer
         {
             get { return _listOfAvailableLayer.OrderBy(f => f.LayerName).ToList(); }
-            set { PropertyChanged.ChangeAndNotify(ref _listOfAvailableLayer, value, () => AvailableLayer); RegisterListenerForEveryMemberOfListOfAvailableLayer(); }
+            set { PropertyChanged.ChangeAndNotify(ref _listOfAvailableLayer, value, () => AvailableLayer); /*RegisterListenerForEveryMemberOfListOfAvailableLayer();*/ }
         }
 
         public IList<MCDA.Model.Layer> AvailableFeatureLayer

@@ -120,6 +120,10 @@
     <Compile Include="AbstractToolViewModel.cs" />
     <Compile Include="AddDataViewModel.cs" />
     <Compile Include="AHPToolBtn.cs" />
+    <Compile Include="AlphaSelectionView.xaml.cs">
+      <DependentUpon>AlphaSelectionView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="AlphaSelectionViewModel.cs" />
     <Compile Include="ClassBreaksRendererContainer.cs" />
     <Compile Include="Classification.cs" />
     <Compile Include="CollectionExtension.cs" />
@@ -221,6 +225,10 @@
       <SubType>Code</SubType>
     </Compile>
     <AddInContent Include="Images\AddDataWindow.png" />
+    <Page Include="AlphaSelectionView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="ConfigView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -312,6 +320,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </AddInContent>
     <AddInContent Include="Images\VisualizationView.png" />
+    <Resource Include="Images\toolbargraphics\Alpha.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
     <Content Include="README.txt" />
   </ItemGroup>
   <ItemGroup>

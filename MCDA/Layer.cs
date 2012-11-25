@@ -46,7 +46,7 @@ namespace MCDA.Model
                 _fields = GetFields();
             }
 
-            RegisterListenerForEveryMemberOfFields();
+            //RegisterListenerForEveryMemberOfFields();
         }
 
         public ESRI.ArcGIS.Carto.ILayer ESRILayer

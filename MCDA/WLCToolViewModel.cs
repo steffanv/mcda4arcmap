@@ -25,11 +25,6 @@ namespace MCDA.ViewModel
        private BindingList<WLCToolParameter> _toolParameter;
        private IList<List<WLCToolParameter>> _toolParameterStorageForAnimationLikeUpdate = new List<List<WLCToolParameter>>();
 
-       private ICommand _standardizationSelectionCommand;
-       private ICommand _sendToInMemoryWorkspaceCommand;
-       private ICommand _lockCommand;
-       private ICommand _exportAsCSVCommand;
-
        private bool _isLocked = false;
        private bool _isSendToInMemoryWorkspaceCommand = false;
        private bool _isUpdateAllowed = false;
@@ -44,6 +39,9 @@ namespace MCDA.ViewModel
 
            _mcdaExtension.RegisterPropertyHandler(x => x.AvailableLayer, MCDAExtensionPropertyChanged);
 
+           if(_mcdaExtension.SelectedLayer != null)
+               _mcdaExtension.SelectedLayer.Fields.ForEach(x => x.RegisterPropertyHandler(f => f.IsSelected, FieldPropertyChanged));
+
            _toolParameter = new BindingList<WLCToolParameter>(_wlcTool.WLCParameter.ToolParameter);
 
            _toolParameter.ForEach(t => t.RegisterPropertyHandler(b => b.IsBenefitCriterion,BenefitCriterionChanged));
@@ -57,17 +55,31 @@ namespace MCDA.ViewModel
 
        }
 
-       void WeightChanged(object sender, PropertyChangedEventArgs e)
+       private void WeightChanged(object sender, PropertyChangedEventArgs e)
        {
            base.Update();
        }
 
-       void BenefitCriterionChanged(object sender, PropertyChangedEventArgs e)
+       private void BenefitCriterionChanged(object sender, PropertyChangedEventArgs e)
        {
            UpdateRealtime();
        }
 
-       void MCDAExtensionPropertyChanged(object sender, PropertyChangedEventArgs e)
+       private void FieldPropertyChanged(object sender, PropertyChangedEventArgs e)
+       {
+           _toolParameter = new BindingList<WLCToolParameter>(_wlcTool.WLCParameter.ToolParameter);
+
+           _toolParameter.ForEach(t => t.UnRegisterPropertyHandler(b => b.IsBenefitCriterion, BenefitCriterionChanged));
+           _toolParameter.ForEach(t => t.UnRegisterPropertyHandler(w => w.Weight, WeightChanged));
+
+           _toolParameter.ForEach(t => t.RegisterPropertyHandler(b => b.IsBenefitCriterion, BenefitCriterionChanged));
+           _toolParameter.ForEach(t => t.RegisterPropertyHandler(w => w.Weight, WeightChanged));
+
+           PropertyChanged.Notify(() => WLCParameter);
+           PropertyChanged.Notify(() => WLCResult);
+       }
+
+       private void MCDAExtensionPropertyChanged(object sender, PropertyChangedEventArgs e)
        {
            if (_isLocked)
                return;
@@ -77,13 +89,13 @@ namespace MCDA.ViewModel
 
            _wlcResultDataTable = _wlcTool.Data;
 
-           _toolParameter = new BindingList<WLCToolParameter>(_wlcTool.WLCParameter.ToolParameter);
+           if (_mcdaExtension.SelectedLayer != null)
+           {
 
-           _toolParameter.ForEach(t => t.RegisterPropertyHandler(b => b.IsBenefitCriterion, BenefitCriterionChanged));
-           _toolParameter.ForEach(t => t.RegisterPropertyHandler(w => w.Weight, WeightChanged));
-
-           PropertyChanged.Notify(() => WLCParameter);
-           PropertyChanged.Notify(() => WLCResult);
+               _mcdaExtension.SelectedLayer.Fields.ForEach(x => x.UnRegisterPropertyHandler(f => f.IsSelected, FieldPropertyChanged));
+               _mcdaExtension.SelectedLayer.Fields.ForEach(x => x.RegisterPropertyHandler(f => f.IsSelected, FieldPropertyChanged));
+           }
+          
        }
 
         //called from the code behind page if something changed
@@ -195,23 +207,7 @@ namespace MCDA.ViewModel
            set { _isSendToInMemoryWorkspaceCommand = value; }
        }
 
-       public ICommand ExportAsCSVCommand
-       {
-           get {
-
-               if (_exportAsCSVCommand == null)
-               {
-                   _exportAsCSVCommand = new RelayCommand(
-                       p => this.DoExportAsCSVCommand(),
-                       p => true
-                       );
-               }
-
-               return _exportAsCSVCommand;
-           }
-       }
-
-       private void DoExportAsCSVCommand()
+       protected override void DoExportAsCSVCommand()
        {
            SaveFileDialog saveFileDialog = new SaveFileDialog();
            saveFileDialog.FileName = _wlcTool.ToString();
@@ -226,23 +222,7 @@ namespace MCDA.ViewModel
            }
        }
 
-       public ICommand LockCommand
-       {
-           get {
-
-               if (_lockCommand == null)
-               {
-                   _lockCommand = new RelayCommand(
-                       p => this.DoLockCommand(),
-                       p => true
-                       );
-               }
-
-               return _lockCommand;
-           }
-       }
-
-       private void DoLockCommand()
+       protected override void DoLockCommand()
        {
            _isLocked = !_isLocked;
 
@@ -275,23 +255,8 @@ namespace MCDA.ViewModel
            PropertyChanged.Notify(() => IsLocked);
        }
 
-       public ICommand SendToInMemoryWorkspaceCommand
+       protected override void DoSendToInMemoryWorkspaceCommand()
        {
-           get
-           {
-               if (_sendToInMemoryWorkspaceCommand == null)
-               {
-
-                   _sendToInMemoryWorkspaceCommand = new RelayCommand(
-                       param => this.DoSendToInMemoryWorkspaceCommand(),
-                       param => this.CanCreateInMemoryFCCommand()
-                   );
-               }
-               return _sendToInMemoryWorkspaceCommand;
-           }
-       }
-
-       private void DoSendToInMemoryWorkspaceCommand(){
 
            _isSendToInMemoryWorkspaceCommand = !_isSendToInMemoryWorkspaceCommand;
 
@@ -310,25 +275,7 @@ namespace MCDA.ViewModel
            PropertyChanged.Notify(() => IsSendToInMemoryWorkspaceCommand);
        }
 
-       private bool CanCreateInMemoryFCCommand()
-       {
-           return true;
-       }
-
-       public ICommand StandardizationSelectionCommand
-       {
-           get { if (_standardizationSelectionCommand == null) {
-
-               _standardizationSelectionCommand = new RelayCommand(
-                   param => this.DoStandardizationSelectionCommand(),
-                   param => true
-               );
-           }
-           return _standardizationSelectionCommand;
-           }
-       }
-
-       private void DoStandardizationSelectionCommand()
+       protected override void DoStandardizationSelectionCommand()
        {
 
            var parentHandle = new IntPtr(ArcMap.Application.hWnd);

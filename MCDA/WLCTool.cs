@@ -11,15 +11,15 @@ using System.Diagnostics;
 
 namespace MCDA.Model
 {
-    public class WLCTool : AbstractToolTemplate
+   public class WLCTool : AbstractToolTemplate
     {
         private DataTable _workingDataTable, _backupDataTable;
-        private WLCParameter _wlcParameter;
+        private ToolParameterContainer _wlcParameter;
         private TransformationStrategy _transformationStrategy;
 
         private string _wlcResultColumnName = "WLCResult";
         
-        public WLCTool(DataTable dataTable, WLCParameter wlcParameter)
+        public WLCTool(DataTable dataTable, ToolParameterContainer wlcParameter)
         {
             _backupDataTable = dataTable.Copy();
 
@@ -41,7 +41,7 @@ namespace MCDA.Model
             get { return _workingDataTable.Copy(); }
         }
 
-        public WLCParameter WLCParameter
+        public ToolParameterContainer WLCParameter
         {
             get { return _wlcParameter; }
             set { _wlcParameter = value; }
@@ -94,8 +94,8 @@ namespace MCDA.Model
 
         protected override void PerformScaling()
         {
-            if (_workingDataTable.Rows.Count == 0 || _wlcParameter.ToolParameter.Count == 0)
-                return;
+            //if (_workingDataTable.Rows.Count == 0 || _wlcParameter.ToolParameter.Count == 0)
+               // return;
             
             foreach(WLCToolParameter currentToolParameter in _wlcParameter.ToolParameter){
 
@@ -137,8 +137,8 @@ namespace MCDA.Model
 
         protected override void PerformAlgorithm()
         {
-            if (_workingDataTable.Rows.Count == 0 || _wlcParameter.ToolParameter.Count == 0)
-                return;
+            //if (_workingDataTable.Rows.Count == 0 || _wlcParameter.ToolParameter.Count == 0)
+             //   return;
 
             Stopwatch sw = Stopwatch.StartNew();
             

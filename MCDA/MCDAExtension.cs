@@ -191,13 +191,13 @@ namespace MCDA
         }
         #endregion
 
-        public WLCParameter GetWLCParameterBasedOnSelectedFields()
+        public ToolParameterContainer GetWLCParameterBasedOnSelectedFields()
         {
-            IList<WLCToolParameter> wlcParameters = new List<WLCToolParameter>();
+            IList<IToolParameter> wlcParameters = new List<IToolParameter>();
             
             AvailableLayer.Where(l => l.IsSelected).ForEach(l => l.Fields.Where(f => f.IsSelected && f.IsNumber).ForEach(f => wlcParameters.Add(new WLCToolParameter(f.FieldName))));
 
-            return new WLCParameter(wlcParameters);
+            return new ToolParameterContainer(wlcParameters);
         }
 
         /// <summary>

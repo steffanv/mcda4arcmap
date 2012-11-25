@@ -10,7 +10,7 @@ namespace MCDA.Model
     class ProportionalDistributionStrategy : IWeightDistributionStrategy
     {
 
-        private static bool _locked = false;
+        //private static bool _locked = false;
 
         public void Distribute<T>(IList<T> listOfToolParameter) where T : class, IToolParameter
         {
@@ -18,11 +18,6 @@ namespace MCDA.Model
                 return;
 
             IToolParameter lastWeightChangedToolParameter =  lastWeightChangedToolParameter = listOfToolParameter[0].LastWeightChangedToolParameter;
-
-            if (lastWeightChangedToolParameter.IsPropertiesLocked)
-                return;
-
-            lastWeightChangedToolParameter.IsPropertiesLocked = true;
 
             double sumOfAllWeights = listOfToolParameter.Sum(t =>t.Weight);
           
@@ -42,11 +37,10 @@ namespace MCDA.Model
                     //in case we have only one element that is suitable we can directly remove all from this one
                     if (listOfToolParameter.Where(t => t.IsLocked == false && t.Weight > 0 && t != lastWeightChangedToolParameter).Count() == 1)
                     {
-                        listOfToolParameter.Where(t => t.IsLocked == false && t.Weight > 0 && t != lastWeightChangedToolParameter).ForEach(t => t.SetLockedWeight(t.Weight - overrun));
-                        lastWeightChangedToolParameter.IsPropertiesLocked = false;
+                        listOfToolParameter.Where(t => t.IsLocked == false && t.Weight > 0 && t != lastWeightChangedToolParameter).ForEach(t => t.Weight = (t.Weight - overrun));
                         return;
                     }
-                    listOfToolParameter.Where(t => t.IsLocked == false && t.Weight > 0 && t != lastWeightChangedToolParameter).ForEach(t => t.SetLockedWeight(t.Weight - (t.Weight / sumOfChangeableWeights) * overrun));
+                    listOfToolParameter.Where(t => t.IsLocked == false && t.Weight > 0 && t != lastWeightChangedToolParameter).ForEach(t => t.Weight = (t.Weight - (t.Weight / sumOfChangeableWeights) * overrun));
                 }
 
                 //we have to resize also the latest change, but we try to keep as much as possible of the latest change
@@ -59,15 +53,14 @@ namespace MCDA.Model
                     double stillOver = listOfToolParameter.Sum(t => t.Weight) - 100;
                    
                     //and cut from the last changed
-                    listOfToolParameter.Where(t => t == lastWeightChangedToolParameter).ForEach(t => t.SetLockedWeight(t.Weight - stillOver));
+                    listOfToolParameter.Where(t => t == lastWeightChangedToolParameter).ForEach(t => t.Weight = (t.Weight - stillOver));
                 }
 
                 //sometimes the calculations produce values < 0 , thats often the case when they are already close to 0
                 //one problem is that the UI shows still show 0, because thats the lower bound of the slider control
-                listOfToolParameter.Where(t => t.Weight < 0).ForEach(t => t.SetLockedWeight(0));   
+                listOfToolParameter.Where(t => t.Weight < 0).ForEach(t => t.Weight = 0);   
             }
 
-            lastWeightChangedToolParameter.IsPropertiesLocked = false;  
         }
     }
 }

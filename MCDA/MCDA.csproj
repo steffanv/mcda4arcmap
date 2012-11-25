@@ -117,6 +117,7 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AbstractToolParameter.cs" />
     <Compile Include="AbstractToolViewModel.cs" />
     <Compile Include="AddDataViewModel.cs" />
     <Compile Include="AHPToolBtn.cs" />
@@ -156,6 +157,7 @@
     <Compile Include="NullToFalseCoverter.cs" />
     <Compile Include="ObjectExtension.cs" />
     <Compile Include="OWAToolBtn.cs" />
+    <Compile Include="OWAToolParameter.cs" />
     <Compile Include="OWAToolView.xaml.cs">
       <DependentUpon>OWAToolView.xaml</DependentUpon>
     </Compile>
@@ -181,7 +183,7 @@
     <Compile Include="WLCToolParameter.cs" />
     <Compile Include="TransformationStrategyFactory.cs" />
     <Compile Include="WeightDistributionStrategyFactory.cs" />
-    <Compile Include="WLCParameter.cs" />
+    <Compile Include="ToolParameterContainer.cs" />
     <Compile Include="WLCTool.cs" />
     <Compile Include="WLCToolBtn.cs" />
     <Compile Include="WLCToolView.xaml.cs">

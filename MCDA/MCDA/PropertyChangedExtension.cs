@@ -11,7 +11,7 @@ namespace MCDA
     public static class PropertyChangedExtension
     {
         public static void RegisterPropertyHandler<T, TProperty>(this T obj, Expression<Func<T, TProperty>> propertyExpression, PropertyChangedEventHandler handlerDelegate)
-            where T : class, INotifyPropertyChanged
+            where T : INotifyPropertyChanged
         {
             if (obj == null) throw new ArgumentNullException("obj");
 
@@ -24,7 +24,7 @@ namespace MCDA
                 };
         }
         public static void UnRegisterPropertyHandler<T, TProperty>(this T obj, Expression<Func<T, TProperty>> propertyExpression, PropertyChangedEventHandler handlerDelegate)
-            where T : class, INotifyPropertyChanged
+            where T : INotifyPropertyChanged
         {
             if (obj == null) throw new ArgumentNullException("obj");
 

@@ -12,7 +12,7 @@ namespace MCDA.Model
 
         public static WLCTool NewWLCTool()
         {
-            WLCParameter wlcParameter = MCDA.MCDAExtension.GetExtension().GetWLCParameterBasedOnSelectedFields();
+            ToolParameterContainer wlcParameter = MCDA.MCDAExtension.GetExtension().GetWLCParameterBasedOnSelectedFields();
             DataTable dataTable = MCDA.MCDAExtension.GetExtension().GetDataTableForParameterSet(wlcParameter.ToolParameter);
 
             WLCTool wlcTool = new WLCTool(dataTable,wlcParameter);

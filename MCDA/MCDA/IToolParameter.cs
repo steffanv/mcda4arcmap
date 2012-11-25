@@ -3,12 +3,12 @@ using System.ComponentModel;
 
 namespace MCDA.Model
 {
-    public interface IToolParameter
+    public interface IToolParameter : IDeepClonable<IToolParameter>, INotifyPropertyChanged
     {
 
         IToolParameter LastWeightChangedToolParameter { get; set; }
 
-        bool IsPropertiesLocked { get; set; }
+        //bool IsPropertiesLocked { get; set; }
 
         string ColumnName { get; set; }
 
@@ -16,7 +16,7 @@ namespace MCDA.Model
 
         double ScaledWeight { get; set; }
 
-        void SetLockedWeight(double weight);
+        //void SetLockedWeight(double weight);
 
         bool IsLocked { get; set; }
 

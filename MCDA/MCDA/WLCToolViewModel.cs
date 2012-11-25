@@ -22,8 +22,8 @@ namespace MCDA.ViewModel
        private MCDAExtension _mcdaExtension;
        private WLCTool _wlcTool; 
        private DataTable _wlcResultDataTable;
-       private BindingList<WLCToolParameter> _toolParameter;
-       private IList<List<WLCToolParameter>> _toolParameterStorageForAnimationLikeUpdate = new List<List<WLCToolParameter>>();
+       private BindingList<IToolParameter> _toolParameter;
+       private IList<List<IToolParameter>> _toolParameterStorageForAnimationLikeUpdate = new List<List<IToolParameter>>();
 
        private bool _isLocked = false;
        private bool _isSendToInMemoryWorkspaceCommand = false;
@@ -42,7 +42,7 @@ namespace MCDA.ViewModel
            if(_mcdaExtension.SelectedLayer != null)
                _mcdaExtension.SelectedLayer.Fields.ForEach(x => x.RegisterPropertyHandler(f => f.IsSelected, FieldPropertyChanged));
 
-           _toolParameter = new BindingList<WLCToolParameter>(_wlcTool.WLCParameter.ToolParameter);
+           _toolParameter = new BindingList<IToolParameter>(_wlcTool.WLCParameter.ToolParameter);
 
            _toolParameter.ForEach(t => t.RegisterPropertyHandler(b => b.IsBenefitCriterion,BenefitCriterionChanged));
            _toolParameter.ForEach(t => t.RegisterPropertyHandler(w => w.Weight, WeightChanged));
@@ -67,7 +67,10 @@ namespace MCDA.ViewModel
 
        private void FieldPropertyChanged(object sender, PropertyChangedEventArgs e)
        {
-           _toolParameter = new BindingList<WLCToolParameter>(_wlcTool.WLCParameter.ToolParameter);
+
+           _wlcTool = ToolFactory.NewWLCTool();
+
+           _toolParameter = new BindingList<IToolParameter>(_wlcTool.WLCParameter.ToolParameter);
 
            _toolParameter.ForEach(t => t.UnRegisterPropertyHandler(b => b.IsBenefitCriterion, BenefitCriterionChanged));
            _toolParameter.ForEach(t => t.UnRegisterPropertyHandler(w => w.Weight, WeightChanged));
@@ -134,7 +137,7 @@ namespace MCDA.ViewModel
        {
            if (!_isUpdateAllowed)
            {
-               List<WLCToolParameter> tList = new List<WLCToolParameter>();
+               List<IToolParameter> tList = new List<IToolParameter>();
 
                for (int i = 0; i < _toolParameter.Count; i++)
                {
@@ -146,7 +149,7 @@ namespace MCDA.ViewModel
 
            else
            {
-               BindingList<WLCToolParameter> latestToolParameter = _toolParameter;
+               BindingList<IToolParameter> latestToolParameter = _toolParameter;
 
                if (_toolParameterStorageForAnimationLikeUpdate.Count > 0)
                {
@@ -182,7 +185,7 @@ namespace MCDA.ViewModel
            PropertyChanged.Notify(() => WLCResult);
        }
 
-       public BindingList<WLCToolParameter> WLCParameter
+       public BindingList<IToolParameter> WLCParameter
        {
            get { return _toolParameter; }
            set {  _toolParameter = value; }

@@ -156,6 +156,7 @@
     <Compile Include="NotifyPropertyChangeExtension.cs" />
     <Compile Include="NullToFalseCoverter.cs" />
     <Compile Include="ObjectExtension.cs" />
+    <Compile Include="OWATool.cs" />
     <Compile Include="OWAToolBtn.cs" />
     <Compile Include="OWAToolParameter.cs" />
     <Compile Include="OWAToolView.xaml.cs">

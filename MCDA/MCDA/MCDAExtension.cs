@@ -236,7 +236,7 @@ namespace MCDA
                 //remove what we tried before
                 if (extension > 0)
                 {
-                    preferredName = preferredName.Remove(preferredName.Length - (extension - 1).ToString().Length);
+                    preferredName = preferredName.Remove(preferredName.Length - (extension).ToString().Length);
                 }
 
                 extension++;

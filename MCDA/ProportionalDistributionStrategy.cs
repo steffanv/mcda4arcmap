@@ -9,9 +9,6 @@ namespace MCDA.Model
 {
     class ProportionalDistributionStrategy : IWeightDistributionStrategy
     {
-
-        //private static bool _locked = false;
-
         public void Distribute<T>(IList<T> listOfToolParameter) where T : class, IToolParameter
         {
             if (listOfToolParameter.Count == 0)

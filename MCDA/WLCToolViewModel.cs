@@ -20,7 +20,7 @@ namespace MCDA.ViewModel
        public event PropertyChangedEventHandler PropertyChanged;
 
        private MCDAExtension _mcdaExtension;
-       private WLCTool _wlcTool; 
+       private AbstractToolTemplate _wlcTool; 
        private DataTable _wlcResultDataTable;
        private BindingList<IToolParameter> _toolParameter;
        private IList<List<IToolParameter>> _toolParameterStorageForAnimationLikeUpdate = new List<List<IToolParameter>>();
@@ -42,7 +42,7 @@ namespace MCDA.ViewModel
            if(_mcdaExtension.SelectedLayer != null)
                _mcdaExtension.SelectedLayer.Fields.ForEach(x => x.RegisterPropertyHandler(f => f.IsSelected, FieldPropertyChanged));
 
-           _toolParameter = new BindingList<IToolParameter>(_wlcTool.WLCParameter.ToolParameter);
+           _toolParameter = new BindingList<IToolParameter>(_wlcTool.ToolParameterContainer.ToolParameter);
 
            _toolParameter.ForEach(t => t.RegisterPropertyHandler(b => b.IsBenefitCriterion,BenefitCriterionChanged));
            _toolParameter.ForEach(t => t.RegisterPropertyHandler(w => w.Weight, WeightChanged));
@@ -70,7 +70,7 @@ namespace MCDA.ViewModel
 
            _wlcTool = ToolFactory.NewWLCTool();
 
-           _toolParameter = new BindingList<IToolParameter>(_wlcTool.WLCParameter.ToolParameter);
+           _toolParameter = new BindingList<IToolParameter>(_wlcTool.ToolParameterContainer.ToolParameter);
 
            _toolParameter.ForEach(t => t.UnRegisterPropertyHandler(b => b.IsBenefitCriterion, BenefitCriterionChanged));
            _toolParameter.ForEach(t => t.UnRegisterPropertyHandler(w => w.Weight, WeightChanged));
@@ -98,7 +98,9 @@ namespace MCDA.ViewModel
                _mcdaExtension.SelectedLayer.Fields.ForEach(x => x.UnRegisterPropertyHandler(f => f.IsSelected, FieldPropertyChanged));
                _mcdaExtension.SelectedLayer.Fields.ForEach(x => x.RegisterPropertyHandler(f => f.IsSelected, FieldPropertyChanged));
            }
-          
+
+           PropertyChanged.Notify(() => WLCParameter);
+           PropertyChanged.Notify(() => WLCResult);
        }
 
         //called from the code behind page if something changed
@@ -157,7 +159,7 @@ namespace MCDA.ViewModel
                    //take several steps...
                    for (int i = 0; i < _toolParameterStorageForAnimationLikeUpdate.Count; i = i + steps)
                    {
-                       _wlcTool.WLCParameter.ToolParameter = _toolParameterStorageForAnimationLikeUpdate[i];
+                       _wlcTool.ToolParameterContainer.ToolParameter = _toolParameterStorageForAnimationLikeUpdate[i];
                        _wlcTool.Run();
                        _wlcResultDataTable = _wlcTool.Data;
 
@@ -167,7 +169,7 @@ namespace MCDA.ViewModel
                }
 
                //make sure we add the latest one
-               _wlcTool.WLCParameter.ToolParameter = latestToolParameter;
+               _wlcTool.ToolParameterContainer.ToolParameter = latestToolParameter;
                _wlcTool.Run();
                _wlcResultDataTable = _wlcTool.Data;
 
@@ -198,10 +200,7 @@ namespace MCDA.ViewModel
        public bool IsLocked
        {
            get{ return _isLocked;}
-           set { _isLocked = value;
-
-           _wlcTool.IsLocked = value;
-           }
+           set { _isLocked = value;}
        }
 
        public bool IsSendToInMemoryWorkspaceCommand
@@ -221,7 +220,7 @@ namespace MCDA.ViewModel
 
            if (result == true)
            {
-               Export.ToCSV(_wlcTool.Data,_wlcTool.WLCParameter.ToolParameter, saveFileDialog.FileName);
+               Export.ToCSV(_wlcTool.Data,_wlcTool.ToolParameterContainer.ToolParameter, saveFileDialog.FileName);
            }
        }
 

@@ -56,5 +56,23 @@ namespace MCDA
             }
 
         }
+
+        private void weightSlider_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
+        {
+            OWAToolViewModel viewmodel = (OWAToolViewModel)DataContext;
+            viewmodel.UpdateAllowedEvent();
+        }
+
+        private void benefitCriteriaCheckBox_Click(object sender, RoutedEventArgs e)
+        {
+            OWAToolViewModel viewmodel = (OWAToolViewModel)DataContext;
+            viewmodel.UpdateAllowedEvent();
+        }
+
+        private void weightSliderTextblock_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+            OWAToolViewModel viewmodel = (OWAToolViewModel)DataContext;
+            viewmodel.UpdateAllowedEvent();
+        }
     }
 }

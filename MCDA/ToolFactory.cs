@@ -10,9 +10,9 @@ namespace MCDA.Model
     public static class ToolFactory
     {
 
-        public static AbstractToolTemplate NewWLCTool()
+        public static WLCTool NewWLCTool()
         {
-            ToolParameterContainer wlcParameter = MCDA.MCDAExtension.GetExtension().GetWLCParameterBasedOnSelectedFields();
+            ToolParameterContainer wlcParameter = MCDA.MCDAExtension.GetExtension().GetToolParameterBasedOnSelectedFields();
             DataTable dataTable = MCDA.MCDAExtension.GetExtension().GetDataTableForParameterSet(wlcParameter.ToolParameter);
 
             WLCTool wlcTool = new WLCTool(dataTable,wlcParameter);
@@ -22,9 +22,16 @@ namespace MCDA.Model
             return wlcTool;
         }
 
-        public static AbstractToolTemplate NewOWATool()
+        public static OWATool NewOWATool()
         {
-            return null;
+            ToolParameterContainer toolParameter = MCDA.MCDAExtension.GetExtension().GetToolParameterBasedOnSelectedFields();
+            DataTable dataTable = MCDA.MCDAExtension.GetExtension().GetDataTableForParameterSet(toolParameter.ToolParameter);
+
+            OWATool owaTool = new OWATool(dataTable, toolParameter);
+
+            owaTool.DefaultResultColumnName = MCDA.MCDAExtension.GetExtension().GetSuggestNameForResultColumn(owaTool.DefaultResultColumnName);
+
+            return owaTool;
         }
     }
 

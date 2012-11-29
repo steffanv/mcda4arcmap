@@ -86,7 +86,7 @@ namespace MCDA.ViewModel
 
         public BindingList<int> NumberOfClasses
         {
-            get { return new BindingList<int>(Enumerable.Range(2, 29).ToList()); }
+            get { return new BindingList<int>(Enumerable.Range(2, 19).ToList()); }
         }
 
         public BindingList<IClassify> ListOfClassificationMethod

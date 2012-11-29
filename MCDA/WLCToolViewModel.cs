@@ -67,10 +67,16 @@ namespace MCDA.ViewModel
 
        private void FieldPropertyChanged(object sender, PropertyChangedEventArgs e)
        {
+           if (_isLocked)
+               return;
 
            _wlcTool = ToolFactory.NewWLCTool();
 
            _toolParameter = new BindingList<IToolParameter>(_wlcTool.ToolParameterContainer.ToolParameter);
+
+           _wlcTool.Run();
+
+           _wlcResultDataTable = _wlcTool.Data;
 
            _toolParameter.ForEach(t => t.UnRegisterPropertyHandler(b => b.IsBenefitCriterion, BenefitCriterionChanged));
            _toolParameter.ForEach(t => t.UnRegisterPropertyHandler(w => w.Weight, WeightChanged));
@@ -88,6 +94,9 @@ namespace MCDA.ViewModel
                return;
 
            _wlcTool = ToolFactory.NewWLCTool();
+
+           _toolParameter = new BindingList<IToolParameter>(_wlcTool.ToolParameterContainer.ToolParameter);
+
            _wlcTool.Run();
 
            _wlcResultDataTable = _wlcTool.Data;
@@ -303,6 +312,8 @@ namespace MCDA.ViewModel
                _isUpdateAllowed = true;
 
                base.Update();
+
+               PropertyChanged.Notify(() => WLCResult);
 
            };
 

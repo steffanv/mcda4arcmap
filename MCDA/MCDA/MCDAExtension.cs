@@ -191,13 +191,13 @@ namespace MCDA
         }
         #endregion
 
-        public ToolParameterContainer GetWLCParameterBasedOnSelectedFields()
+        public ToolParameterContainer GetToolParameterBasedOnSelectedFields()
         {
-            IList<IToolParameter> wlcParameters = new List<IToolParameter>();
+            IList<IToolParameter> toolParameter = new List<IToolParameter>();
             
-            AvailableLayer.Where(l => l.IsSelected).ForEach(l => l.Fields.Where(f => f.IsSelected && f.IsNumber).ForEach(f => wlcParameters.Add(new WLCToolParameter(f.FieldName))));
+            AvailableLayer.Where(l => l.IsSelected).ForEach(l => l.Fields.Where(f => f.IsSelected && f.IsNumber).ForEach(f => toolParameter.Add(new WLCToolParameter(f.FieldName))));
 
-            return new ToolParameterContainer(wlcParameters);
+            return new ToolParameterContainer(toolParameter);
         }
 
         /// <summary>
@@ -243,7 +243,7 @@ namespace MCDA
                 preferredName += extension;          
             }
 
-            return preferredName + extension;
+            return preferredName;
            
         }
 

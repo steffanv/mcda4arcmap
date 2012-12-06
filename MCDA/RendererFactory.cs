@@ -72,4 +72,11 @@ namespace MCDA.Model
             return classBreaksRenderer;
         }     
     }
+
+    public enum Renderer
+    {
+        ClassBreaksRenderer,
+        BiPolarRenderer,
+        None
+    }
 }

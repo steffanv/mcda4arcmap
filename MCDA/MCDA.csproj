@@ -125,7 +125,7 @@
       <DependentUpon>AlphaSelectionView.xaml</DependentUpon>
     </Compile>
     <Compile Include="AlphaSelectionViewModel.cs" />
-    <Compile Include="ClassBreaksRendererContainer.cs" />
+    <Compile Include="RendererContainer.cs" />
     <Compile Include="Classification.cs" />
     <Compile Include="CollectionExtension.cs" />
     <Compile Include="Config.Designer.cs">

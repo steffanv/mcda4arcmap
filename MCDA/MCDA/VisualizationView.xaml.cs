@@ -28,6 +28,10 @@ namespace MCDA
         private ColorPicker _startColorColorPicker = new ColorPicker();
         private ColorPicker _endColorColorPicker = new ColorPicker();
 
+        private ColorPicker _negativColorPickerForBiPolarRenderer = new ColorPicker();
+        private ColorPicker _positivColorPickerForBiPolarRenderer = new ColorPicker();
+        private ColorPicker _neutralColorPickerForBipolarRenderer = new ColorPicker();
+
         private VisualizationViewModel viewModel;
 
         public VisualizationView()
@@ -40,11 +44,12 @@ namespace MCDA
 
             viewModel = (VisualizationViewModel) DataContext;
 
-            viewModel.RegisterPropertyHandler(p => p.SelectedClassificationMethod, ViewModelPropertyChanged);
-            viewModel.RegisterPropertyHandler(p => p.SelectedNumberOfClasses, ViewModelPropertyChanged);
-
+            //we have to take care of the histogram if the viewmodel changes
+            //viewModel.RegisterPropertyHandler(p => p.SelectedClassificationMethod, ViewModelPropertyChanged);
+            //viewModel.RegisterPropertyHandler(p => p.SelectedNumberOfClasses, ViewModelPropertyChanged);
         }
 
+        /*
         void ViewModelPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             //we use this so far only for the histogram
@@ -62,7 +67,7 @@ namespace MCDA
             double[] classes = Classification.Classify(viewModel.SelectedClassificationMethod, viewModel.SelectedMCDAWorkspaceContainer.FeatureClass, viewModel.SelectedIField, viewModel.SelectedNumberOfClasses);
 
             historgram.Breaks = classes;
-        }
+        }*/
 
         private void InitialiazeColorPicker()
         {
@@ -82,6 +87,51 @@ namespace MCDA
             dockPanel2.Children.Add(_endColorColorPicker);
 
             colorRampRectangle.Fill = new LinearGradientBrush(_startColorColorPicker.SelectedColor, _endColorColorPicker.SelectedColor, 0d);
+
+
+            // bi polar stuff
+            Binding biPolarNegativColorBinding = new Binding("SelectedBiPolarNegativColor");
+            _negativColorPickerForBiPolarRenderer.SetBinding(ColorPicker.SelectedColorProperty, biPolarNegativColorBinding);
+
+            Binding biPolarPositivColorBinding = new Binding("SelectedBiPolarPositivColor");
+            _positivColorPickerForBiPolarRenderer.SetBinding(ColorPicker.SelectedColorProperty, biPolarPositivColorBinding);
+
+            Binding biPolarNeutralColorBinding = new Binding("SelectedBiPolarNeutralColor");
+            _neutralColorPickerForBipolarRenderer.SetBinding(ColorPicker.SelectedColorProperty, biPolarNeutralColorBinding);
+
+            biPolarNegativColorDockPanel.Children.Add(_negativColorPickerForBiPolarRenderer);
+            biPolarPositivColorDockPanel.Children.Add(_positivColorPickerForBiPolarRenderer);
+            biPolarNeutralColorDockPanel.Children.Add(_neutralColorPickerForBipolarRenderer);
+            
+            LinearGradientBrush biPolarColorScaleRectagleBrush = new LinearGradientBrush(_negativColorPickerForBiPolarRenderer.SelectedColor, _positivColorPickerForBiPolarRenderer.SelectedColor, 0d);
+            biPolarColorScaleRectagleBrush.GradientStops.Add(new GradientStop(_neutralColorPickerForBipolarRenderer.SelectedColor, 0.5d));
+
+            biPolarColorScaleRectangle.Fill = biPolarColorScaleRectagleBrush;
+
+            _negativColorPickerForBiPolarRenderer.SelectedColorChanged += new RoutedPropertyChangedEventHandler<Color>(ColorPickerForBiPolarRendererSelectedColorChanged);
+            _positivColorPickerForBiPolarRenderer.SelectedColorChanged += new RoutedPropertyChangedEventHandler<Color>(ColorPickerForBiPolarRendererSelectedColorChanged);
+            _neutralColorPickerForBipolarRenderer.SelectedColorChanged += new RoutedPropertyChangedEventHandler<Color>(ColorPickerForBiPolarRendererSelectedColorChanged);
+
+            biPolarColorSlider.ValueChanged += new RoutedPropertyChangedEventHandler<double>(BiPolarColorSliderValueChanged);
+        }
+
+        private void RedefineBiPolarLinearGradient()
+        {
+            LinearGradientBrush biPolarColorScaleRectagleBrush = new LinearGradientBrush(_negativColorPickerForBiPolarRenderer.SelectedColor, _positivColorPickerForBiPolarRenderer.SelectedColor, 0d);
+
+            biPolarColorScaleRectagleBrush.GradientStops.Add(new GradientStop(_neutralColorPickerForBipolarRenderer.SelectedColor, biPolarColorSlider.Value / 100));
+
+            biPolarColorScaleRectangle.Fill = biPolarColorScaleRectagleBrush;
+        }
+
+        void BiPolarColorSliderValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            RedefineBiPolarLinearGradient();
+        }
+
+        void ColorPickerForBiPolarRendererSelectedColorChanged(object sender, RoutedPropertyChangedEventArgs<Color> e)
+        {
+            RedefineBiPolarLinearGradient();
         }
 
         void ColorPickerSelectedColorChanged(object sender, RoutedPropertyChangedEventArgs<Color> e)

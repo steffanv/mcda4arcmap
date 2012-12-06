@@ -20,6 +20,8 @@ namespace MCDA.Model
         private IFeatureLayer _fl;
         private AbstractToolTemplate _tool;
         private ClassBreaksRendererContainer _classBreaksRendererContainer;
+        private BiPolarRendererContainer _biPolarRendererContainer;
+        private Renderer _renderer = Renderer.None;
 
         public MCDAWorkspaceContainer(AbstractToolTemplate tool, IFeatureClass fc)
         {
@@ -48,6 +50,18 @@ namespace MCDA.Model
             get { return _classBreaksRendererContainer; }
             set { PropertyChanged.ChangeAndNotify(ref _classBreaksRendererContainer, value, () => ClassBreaksRendererContainer); } 
         
-        }   
+        }
+
+        public BiPolarRendererContainer BiPolarRendererContainer
+        {
+            get { return _biPolarRendererContainer;  }
+            set { PropertyChanged.ChangeAndNotify(ref _biPolarRendererContainer, value, () => BiPolarRendererContainer); }
+        }
+
+        public Renderer Renderer {
+
+            get { return _renderer; }
+            set { _renderer = value;  }
+        }
     }
 }

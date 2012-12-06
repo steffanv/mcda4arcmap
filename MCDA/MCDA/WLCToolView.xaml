@@ -56,14 +56,12 @@
                 </Button>
             </ToolBar>
         </ToolBarTray>    
-
         <TabControl Name="tabControl1" Grid.Column="0" Grid.Row="1">
             <TabItem Header="Criteria" Name="criteriaTabItem">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-
                     <ListView Name="listView" ItemsSource="{Binding Path=WLCParameter}" DataContext="{Binding}" HorizontalContentAlignment="Stretch">
                         <ListView.View>
                             <GridView>

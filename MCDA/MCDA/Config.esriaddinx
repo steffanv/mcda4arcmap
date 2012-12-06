@@ -37,7 +37,7 @@
           <InitialPlacement height="300" width="300" state="unpinned" position="float" />
         </DockableWindow>
         <DockableWindow id="Ryerson_University_MCDA_VisualizationView" class="VisualizationView+AddinImpl" caption="Visualization" image="Images\VisualizationView.png">
-          <InitialPlacement height="300" width="300" state="unpinned" position="left" />
+          <InitialPlacement height="300" width="500" state="unpinned" position="left" />
         </DockableWindow>
       </DockableWindows>
       <Toolbars>

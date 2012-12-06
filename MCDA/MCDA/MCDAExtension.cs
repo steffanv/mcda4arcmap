@@ -374,7 +374,7 @@ namespace MCDA
             return listOfValuesFromField;
         }
 
-        public static IList<IField> GetListOfFieldsFromFeatureClass(IFeatureClass featureClass)
+        public IList<IField> GetListOfFieldsFromFeatureClass(IFeatureClass featureClass)
         {
             IList<IField> fieldsList = new List<IField>();
             
@@ -657,12 +657,18 @@ namespace MCDA
             {
                 IGeoFeatureLayer geoFeatureLayer = mcdaWorkspaceContainer.FeatureLayer as IGeoFeatureLayer;
 
-                if (mcdaWorkspaceContainer.ClassBreaksRendererContainer != null && mcdaWorkspaceContainer.ClassBreaksRendererContainer.IsComplete())
-                {
+                if(mcdaWorkspaceContainer.Renderer == Renderer.ClassBreaksRenderer)
                     geoFeatureLayer.Renderer = RendererFactory.newClassBreaksRenderer(mcdaWorkspaceContainer.ClassBreaksRendererContainer, mcdaWorkspaceContainer) as IFeatureRenderer;
-
-                    PartialRefresh(mcdaWorkspaceContainer);
+   
+                if (mcdaWorkspaceContainer.Renderer == Renderer.BiPolarRenderer)
+                {
                 }
+                if (mcdaWorkspaceContainer.Renderer == Renderer.None)
+                {
+                    geoFeatureLayer.Renderer = null;
+                }
+
+                PartialRefresh(mcdaWorkspaceContainer);
             }
         }
 

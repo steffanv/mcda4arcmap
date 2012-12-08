@@ -531,18 +531,7 @@ namespace MCDA
             if (!_dictionaryOfLinks.TryGetValue(tool, out mcdaWorkspaceContainer))
                 return;
 
-           IFeatureClass fc = mcdaWorkspaceContainer.FeatureClass;
-
-           IFeatureLayer fl = new FeatureLayerClass();
-           fl.FeatureClass = fc;
-
-           fl.Name = CreateLayerName(tool);
-
-           mcdaWorkspaceContainer.FeatureLayer = fl;
-          
-           IGeoFeatureLayer gFl = fl as IGeoFeatureLayer;
-
-           ArcMap.Document.ActiveView.FocusMap.AddLayer(fl);
+           ArcMap.Document.ActiveView.FocusMap.AddLayer(mcdaWorkspaceContainer.FeatureLayer);
         }
 
         public void RemoveLink(AbstractToolTemplate tool)
@@ -562,7 +551,20 @@ namespace MCDA
             IFeatureClass fc = fl.FeatureClass;
 
             IFeatureClass fcCopy = CopyFeatureClassIntoNewWorkspace(fc, _shadowWorkspace, tool.ToString() + CreateTimeStamp());
-            _dictionaryOfLinks.Add(tool, new MCDAWorkspaceContainer(tool, fcCopy));
+
+            MCDAWorkspaceContainer mcdaWorkspaceContainer = new MCDAWorkspaceContainer(tool, fcCopy);
+
+            //IFeatureClass fc = mcdaWorkspaceContainer.FeatureClass;
+
+            //createn feature layer to display the result on a map
+            IFeatureLayer newfl = new FeatureLayerClass();
+            newfl.FeatureClass = mcdaWorkspaceContainer.FeatureClass;
+
+            newfl.Name = CreateLayerName(tool);
+
+            mcdaWorkspaceContainer.FeatureLayer = newfl;
+
+            _dictionaryOfLinks.Add(tool, mcdaWorkspaceContainer);
 
             PropertyChanged.Notify(() => LinkDictionary);
 
@@ -578,8 +580,6 @@ namespace MCDA
         {
             return DateTime.Now.ToString("yyyyMMddHHmmssffff");
         }
-
-       
 
         /// <summary>
         /// Joins the result table of the data table into the feature class of the tool by using the oid/fid.
@@ -657,15 +657,14 @@ namespace MCDA
             {
                 IGeoFeatureLayer geoFeatureLayer = mcdaWorkspaceContainer.FeatureLayer as IGeoFeatureLayer;
 
-                if(mcdaWorkspaceContainer.Renderer == Renderer.ClassBreaksRenderer)
-                    geoFeatureLayer.Renderer = RendererFactory.newClassBreaksRenderer(mcdaWorkspaceContainer.ClassBreaksRendererContainer, mcdaWorkspaceContainer) as IFeatureRenderer;
-   
-                if (mcdaWorkspaceContainer.Renderer == Renderer.BiPolarRenderer)
-                {
-                }
-                if (mcdaWorkspaceContainer.Renderer == Renderer.None)
-                {
-                    geoFeatureLayer.Renderer = null;
+                switch(mcdaWorkspaceContainer.Renderer){
+
+                    case Renderer.ClassBreaksRenderer: geoFeatureLayer.Renderer = RendererFactory.NewClassBreaksRenderer( mcdaWorkspaceContainer);
+                        break;
+                    case Renderer.BiPolarRenderer: geoFeatureLayer.Renderer = RendererFactory.NewUniqueValueRenderer(mcdaWorkspaceContainer);
+                        break;
+                    case Renderer.None: geoFeatureLayer.Renderer = RendererFactory.NewSimpleRenderer();
+                        break;
                 }
 
                 PartialRefresh(mcdaWorkspaceContainer);

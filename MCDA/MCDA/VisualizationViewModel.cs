@@ -19,10 +19,7 @@ namespace MCDA.ViewModel
 	{
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private Color _selectedStartColor, _selectedEndColor;
-        //private BindingList<MCDAWorkspaceContainer> _listOfMCDAWorkspaceContainer;
-        //private BindingList<IField> _listOfFields;
-        //private MCDAWorkspaceContainer _selectedMCDAWorkspaceContainer;
+        private Color _selectedStartColor, _selectedEndColor; 
 
         private BindingList<IClassify> _listOfClassificationMethod;
         private BindingList<int> _listOfNumberOfClasses;
@@ -37,8 +34,8 @@ namespace MCDA.ViewModel
         private double _biPolarColorSliderValue;
         private Color _selectedBiPolarNegativColor, _selectedBiPolarPositivColor, _selectedBiPolarNeutralColor;
 
-        private BindingList<X> _resultList;
-        private X _selectedResult;
+        private BindingList<ResultContainer> _resultList;
+        private ResultContainer _selectedResult;
 
         private ICommand _applyClassBreaksRendererCommand;
         private ICommand _removeClassBreaksRendererCommand;
@@ -46,8 +43,12 @@ namespace MCDA.ViewModel
         private ICommand _applyBiPolarRendererCommand;
         private ICommand _removeBiPolarRendererCommand;
 
-        private bool _isClassBreaksRendererCommandExecuted = false;
-        private bool _isBiPolarRendererCommandExecuted = false;
+        private bool _canClassBreaksRendererApplyCommandExecuted = false;
+        private bool _canClassBreaksRendererRemoveCommandExecuted = false;
+        private bool _isClassBreaksRendererApplyCommandExecuted = false;
+        private bool _canBiPolarRendererApplyCommandExecuted = false;
+        private bool _canBiPolarRendererRemoveCommandExecuted = false;
+        private bool _isBiPolarRendererApplyCommandExecuted = false;
 
         private MCDAExtension MCDAExtension = MCDAExtension.GetExtension();
 
@@ -62,11 +63,12 @@ namespace MCDA.ViewModel
             SelectedBiPolarPositivColor = Color.FromRgb(0, 255, 0);
             SelectedBiPolarNeutralColor = Color.FromRgb(255, 255, 255);
 
-            //_listOfMCDAWorkspaceContainer = new BindingList<MCDAWorkspaceContainer>(_MCDAExtension.GetAllMCDAWorkspaceContainerFromShadowWorkspace());
-          
+            BiPolarColorSliderValue = 50;
+
+
             MCDAExtension.RegisterPropertyHandler(x => x.LinkDictionary, LinkDictionaryPropertyChanged);
 
-            Y();
+            CreateResultList();
 
             PropertyChanged.Notify(() => ResultList);
         }
@@ -74,45 +76,26 @@ namespace MCDA.ViewModel
         void LinkDictionaryPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
 
-            // dafue sorgen, dass das selected selected leibt wenn noch vorhanden!!!!
+            CreateResultList();
 
-            /*
-            IList<MCDAWorkspaceContainer> _mcdaWorkspaceContainer = _MCDAExtension.GetAllMCDAWorkspaceContainerFromShadowWorkspace();
-
-            //the selected container is still in the in memory workspace
-            if (_mcdaWorkspaceContainer.Any(c => c == _selectedMCDAWorkspaceContainer))
-            {
-                ClassBreaksRendererContainerToView();
-                Render();
-            }
-            else
-            {
-                _selectedIField = null;
-                SetFields();
-            }
-
-            _listOfMCDAWorkspaceContainer = new BindingList<MCDAWorkspaceContainer>(_mcdaWorkspaceContainer);
-            */
-
-            Y();
-
-            //PropertyChanged.Notify(() => MCDAWorkspaceContainer);
-            //PropertyChanged.Notify(() => SelectedMCDAWorkspaceContainer);
-            //PropertyChanged.Notify(() => Fields);
+            _selectedResult = _resultList.FirstOrDefault(r => r.Equals(_selectedResult));
+    
             PropertyChanged.Notify(() => ResultList);
+            PropertyChanged.Notify(() => SelectedResult);
         }
 
-        public BindingList<X> ResultList
+
+        public BindingList<ResultContainer> ResultList
         {
             get { return _resultList; }
         }
 
-        public X SelectedResult
+        public ResultContainer SelectedResult
         {
             get { return _selectedResult; }
             set { _selectedResult = value;
 
-            RendererContainerToView();
+            SelectedResultChanged();
 
             }
         }
@@ -125,8 +108,7 @@ namespace MCDA.ViewModel
 
         public BindingList<IClassify> ListOfClassificationMethod
         {
-            get { return _listOfClassificationMethod; }
-            //set { _listOfClassificationMethod = value; }
+            get { return _listOfClassificationMethod; }  
         }
 
         
@@ -136,12 +118,12 @@ namespace MCDA.ViewModel
             set { 
                 
                 _selectedNumberOfClasses = value;
-                _classBreaksRendererContainer.NumberOfClasses = value;
 
+                ClassBreaksRendererValuesChanged();
                 //for the histogram
                 PropertyChanged.Notify(() => SelectedNumberOfClasses);
 
-                Render();
+
             }
         }
 
@@ -151,24 +133,23 @@ namespace MCDA.ViewModel
             set { 
                 
                 _selectedClassificationMethod = value;
-                _classBreaksRendererContainer.ClassificationMethod = value;
+
+                ClassBreaksRendererValuesChanged();
 
                 //for the histogram
                 PropertyChanged.Notify(() => SelectedClassificationMethod);
 
-                Render();
             }
         }
 
         public Color SelectedStartColor
         {
             get { return _selectedStartColor;  }
-            set { 
+            set {
 
+                ClassBreaksRendererValuesChanged();
                 _selectedStartColor = value;
-                _classBreaksRendererContainer.StartColor = value;
 
-                Render();
             }
         }
 
@@ -177,10 +158,9 @@ namespace MCDA.ViewModel
             get { return _selectedEndColor; }
             set
             {
+                ClassBreaksRendererValuesChanged();
                 _selectedEndColor = value;
-                _classBreaksRendererContainer.EndColor = value;
 
-                Render();
             }
         }
         #endregion
@@ -190,7 +170,12 @@ namespace MCDA.ViewModel
         public double BiPolarColorSliderValue
         {
             get { return _biPolarColorSliderValue; }
-            set { _biPolarColorSliderValue = value; }
+            set { 
+                
+                _biPolarColorSliderValue = value;
+                BiPolarRendererValuesChanged();
+            
+            }
         }
 
         public Color SelectedBiPolarNegativColor
@@ -199,7 +184,7 @@ namespace MCDA.ViewModel
             set
             {
                 _selectedBiPolarNegativColor = value;
-                Render();
+                BiPolarRendererValuesChanged();
             }
         }
 
@@ -209,7 +194,7 @@ namespace MCDA.ViewModel
             set
             {
                 _selectedBiPolarPositivColor = value;
-                Render();
+                BiPolarRendererValuesChanged();
             }
         }
 
@@ -219,8 +204,7 @@ namespace MCDA.ViewModel
             set
             {
                 _selectedBiPolarNeutralColor = value;
-               
-                Render();
+                BiPolarRendererValuesChanged();
             }
         }
 
@@ -228,22 +212,19 @@ namespace MCDA.ViewModel
 
         private void Render()
         {
-            
-            if(_isBiPolarRendererCommandExecuted || _isClassBreaksRendererCommandExecuted)
                 MCDAExtension.Render(_selectedResult.MCDAWorkspaceContainer);
-
         }
 
-        private void Y()
+        private void CreateResultList()
         {
-            _resultList = new BindingList<X>();
+            _resultList = new BindingList<ResultContainer>();
 
             foreach (MCDAWorkspaceContainer currentMCDAWorkspaceContainer in MCDAExtension.GetAllMCDAWorkspaceContainerFromShadowWorkspace())
             {
                 //this list should include only one element, becauseone tool has only one result
                 IList<IField> fields = MCDAExtension.GetExtension().GetListOfFieldsFromFeatureClass(currentMCDAWorkspaceContainer.FeatureClass).Where(f => f.Name.Equals(currentMCDAWorkspaceContainer.Tool.DefaultResultColumnName)).ToList();
 
-                    X temp = new X();
+                    ResultContainer temp = new ResultContainer();
                     temp.Field = fields.FirstOrDefault();
                     temp.MCDAWorkspaceContainer = currentMCDAWorkspaceContainer;
 
@@ -266,6 +247,32 @@ namespace MCDA.ViewModel
             _listOfNumberOfClasses =  new BindingList<int>(Enumerable.Range(2, 19).ToList());
 
             _selectedNumberOfClasses = 5;
+        }
+
+        private BiPolarRendererContainer GetBiPolarContainer()
+        {      
+            BiPolarRendererContainer container = new BiPolarRendererContainer();
+
+            container.Field = _selectedResult.Field;
+            container.NegativColor = _selectedBiPolarNegativColor;
+            container.PositivColor = _selectedBiPolarPositivColor;
+            container.NeutralColor = _selectedBiPolarNeutralColor;
+            container.NeutralColorPosition = _biPolarColorSliderValue;
+
+            return container;
+        }
+
+        private ClassBreaksRendererContainer GetClassBreaksRendererContainer()
+        {
+            ClassBreaksRendererContainer container = new ClassBreaksRendererContainer();
+
+            container.Field = _selectedResult.Field;
+            container.ClassificationMethod = _selectedClassificationMethod;
+            container.EndColor = _selectedEndColor;
+            container.StartColor = _selectedStartColor;
+            container.NumberOfClasses = _selectedNumberOfClasses;
+
+            return container;
         }
 
         private void RendererContainerToView()
@@ -303,11 +310,57 @@ namespace MCDA.ViewModel
             }
         }
 
+
+        private void BiPolarRendererValuesChanged()
+        {
+            if (_isBiPolarRendererApplyCommandExecuted)
+            {
+                _selectedResult.MCDAWorkspaceContainer.BiPolarRendererContainer = GetBiPolarContainer();
+                _selectedResult.MCDAWorkspaceContainer.Renderer = Renderer.BiPolarRenderer;
+
+                Render();
+            }
+        }
+
+        private void ClassBreaksRendererValuesChanged()
+        {
+            if (_isClassBreaksRendererApplyCommandExecuted)
+            {
+                _selectedResult.MCDAWorkspaceContainer.ClassBreaksRendererContainer = GetClassBreaksRendererContainer();
+                _selectedResult.MCDAWorkspaceContainer.Renderer = Renderer.ClassBreaksRenderer;
+
+                Render();
+            }
+        }
+
         private void SelectedResultChanged()
         {
+            _canBiPolarRendererApplyCommandExecuted = false;
+            _canBiPolarRendererRemoveCommandExecuted = false;
+            _isBiPolarRendererApplyCommandExecuted = false;
+
+            _canClassBreaksRendererApplyCommandExecuted = false;
+            _canClassBreaksRendererRemoveCommandExecuted = false;
+            _isClassBreaksRendererApplyCommandExecuted = false;
+
             if (_selectedResult == null)
             {
-                //_applyClassBreaksRendererCommand.
+            //...    
+            }
+            else
+            {
+                switch (_selectedResult.MCDAWorkspaceContainer.Renderer)
+                {
+                    case Renderer.None: _canBiPolarRendererApplyCommandExecuted = true; _canClassBreaksRendererApplyCommandExecuted = true;
+                        break;
+                    case Renderer.BiPolarRenderer: _canBiPolarRendererRemoveCommandExecuted = true; _isBiPolarRendererApplyCommandExecuted = true; _canClassBreaksRendererApplyCommandExecuted = true;                                                  
+                        break;
+                    case Renderer.ClassBreaksRenderer: _isClassBreaksRendererApplyCommandExecuted = true; _canClassBreaksRendererRemoveCommandExecuted = true; _canBiPolarRendererApplyCommandExecuted = true;
+                        break;             
+                }
+
+                RendererContainerToView();
+
             }
         }
 
@@ -321,7 +374,7 @@ namespace MCDA.ViewModel
                 {
                     _applyClassBreaksRendererCommand = new RelayCommand(
                         p => this.DoApplyClassBreaksRendererCommand(),
-                        p => !_isClassBreaksRendererCommandExecuted );
+                        p => _canClassBreaksRendererApplyCommandExecuted);
                 }
                 return _applyClassBreaksRendererCommand;
             }
@@ -335,7 +388,7 @@ namespace MCDA.ViewModel
                 {
                     _removeClassBreaksRendererCommand = new RelayCommand(
                         p => this.DoRemoveClassBreaksRendererCommand(),
-                        p => _isClassBreaksRendererCommandExecuted);
+                        p => _canClassBreaksRendererRemoveCommandExecuted);
                 }
                 return _removeClassBreaksRendererCommand;
             }
@@ -349,7 +402,7 @@ namespace MCDA.ViewModel
                 {
                     _applyBiPolarRendererCommand = new RelayCommand(
                         p => this.DoApplyBiPolarRendererCommand(),
-                        p => !_isBiPolarRendererCommandExecuted);
+                        p => _canBiPolarRendererApplyCommandExecuted );
                 }
                 return _applyBiPolarRendererCommand;
             }
@@ -361,9 +414,9 @@ namespace MCDA.ViewModel
             {
                 if (_removeBiPolarRendererCommand == null)
                 {
-                    _removeClassBreaksRendererCommand = new RelayCommand(
+                    _removeBiPolarRendererCommand = new RelayCommand(
                         p => this.DoRemoveBiPolarRendererCommand(),
-                        p => _isBiPolarRendererCommandExecuted);
+                        p => _canBiPolarRendererRemoveCommandExecuted);
                 }
                 return _removeBiPolarRendererCommand;
             }
@@ -371,52 +424,81 @@ namespace MCDA.ViewModel
 
         #endregion
 
+        #region implemented commands
+
         private void DoApplyClassBreaksRendererCommand(){
 
-            _isClassBreaksRendererCommandExecuted = true;
+            _isClassBreaksRendererApplyCommandExecuted = true;
+            _canClassBreaksRendererApplyCommandExecuted = false;
+            _canClassBreaksRendererRemoveCommandExecuted = true;
 
-            ClassBreaksRendererContainer container = new ClassBreaksRendererContainer();
+            _isBiPolarRendererApplyCommandExecuted = false;
+            _canBiPolarRendererApplyCommandExecuted = true;
+            _canBiPolarRendererRemoveCommandExecuted = false;
 
-            container.ClassificationMethod = _selectedClassificationMethod;
-            container.EndColor = _selectedEndColor;
-            container.StartColor = _selectedStartColor;
-            container.NumberOfClasses = _selectedNumberOfClasses;
-            container.Field = _selectedResult.Field;
-
-            _selectedResult.MCDAWorkspaceContainer.ClassBreaksRendererContainer = container;
-            _selectedResult.MCDAWorkspaceContainer.Renderer = Renderer.ClassBreaksRenderer;
+            ClassBreaksRendererValuesChanged();
         }
 
         private void DoRemoveClassBreaksRendererCommand()
         {
-            _isClassBreaksRendererCommandExecuted = false;
+            _isClassBreaksRendererApplyCommandExecuted = false;
+            _canClassBreaksRendererApplyCommandExecuted = true;
+            _canClassBreaksRendererRemoveCommandExecuted = false;
+
+            _isBiPolarRendererApplyCommandExecuted = false;
+            _canBiPolarRendererApplyCommandExecuted = true;
+            _canBiPolarRendererRemoveCommandExecuted = false;
+
             _selectedResult.MCDAWorkspaceContainer.Renderer = Renderer.None;
+
+            Render();
         }
 
         private void DoApplyBiPolarRendererCommand()
         {
-            _isBiPolarRendererCommandExecuted = true;
-
-            BiPolarRendererContainer container = new BiPolarRendererContainer();
-
-            container.NeutralColor = _selectedBiPolarNeutralColor;
-            container.NegativColor = _selectedBiPolarNegativColor;
-            container.PositivColor = _selectedBiPolarPositivColor;
-            container.NeutralColorPosition = _biPolarColorSliderValue;
-            container.Field = _selectedResult.Field;
             
+            _canBiPolarRendererApplyCommandExecuted = false;
+            _canBiPolarRendererRemoveCommandExecuted = true;
+            _isBiPolarRendererApplyCommandExecuted = true;
+
+            _isClassBreaksRendererApplyCommandExecuted = false;
+            _canClassBreaksRendererApplyCommandExecuted = true;
+            _canClassBreaksRendererRemoveCommandExecuted = false;
+
+            BiPolarRendererValuesChanged();
         }
 
         private void DoRemoveBiPolarRendererCommand()
         {
-            _isBiPolarRendererCommandExecuted = false;
+            _isClassBreaksRendererApplyCommandExecuted = false;
+            _canClassBreaksRendererApplyCommandExecuted = true;
+            _canClassBreaksRendererRemoveCommandExecuted = false;
+
+            _isBiPolarRendererApplyCommandExecuted = false;
+            _canBiPolarRendererApplyCommandExecuted = true;
+            _canBiPolarRendererRemoveCommandExecuted = false;
+
             _selectedResult.MCDAWorkspaceContainer.Renderer = Renderer.None;
+
+            Render();
         }
 
-        public class X
+        #endregion
+
+        public class ResultContainer
         {
             public IField Field { get; set; }
             public MCDAWorkspaceContainer MCDAWorkspaceContainer { get; set; }
+
+            public override bool Equals(object obj)
+            { 
+                ResultContainer arg = obj as ResultContainer;
+
+                if(arg == null)
+                    return false;
+
+                return arg.Field == Field && arg.MCDAWorkspaceContainer == MCDAWorkspaceContainer;
+            }
         }
 
 	}

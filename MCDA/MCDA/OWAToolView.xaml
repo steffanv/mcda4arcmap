@@ -13,7 +13,7 @@
         <ToolBarTray Grid.Column="0" Grid.Row="0">
             <ToolBar Band="1" BandIndex="1">
                 <Button Name="lockButton" Command="{Binding Path=LockCommand}" ToolTip="Lock the OWA Tool data.">
-                    <Image >
+                    <Image RenderOptions.BitmapScalingMode="HighQuality" >
                         <Image.Style>
                             <Style TargetType="{x:Type Image}">
                                 <Style.Triggers>
@@ -30,14 +30,14 @@
                 </Button>
                 <Separator />
                 <Button Command="{Binding Path=StandardizationSelectionCommand}" ToolTip="Choose another standardization strategy.">
-                    <Image Source="Images\toolbargraphics\Standardization.png"/>
+                    <Image Source="Images\toolbargraphics\Standardization.png" RenderOptions.BitmapScalingMode="HighQuality" />
                 </Button>
                 <Button Command="{Binding Path=AlphaSelectionCommand}" ToolTip="Choose another alpha value.">
-                    <Image Source="Images\toolbargraphics\Alpha.png"/>
+                    <Image Source="Images\toolbargraphics\Alpha.png" RenderOptions.BitmapScalingMode="HighQuality" />
                 </Button>
                 <Separator />
                 <Button Command="{Binding Path=SendToInMemoryWorkspaceCommand}">
-                    <Image >
+                    <Image RenderOptions.BitmapScalingMode="HighQuality" >
                         <Image.Style>
                             <Style TargetType="{x:Type Image}">
                                 <Style.Triggers>
@@ -54,7 +54,7 @@
 
                 </Button>
                 <Button Command="{Binding Path=ExportAsCSVCommand}" ToolTip="Export result table and parameters as CSV.">
-                    <Image Source="Images\toolbargraphics\Export.png"/>
+                    <Image Source="Images\toolbargraphics\Export.png" RenderOptions.BitmapScalingMode="HighQuality" />
                 </Button>
             </ToolBar>
         </ToolBarTray>

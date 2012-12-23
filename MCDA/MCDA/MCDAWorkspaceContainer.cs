@@ -12,7 +12,7 @@ namespace MCDA.Model
     /// <summary>
     /// A container for a tool and its 
     /// </summary>
-    public class MCDAWorkspaceContainer : INotifyPropertyChanged
+    public class MCDAWorkspaceContainer : INotifyPropertyChanged, IRenderContainer
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -37,6 +37,7 @@ namespace MCDA.Model
         public IFeatureClass FeatureClass
         {
             get { return _fc; }
+            set { PropertyChanged.ChangeAndNotify(ref _fc, value, () => FeatureClass); }
         }
 
         public IFeatureLayer FeatureLayer
@@ -49,7 +50,6 @@ namespace MCDA.Model
             
             get { return _classBreaksRendererContainer; }
             set { PropertyChanged.ChangeAndNotify(ref _classBreaksRendererContainer, value, () => ClassBreaksRendererContainer); } 
-        
         }
 
         public BiPolarRendererContainer BiPolarRendererContainer
@@ -61,7 +61,7 @@ namespace MCDA.Model
         public Renderer Renderer {
 
             get { return _renderer; }
-            set { _renderer = value;  }
+            set { PropertyChanged.ChangeAndNotify(ref _renderer, value, () => Renderer); }
         }
     }
 }

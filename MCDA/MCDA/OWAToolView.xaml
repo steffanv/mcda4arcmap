@@ -1,7 +1,16 @@
-﻿<UserControl x:Class="MCDA.OWAToolView"
+﻿<!--<UserControl x:Class="MCDA.OWAToolView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    Height="400" Width="500">
+    Height="400" Width="500">-->
+<Window x:Class="MCDA.OWAToolView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="OWA Tool"
+        WindowStyle="SingleBorderWindow"
+        ShowInTaskbar="False"
+        ResizeMode="CanResize"
+        WindowStartupLocation="CenterOwner"
+        Height="300" Width="500">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
@@ -29,11 +38,14 @@
                     </Image>
                 </Button>
                 <Separator />
+                <Button Command="{Binding Path=DistributionCommand}" ToolTip="Distribute the weights.">
+                    <Image Source="Images\toolbargraphics\Distribution.png"/>
+                </Button>
                 <Button Command="{Binding Path=StandardizationSelectionCommand}" ToolTip="Choose another standardization strategy.">
                     <Image Source="Images\toolbargraphics\Standardization.png" RenderOptions.BitmapScalingMode="HighQuality" />
                 </Button>
                 <Button Command="{Binding Path=AlphaSelectionCommand}" ToolTip="Choose another alpha value.">
-                    <Image Source="Images\toolbargraphics\Alpha.png" RenderOptions.BitmapScalingMode="HighQuality" />
+                    <Image Source="Images\toolbargraphics\Alpha.png" Width="16" Height="16" RenderOptions.BitmapScalingMode="HighQuality" />
                 </Button>
                 <Separator />
                 <Button Command="{Binding Path=SendToInMemoryWorkspaceCommand}">
@@ -51,7 +63,6 @@
                             </Style>
                         </Image.Style>
                     </Image>
-
                 </Button>
                 <Button Command="{Binding Path=ExportAsCSVCommand}" ToolTip="Export result table and parameters as CSV.">
                     <Image Source="Images\toolbargraphics\Export.png" RenderOptions.BitmapScalingMode="HighQuality" />
@@ -109,4 +120,4 @@
             </TabItem>
         </TabControl>
     </Grid>
-</UserControl>
+</Window>

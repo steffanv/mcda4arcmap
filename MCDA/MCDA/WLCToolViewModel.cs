@@ -5,7 +5,6 @@ using System.Text;
 using System.ComponentModel;
 using MCDA.Model;
 using MCDA.Extensions;
-using MCDA.Entity;
 using System.Data;
 using System.Windows.Input;
 using ESRI.ArcGIS.esriSystem;
@@ -42,14 +41,6 @@ namespace MCDA.ViewModel
            if(_mcdaExtension.SelectedLayer != null)
                _mcdaExtension.SelectedLayer.Fields.ForEach(x => x.RegisterPropertyHandler(f => f.IsSelected, FieldPropertyChanged));
 
-           _toolParameter = new BindingList<IToolParameter>(_wlcTool.ToolParameterContainer.ToolParameter);
-
-           _toolParameter.ForEach(t => t.RegisterPropertyHandler(b => b.IsBenefitCriterion,BenefitCriterionChanged));
-           _toolParameter.ForEach(t => t.RegisterPropertyHandler(w => w.Weight, WeightChanged));
-           
-            PropertyChanged.Notify(() => WLCParameter);
-            PropertyChanged.Notify(() => WLCResult);
-
            //we have to call our own update method to make sure we have a result column
             MCDAExtensionPropertyChanged(this, null);
 
@@ -78,14 +69,19 @@ namespace MCDA.ViewModel
 
            _wlcResultDataTable = _wlcTool.Data;
 
+           RegisterToolParameterEvents();
+
+           PropertyChanged.Notify(() => WLCParameter);
+           PropertyChanged.Notify(() => WLCResult);
+       }
+
+       private void RegisterToolParameterEvents()
+       {
            _toolParameter.ForEach(t => t.UnRegisterPropertyHandler(b => b.IsBenefitCriterion, BenefitCriterionChanged));
            _toolParameter.ForEach(t => t.UnRegisterPropertyHandler(w => w.Weight, WeightChanged));
 
            _toolParameter.ForEach(t => t.RegisterPropertyHandler(b => b.IsBenefitCriterion, BenefitCriterionChanged));
            _toolParameter.ForEach(t => t.RegisterPropertyHandler(w => w.Weight, WeightChanged));
-
-           PropertyChanged.Notify(() => WLCParameter);
-           PropertyChanged.Notify(() => WLCResult);
        }
 
        private void MCDAExtensionPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -107,6 +103,8 @@ namespace MCDA.ViewModel
                _mcdaExtension.SelectedLayer.Fields.ForEach(x => x.UnRegisterPropertyHandler(f => f.IsSelected, FieldPropertyChanged));
                _mcdaExtension.SelectedLayer.Fields.ForEach(x => x.RegisterPropertyHandler(f => f.IsSelected, FieldPropertyChanged));
            }
+
+           RegisterToolParameterEvents();
 
            PropertyChanged.Notify(() => WLCParameter);
            PropertyChanged.Notify(() => WLCResult);
@@ -255,7 +253,7 @@ namespace MCDA.ViewModel
            }
 
            if(_isLocked)
-               _mcdaExtension.EstablishLink(_wlcTool);
+               ProgressDialog.ShowProgressDialog("Establish Link", _mcdaExtension.EstablishLink, _wlcTool);
 
            if (!_isLocked)
            {
@@ -318,7 +316,41 @@ namespace MCDA.ViewModel
            };
 
            wpfWindow.ShowDialog();
- 
+       }
+
+       protected override void DoDistributionCommand()
+        {
+            _wlcTool.ToolParameterContainer.DistributeEquallyToolParameterWeights();
+
+            _wlcTool.Run();
+
+            _wlcResultDataTable = _wlcTool.Data;
+
+            PropertyChanged.Notify(() => WLCParameter);
+            PropertyChanged.Notify(() => WLCResult);
+        }
+
+       protected override void DoClosingCommand()
+       {
+           if (_isLocked || _isSendToInMemoryWorkspaceCommand)
+           {
+               _mcdaExtension.RemoveLink(_wlcTool);
+
+               //ESRI.ArcGIS.Framework.IMessageDialog msgBox = new ESRI.ArcGIS.Framework.MessageDialogClass();
+               //bool userResult = msgBox.DoModal("Closing", "Unlocking also removes the existing in memory connection.", "Yes", "No", ArcMap.Application.hWnd);
+
+               ////if the user hit no we have to set the lock state back to locked
+               //if (userResult)
+               //{
+               //    _mcdaExtension.RemoveLink(_wlcTool);
+
+
+               //}
+               //else
+               //{
+
+               //}
+           }
        }
     }
 }

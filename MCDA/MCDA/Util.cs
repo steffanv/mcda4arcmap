@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Linq.Expressions;
+using MCDA.Extensions;
 
 namespace MCDA.Model
 {
@@ -14,5 +15,6 @@ namespace MCDA.Model
         {
             return (expression.Body as MemberExpression).Member.Name;
         }
+
     }
 }

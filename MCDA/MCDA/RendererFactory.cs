@@ -9,6 +9,7 @@ using ESRI.ArcGIS.Display;
 using System.Windows.Media;
 using System.ComponentModel;
 using MCDA.Extensions;
+using System.Threading.Tasks;
 
 namespace MCDA.Model
 {
@@ -38,9 +39,9 @@ namespace MCDA.Model
             return rgbColor;
         }
 
-        public static IFeatureRenderer NewUniqueValueRenderer(MCDAWorkspaceContainer mcdaWorkspaceContainer)
+        public static IFeatureRenderer NewUniqueValueRenderer(IRenderContainer renderContainer)
         {
-            BiPolarRendererContainer biPolarRendererContainer = mcdaWorkspaceContainer.BiPolarRendererContainer;
+            BiPolarRendererContainer biPolarRendererContainer = renderContainer.BiPolarRendererContainer;
             //Make the renderer.
             IUniqueValueRenderer uniqueValueRenderer = new UniqueValueRendererClass();
 
@@ -56,61 +57,54 @@ namespace MCDA.Model
             uniqueValueRenderer.DefaultSymbol = pSimpleFillSymbol as ISymbol;
             uniqueValueRenderer.UseDefaultSymbol = true;
 
-            IGeoFeatureLayer pGeoFeatureLayer = mcdaWorkspaceContainer.FeatureLayer as IGeoFeatureLayer;
+            IGeoFeatureLayer pGeoFeatureLayer = renderContainer.FeatureLayer as IGeoFeatureLayer;
 
             IDisplayTable pDisplayTable = pGeoFeatureLayer as IDisplayTable;
             IFeatureCursor pFeatureCursor = pDisplayTable.SearchDisplayTable(null, false) as IFeatureCursor;
             IFeature pFeature = pFeatureCursor.NextFeature();
 
-            IList<double> listOfFeatures = new List<double>();
-
             int fieldIndex;
             IFields pFields = pFeatureCursor.Fields;
             fieldIndex = pFields.FindField(fieldName);
 
+            HashSet<double> setOfFeatures = new HashSet<double>();
+
             while (pFeature != null)
             {
-                listOfFeatures.Add(Convert.ToDouble(pFeature.get_Value(fieldIndex)));
+                setOfFeatures.Add(Convert.ToDouble(pFeature.get_Value(fieldIndex)));
 
                 pFeature = pFeatureCursor.NextFeature();
             }
 
-            bool ValFound;
+            //bool ValFound;
 
-            IEnumerable<double> sortedFeatures = listOfFeatures.OrderBy(d => d);
+            IEnumerable<double> sortedFeatures = setOfFeatures.AsParallel().OrderBy(d => d);
 
-            //while (pFeature != null)
-            foreach(double currentClassValue in sortedFeatures)
+            foreach (double currentClassValue in sortedFeatures)
             {
                 ISimpleFillSymbol pClassSymbol = new SimpleFillSymbolClass();
                 pClassSymbol.Style = esriSimpleFillStyle.esriSFSSolid;
                 pClassSymbol.Outline.Width = 0.4;
 
-                string classValue;
-                classValue = Convert.ToString(currentClassValue);
+                string classValue = currentClassValue.ToString();
 
                 //Test to see if this value was added
                 //to the renderer. If not, add it.
-                ValFound = false;
-                for (int i = 0; i <= uniqueValueRenderer.ValueCount - 1; i++)
-                {
-                    if (uniqueValueRenderer.get_Value(i) == classValue)
-                    {
-                        ValFound = true;
-                        break; //Exit the loop if the value was found.
-                    }
-                }
-                //If the value was not found, it is new and it will be added.
-                if (ValFound == false)
-                {
-                    uniqueValueRenderer.AddValue(classValue, fieldName, pClassSymbol as ISymbol);
-                    uniqueValueRenderer.set_Label(classValue, classValue);
-                    uniqueValueRenderer.set_Symbol(classValue, pClassSymbol as ISymbol);
-                }
-                //pFeature = pFeatureCursor.NextFeature();
-            }
 
-            //MultiPartColorRamp multiPartColorRamp = new MultiPartColorRampClass()
+                //for (int i = 0; i <= uniqueValueRenderer.ValueCount - 1; i++)
+                //{
+                    //if (uniqueValueRenderer.get_Value(i).Equals(classValue))
+                    //    continue;
+
+                    //If the value was not found, it is new and it will be added.
+
+                    uniqueValueRenderer.AddValue(classValue, fieldName, (ISymbol)pClassSymbol);
+                    uniqueValueRenderer.set_Label(classValue, classValue);
+                    uniqueValueRenderer.set_Symbol(classValue, (ISymbol)pClassSymbol);
+
+                //}
+
+            }
 
             //figure out how many colors belong to which side from the neutral color
             int size = uniqueValueRenderer.ValueCount;
@@ -120,13 +114,12 @@ namespace MCDA.Model
 
             IAlgorithmicColorRamp firstColorRamp = new AlgorithmicColorRampClass();
            
-            //firstColorRamp.Algorithm = esriColorRampAlgorithm.esriHSVAlgorithm;
             firstColorRamp.FromColor = ToColor(biPolarRendererContainer.NegativColor);
             firstColorRamp.ToColor = ToColor(biPolarRendererContainer.NeutralColor);
 
             firstColorRamp.Size = left;
             bool bOK;
-            firstColorRamp.CreateRamp(out bOK);
+            //firstColorRamp.CreateRamp(out bOK);
 
             IAlgorithmicColorRamp secondColorRamp = new AlgorithmicColorRampClass();
            
@@ -134,8 +127,9 @@ namespace MCDA.Model
             secondColorRamp.ToColor = ToColor(biPolarRendererContainer.PositivColor);
 
             secondColorRamp.Size = right;
-           
-            secondColorRamp.CreateRamp(out bOK);
+            //secondColorRamp.CreateRamp(out bOK);
+
+            Parallel.Invoke(() => firstColorRamp.CreateRamp(out bOK), () => secondColorRamp.CreateRamp(out bOK));
 
             IEnumColors firstEnumColors = firstColorRamp.Colors;
             IEnumColors secondEnumColors = secondColorRamp.Colors;
@@ -147,9 +141,9 @@ namespace MCDA.Model
             {
                 string xv = uniqueValueRenderer.get_Value(j);
 
-                if (xv != String.Empty)
-                {
-                    ISimpleFillSymbol pSimpleFillColor = uniqueValueRenderer.get_Symbol(xv) as ISimpleFillSymbol;
+                //if (xv != String.Empty)
+                //{
+                ISimpleFillSymbol pSimpleFillColor = (ISimpleFillSymbol)uniqueValueRenderer.get_Symbol(xv);
 
                     IColor color = firstEnumColors.Next();
 
@@ -162,9 +156,9 @@ namespace MCDA.Model
 
                     pSimpleFillColor.Color = color;
                     
-                    uniqueValueRenderer.set_Symbol(xv, pSimpleFillColor as ISymbol);
+                    uniqueValueRenderer.set_Symbol(xv, (ISymbol) pSimpleFillColor);
 
-                }
+                //}
             }
 
             //'** If you didn't use a predefined color ramp
@@ -178,19 +172,19 @@ namespace MCDA.Model
 
             //This makes the layer properties symbology tab
             //show the correct interface.
-            IUID pUID = new UIDClass();
-            pUID.Value = "{683C994E-A17B-11D1-8816-080009EC732A}";
-            pGeoFeatureLayer.RendererPropertyPageClassID = pUID as UIDClass;
+            //IUID pUID = new UIDClass();
+            //pUID.Value = "{683C994E-A17B-11D1-8816-080009EC732A}";
+            //pGeoFeatureLayer.RendererPropertyPageClassID = pUID as UIDClass;
 
             return (IFeatureRenderer) uniqueValueRenderer;
         }
 
 
-        public static IFeatureRenderer NewClassBreaksRenderer(MCDAWorkspaceContainer MCDAWorkspaceContainer)
+        public static IFeatureRenderer NewClassBreaksRenderer(IRenderContainer renderContainer)
         {
-            ClassBreaksRendererContainer classBreaksRendererContainer = MCDAWorkspaceContainer.ClassBreaksRendererContainer;
+            ClassBreaksRendererContainer classBreaksRendererContainer = renderContainer.ClassBreaksRendererContainer;
 
-            double[] classificationResult = Classification.Classify(classBreaksRendererContainer.ClassificationMethod, MCDAWorkspaceContainer.FeatureClass, classBreaksRendererContainer.Field, classBreaksRendererContainer.NumberOfClasses);
+            double[] classificationResult = Classification.Classify(classBreaksRendererContainer.ClassificationMethod, renderContainer.FeatureClass, classBreaksRendererContainer.Field, classBreaksRendererContainer.NumberOfClasses);
 
             IClassBreaksRenderer classBreaksRenderer = new ClassBreaksRendererClass();
             classBreaksRenderer.Field = classBreaksRendererContainer.Field.AliasName;

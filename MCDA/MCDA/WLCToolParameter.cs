@@ -13,8 +13,6 @@ namespace MCDA.Model
         
         private static IToolParameter _lastWeightChangedToolParameter;
 
-        private static bool _isPropertiesLocked;
-
         public WLCToolParameter(string columnName)
         {
             _columnName = columnName;

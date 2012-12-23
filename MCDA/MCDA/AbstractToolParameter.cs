@@ -60,6 +60,5 @@ namespace MCDA.Model
         }
 
         public abstract IToolParameter DeepClone();
-        
     }
 }

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using MCDA.Entity;
 using System.Data;
 
 namespace MCDA.Model
@@ -13,6 +12,8 @@ namespace MCDA.Model
         public static WLCTool NewWLCTool()
         {
             ToolParameterContainer wlcParameter = MCDA.MCDAExtension.GetExtension().GetToolParameterBasedOnSelectedFields();
+            wlcParameter.DistributeEquallyToolParameterWeights();
+
             DataTable dataTable = MCDA.MCDAExtension.GetExtension().GetDataTableForParameterSet(wlcParameter.ToolParameter);
 
             WLCTool wlcTool = new WLCTool(dataTable,wlcParameter);
@@ -24,7 +25,9 @@ namespace MCDA.Model
 
         public static OWATool NewOWATool()
         {
-            ToolParameterContainer toolParameter = MCDA.MCDAExtension.GetExtension().GetToolParameterBasedOnSelectedFields();
+            ToolParameterContainer toolParameter =  MCDA.MCDAExtension.GetExtension().GetToolParameterBasedOnSelectedFields();
+            toolParameter.DistributeEquallyToolParameterWeights();
+
             DataTable dataTable = MCDA.MCDAExtension.GetExtension().GetDataTableForParameterSet(toolParameter.ToolParameter);
 
             OWATool owaTool = new OWATool(dataTable, toolParameter);

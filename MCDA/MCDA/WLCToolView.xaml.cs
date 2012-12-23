@@ -19,7 +19,7 @@ namespace MCDA
     /// Designer class of the dockable window add-in. It contains WPF user interfaces that
     /// make up the dockable window.
     /// </summary>
-    public partial class WLCToolView : UserControl
+    public partial class WLCToolView : Window
     {
         public WLCToolView()
         {
@@ -28,6 +28,7 @@ namespace MCDA
             DataContext = new WLCToolViewModel();
         }
 
+        /*
         /// <summary>
         /// Implementation class of the dockable window add-in. It is responsible for 
         /// creating and disposing the user interface class of the dockable window.
@@ -54,6 +55,14 @@ namespace MCDA
 
                 base.Dispose(disposing);
             }
+        }
+        */
+
+        protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
+        {
+            base.OnClosing(e);
+            WLCToolViewModel viewmodel = (WLCToolViewModel)DataContext;
+            viewmodel.ClosingCommand.Execute(null);
         }
 
         private void weightSlider_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)

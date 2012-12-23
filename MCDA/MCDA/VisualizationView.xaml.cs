@@ -32,7 +32,7 @@ namespace MCDA
         private ColorPicker _positivColorPickerForBiPolarRenderer = new ColorPicker();
         private ColorPicker _neutralColorPickerForBipolarRenderer = new ColorPicker();
 
-        private VisualizationViewModel viewModel;
+        private VisualizationViewModel _viewModel;
 
         public VisualizationView()
         {
@@ -42,11 +42,12 @@ namespace MCDA
 
             DataContext = new VisualizationViewModel();
 
-            viewModel = (VisualizationViewModel) DataContext;
+            _viewModel = (VisualizationViewModel) DataContext;
 
             //we have to take care of the histogram if the viewmodel changes
             //viewModel.RegisterPropertyHandler(p => p.SelectedClassificationMethod, ViewModelPropertyChanged);
             //viewModel.RegisterPropertyHandler(p => p.SelectedNumberOfClasses, ViewModelPropertyChanged);
+           
         }
 
         /*
@@ -124,19 +125,25 @@ namespace MCDA
             biPolarColorScaleRectangle.Fill = biPolarColorScaleRectagleBrush;
         }
 
-        void BiPolarColorSliderValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        private void BiPolarColorSliderValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             RedefineBiPolarLinearGradient();
         }
 
-        void ColorPickerForBiPolarRendererSelectedColorChanged(object sender, RoutedPropertyChangedEventArgs<Color> e)
+        private void ColorPickerForBiPolarRendererSelectedColorChanged(object sender, RoutedPropertyChangedEventArgs<Color> e)
         {
             RedefineBiPolarLinearGradient();
         }
 
-        void ColorPickerSelectedColorChanged(object sender, RoutedPropertyChangedEventArgs<Color> e)
+        private void ColorPickerSelectedColorChanged(object sender, RoutedPropertyChangedEventArgs<Color> e)
         {
             colorRampRectangle.Fill = new LinearGradientBrush(_startColorColorPicker.SelectedColor, _endColorColorPicker.SelectedColor, 0d);
+        }
+
+        private void biPolarColorSlider_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
+        {
+            VisualizationViewModel viewmodel = (VisualizationViewModel)DataContext;
+            viewmodel.BiPolarRendererValuesChanged();
         }
 
       /// <summary>
@@ -167,6 +174,11 @@ namespace MCDA
           base.Dispose(disposing);
         }
 
+      }
+
+      private void button1_Click(object sender, RoutedEventArgs e)
+      {
+          fc.Flip();
       }
 
     }

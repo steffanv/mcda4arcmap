@@ -2,7 +2,8 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"  
     xmlns:local="clr-namespace:MCDA.Model"
-    xmlns:customControl="clr-namespace:MCDA"
+    xmlns:customControl="clr-namespace:MCDA.CustomControls"
+    xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
     Height="300" Width="500">
     <UserControl.Resources>
         <local:NullToFalseConverter x:Key="nullToFalseConverter" />
@@ -17,37 +18,52 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <!--<Label Content="Layer" Grid.Column="0" Grid.Row="0" />
-        <Label Content="Attribute" Grid.Column="1" Grid.Row="0" />
-        <ComboBox ItemsSource="{Binding Path=MCDAWorkspaceContainer, Mode=TwoWay}" DisplayMemberPath="FeatureLayer.Name" SelectedValue="{Binding Path=SelectedMCDAWorkspaceContainer, UpdateSourceTrigger=PropertyChanged}" Name="layerComboBox" Grid.Column="0" Grid.Row="1" />
-        <ComboBox ItemsSource="{Binding Path=Fields, Mode=TwoWay}" DisplayMemberPath="Name" SelectedValue="{Binding Path=SelectedIField, UpdateSourceTrigger=PropertyChanged}" Name="attributeComboBox" Grid.Column="1" Grid.Row="1"/>-->
-        <ListView Name="listView" Grid.Column="0" Grid.Row="0"  ItemsSource="{Binding Path=ResultList, Mode=OneWay}" SelectedItem="{Binding Path=SelectedResult, Mode=TwoWay}" HorizontalContentAlignment="Stretch">
-            <ListView.View>
-                <GridView>
-                    <GridViewColumn  Header="Field"  Width="80">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <Label Name="fieldLabel" Content="{Binding Path=Field.Name, Mode=OneWay}"/>
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-                    <GridViewColumn  Header="Owner"  Width="100">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <Label Name="ownerLabel" Content="{Binding Path=MCDAWorkspaceContainer.FeatureLayer.Name, Mode=OneWay}"/>
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-                    <!--<GridViewColumn  Header="Locked"  Width="Auto">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <CheckBox Name="benefitCriteriaCheckBox" IsChecked="{Binding Path=IsLocked, Mode=TwoWay}" Grid.Column="3"/>
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>-->
-                </GridView>
-            </ListView.View>
-        </ListView >
+        <customControl:FlipControl x:Name="fc" Grid.Column="0" Grid.Row="0" HorizontalContentAlignment="Stretch" >
+            <customControl:FlipControl.Front>
+                <ListView ItemsSource="{Binding Path=ResultList, Mode=OneWay}" SelectedItem="{Binding Path=SelectedResult, Mode=TwoWay}" >
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn  Header="Field"  Width="80">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Label Content="{Binding Path=Field.Name, Mode=OneWay}"/>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn  Header="Owner"  Width="100">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Label Content="{Binding Path=RenderContainer.FeatureLayer.Name, Mode=OneWay}"/>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                        </GridView>
+                    </ListView.View>
+                </ListView >
+            </customControl:FlipControl.Front>
+            <customControl:FlipControl.Back>
+                <ListView ItemsSource="{Binding Path=CompleteResultList, Mode=OneWay}" SelectedItem="{Binding Path=SelectedResult, Mode=TwoWay}" >
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn  Header="Field"  Width="80">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Label Content="{Binding Path=Field.Name, Mode=OneWay}"/>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn  Header="Owner"  Width="100">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Label Content="{Binding Path=RenderContainer.FeatureLayer.Name, Mode=OneWay}"/>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                        </GridView>
+                    </ListView.View>
+                </ListView >
+            </customControl:FlipControl.Back>
+        </customControl:FlipControl>
         <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ResizeBehavior="PreviousAndNext" />
         <TabControl   Name="visualizationMethodsTabControl"  Grid.Column="2" Grid.ColumnSpan="2" Grid.Row="0">
             <TabItem Header="Class-Breaks Renderer" Name="classBreaksRenderer">
@@ -111,6 +127,7 @@
                     <Button Grid.Column="1" Grid.Row="3" Width="50" HorizontalAlignment="Right" Command="{Binding Path=ApplyClassBreaksRendererCommand}">
                         Apply
                     </Button>
+                    <Button Content="Button" Click="button1_Click" Grid.Row="3" Height="23" HorizontalAlignment="Left" Margin="18,8,0,0" Name="button1" VerticalAlignment="Top" Width="75" />
                 </Grid>
             </TabItem>
             <TabItem Header="Bi-Polar Renderer" Name="uniqueValueRenderer">
@@ -139,16 +156,15 @@
                     <GroupBox Header="Color Scale" Grid.ColumnSpan="2" Grid.Row="3">
                         <Rectangle Name="biPolarColorScaleRectangle"  VerticalAlignment="Stretch" HorizontalAlignment="Stretch" />
                     </GroupBox>
-                    <Slider Name="biPolarColorSlider" Grid.ColumnSpan="2" Grid.Row="4" Height="30"  Value="{Binding Path=BiPolarColorSliderValue, Mode=TwoWay}" Orientation="Horizontal" Minimum="1" Maximum="99" />
+                    <Slider Name="biPolarColorSlider" Grid.ColumnSpan="2" Grid.Row="4" Height="30"  Value="{Binding Path=BiPolarColorSliderValue, Mode=TwoWay}" Thumb.DragCompleted="biPolarColorSlider_DragCompleted" Orientation="Horizontal" Minimum="1" Maximum="99" />
                     <Button Grid.Column="1" Grid.Row="5" Width="50" HorizontalAlignment="Center" Command="{Binding Path=RemoveBiPolarRendererCommand}">
                         Remove
                     </Button>
-                    <Button Grid.Column="1" Grid.Row="5" Width="50" HorizontalAlignment="Right" Command="{Binding Path=ApplyBiPolarRendererCommand}">
-                        Apply
-                    </Button>
+                        <Button Grid.Column="1" Grid.Row="5" Width="50" HorizontalAlignment="Right" Command="{Binding Path=ApplyBiPolarRendererCommand}">
+                             Apply
+                        </Button>
                 </Grid>
             </TabItem>
-        </TabControl>
-        
+        </TabControl>     
     </Grid>
 </UserControl>

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using MCDA.Entity;
 using MCDA.Extensions;
 
 namespace MCDA.Model
@@ -14,49 +13,32 @@ namespace MCDA.Model
             if (listOfToolParameter.Count == 0)
                 return;
 
-            IToolParameter lastWeightChangedToolParameter =  lastWeightChangedToolParameter = listOfToolParameter[0].LastWeightChangedToolParameter;
+            IToolParameter lastWeightChangedToolParameter =  lastWeightChangedToolParameter = listOfToolParameter.FirstOrDefault().LastWeightChangedToolParameter;
 
-            double sumOfAllWeights = listOfToolParameter.Sum(t =>t.Weight);
-          
-            //we have to rescale
-            if (sumOfAllWeights > 100)
+            double difference = 100 - listOfToolParameter.Sum(t => t.Weight);
+
+            if (listOfToolParameter.Where(t => !t.IsLocked && t != lastWeightChangedToolParameter).Sum(t => t.Weight) == 0  && difference < 0)
             {
-                double overrun = sumOfAllWeights - 100;  
-                //how much do we have without the locked and the last changed?
-                double availableSpace = listOfToolParameter.Where(t => t.IsLocked == false && t != lastWeightChangedToolParameter).Sum(t => t.Weight);
-
-                //we have enough by taking from the non locked
-                if (availableSpace >= overrun)
-                {
-                    //lets remove proportional
-                    double sumOfChangeableWeights = listOfToolParameter.Where(t => t.IsLocked == false && t != lastWeightChangedToolParameter).Sum(t => t.Weight);
-
-                    //in case we have only one element that is suitable we can directly remove all from this one
-                    if (listOfToolParameter.Where(t => t.IsLocked == false && t.Weight > 0 && t != lastWeightChangedToolParameter).Count() == 1)
-                    {
-                        listOfToolParameter.Where(t => t.IsLocked == false && t.Weight > 0 && t != lastWeightChangedToolParameter).ForEach(t => t.Weight = (t.Weight - overrun));
-                        return;
-                    }
-                    listOfToolParameter.Where(t => t.IsLocked == false && t.Weight > 0 && t != lastWeightChangedToolParameter).ForEach(t => t.Weight = (t.Weight - (t.Weight / sumOfChangeableWeights) * overrun));
-                }
-
-                //we have to resize also the latest change, but we try to keep as much as possible of the latest change
-                else
-                {
-                    //lets set them to zero
-                    listOfToolParameter.Where(t => t.IsLocked == false && t != lastWeightChangedToolParameter).ForEach(t => t.Weight = 0);
-
-                    //how much are we still over?
-                    double stillOver = listOfToolParameter.Sum(t => t.Weight) - 100;
-                   
-                    //and cut from the last changed
-                    listOfToolParameter.Where(t => t == lastWeightChangedToolParameter).ForEach(t => t.Weight = (t.Weight - stillOver));
-                }
-
-                //sometimes the calculations produce values < 0 , thats often the case when they are already close to 0
-                //one problem is that the UI shows still show 0, because thats the lower bound of the slider control
-                listOfToolParameter.Where(t => t.Weight < 0).ForEach(t => t.Weight = 0);   
+                listOfToolParameter.Where(t => t == lastWeightChangedToolParameter).FirstOrDefault().Weight += difference;
             }
+            else
+            {
+                //assume values = 0 are only close to zero (0.001) otherwise we could never increase the value while distributing the weight
+                double hundredPercentValueOfWeights = listOfToolParameter.Where(t => t.IsLocked == false && t != lastWeightChangedToolParameter).Sum(t => t.Weight);
+                listOfToolParameter.Where(t => t.IsLocked == false && t != lastWeightChangedToolParameter && t.Weight == 0).ForEach(t => hundredPercentValueOfWeights += 0.001);
+
+                foreach (IToolParameter currentToolParameter in listOfToolParameter.Where(t => t.IsLocked == false && t != lastWeightChangedToolParameter).ToList())
+                {
+
+                    double weight = currentToolParameter.Weight;
+
+                    currentToolParameter.Weight = weight + ((weight == 0 ? 0.001 : weight) / hundredPercentValueOfWeights) * difference;
+                }
+            }
+
+            listOfToolParameter.Where(t => t.Weight < 0).ForEach(t => t.Weight = 0);
+
+            listOfToolParameter.Where(t => t.Weight > 100).ForEach(t => t.Weight = 100);  
 
         }
     }

@@ -19,7 +19,7 @@ namespace MCDA
     /// Designer class of the dockable window add-in. It contains WPF user interfaces that
     /// make up the dockable window.
     /// </summary>
-    public partial class OWAToolView : UserControl
+    public partial class OWAToolView : Window
     {
         public OWAToolView()
         {
@@ -28,6 +28,7 @@ namespace MCDA
             DataContext = new OWAToolViewModel();
         }
 
+        /*
         /// <summary>
         /// Implementation class of the dockable window add-in. It is responsible for 
         /// creating and disposing the user interface class of the dockable window.
@@ -56,6 +57,14 @@ namespace MCDA
             }
 
         }
+        */
+
+        protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
+        {
+            base.OnClosing(e);
+            OWAToolViewModel viewmodel = (OWAToolViewModel)DataContext;
+            viewmodel.ClosingCommand.Execute(null);
+        }
 
         private void weightSlider_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
         {
@@ -74,5 +83,6 @@ namespace MCDA
             OWAToolViewModel viewmodel = (OWAToolViewModel)DataContext;
             viewmodel.UpdateAllowedEvent();
         }
+       
     }
 }

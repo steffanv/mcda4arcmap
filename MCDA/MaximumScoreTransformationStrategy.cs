@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using MCDA.Extensions;
 using System.Data;
-using MCDA.Entity;
 
 namespace MCDA.Model
 {

@@ -6,7 +6,7 @@ using System.ComponentModel;
 using MCDA.Extensions;
 using MCDA.Model;
 
-namespace MCDA.Entity
+namespace MCDA.Model
 {  
     public class ToolParameterContainer : INotifyPropertyChanged
     {
@@ -31,10 +31,13 @@ namespace MCDA.Entity
             if (!_isLocked)
             {
                 _isLocked = true;
-                _weightDistributionStrategy.Distribute(_listOfParameter);
-            }
 
-            _isLocked = false;
+                _weightDistributionStrategy.Distribute(_listOfParameter);
+
+                _isLocked = false;
+
+                PropertyChanged.Notify(() => ToolParameter);
+            }    
         }
 
         public IWeightDistributionStrategy WeightDistributionStrategy{
@@ -42,6 +45,20 @@ namespace MCDA.Entity
             get { return _weightDistributionStrategy;}
             set { _weightDistributionStrategy = value; }
             
+        }
+
+        public void DistributeEquallyToolParameterWeights()
+        {
+            
+            double weight = 100 / (double)_listOfParameter.Count;
+
+            _isLocked = true;
+
+            _listOfParameter.ForEach(t => t.Weight = weight);
+
+            _isLocked = false;
+
+            PropertyChanged.Notify(() => ToolParameter);
         }
 
         public IList<IToolParameter> ToolParameter

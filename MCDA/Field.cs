@@ -34,6 +34,8 @@ namespace MCDA.Model
             set { PropertyChanged.ChangeAndNotify(ref _isSelected, value, () => IsSelected); }
         }
 
+        public ESRI.ArcGIS.Geodatabase.IField ESRIField { get { return _field; } }
+
         public string FieldName
         {
             get { return _field.Name; }

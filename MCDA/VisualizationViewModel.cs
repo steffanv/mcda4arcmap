@@ -12,6 +12,7 @@ using ESRI.ArcGIS.esriSystem;
 using System.Windows.Media;
 using System.Windows;
 using System.Windows.Input;
+using System.Threading;
 
 namespace MCDA.ViewModel
 {
@@ -34,7 +35,7 @@ namespace MCDA.ViewModel
         private double _biPolarColorSliderValue;
         private Color _selectedBiPolarNegativColor, _selectedBiPolarPositivColor, _selectedBiPolarNeutralColor;
 
-        private BindingList<ResultContainer> _resultList;
+        private BindingList<ResultContainer> _resultList, _completeResultList;
         private ResultContainer _selectedResult;
 
         private ICommand _applyClassBreaksRendererCommand;
@@ -54,6 +55,7 @@ namespace MCDA.ViewModel
 
         public VisualizationViewModel()
         {
+
             InitializeClassificationArguments();
 
             SelectedStartColor  = Color.FromRgb(255, 0, 0);
@@ -65,29 +67,42 @@ namespace MCDA.ViewModel
 
             BiPolarColorSliderValue = 50;
 
-
             MCDAExtension.RegisterPropertyHandler(x => x.LinkDictionary, LinkDictionaryPropertyChanged);
+            MCDAExtension.RegisterPropertyHandler(x => x.AvailableLayer, AvailableLayerChanged);
 
             CreateResultList();
+            CreateCompleteResultList();
 
             PropertyChanged.Notify(() => ResultList);
+            PropertyChanged.Notify(() => CompleteResultList);
         }
 
-        void LinkDictionaryPropertyChanged(object sender, PropertyChangedEventArgs e)
+        private void AvailableLayerChanged(object sender, PropertyChangedEventArgs e)
         {
+            CreateCompleteResultList();
 
+            PropertyChanged.Notify(() => CompleteResultList);
+        }
+
+        private void LinkDictionaryPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
             CreateResultList();
 
             _selectedResult = _resultList.FirstOrDefault(r => r.Equals(_selectedResult));
     
             PropertyChanged.Notify(() => ResultList);
             PropertyChanged.Notify(() => SelectedResult);
+            PropertyChanged.Notify(() => CompleteResultList);
         }
-
 
         public BindingList<ResultContainer> ResultList
         {
             get { return _resultList; }
+        }
+
+        public BindingList<ResultContainer> CompleteResultList
+        {
+            get { return _completeResultList; }
         }
 
         public ResultContainer SelectedResult
@@ -173,7 +188,9 @@ namespace MCDA.ViewModel
             set { 
                 
                 _biPolarColorSliderValue = value;
-                BiPolarRendererValuesChanged();
+                //no more update after slider change, this takes to long on normal machines
+                //from the code behind page if slider draged
+                //BiPolarRendererValuesChanged();
             
             }
         }
@@ -212,7 +229,28 @@ namespace MCDA.ViewModel
 
         private void Render()
         {
-                MCDAExtension.Render(_selectedResult.MCDAWorkspaceContainer);
+            MCDAExtension.Render(_selectedResult.RenderContainer);
+        }
+
+        private void CreateCompleteResultList()
+        {
+            _completeResultList = new BindingList<ResultContainer>();
+
+            foreach (Layer currentLayer in MCDAExtension.AvailableFeatureLayer)
+            {
+                foreach(MCDA.Model.Field currentField in currentLayer.Fields){
+
+                    RenderContainer tempRenderContainer = new RenderContainer();
+                    tempRenderContainer.FeatureClass = currentLayer.FeatureLayer.FeatureClass;
+                    tempRenderContainer.FeatureLayer = (IFeatureLayer) currentLayer.FeatureLayer;
+
+                    ResultContainer temp = new ResultContainer();
+                    temp.Field = currentField.ESRIField;
+                    temp.RenderContainer = tempRenderContainer;
+
+                    _completeResultList.Add(temp); 
+                }
+            }
         }
 
         private void CreateResultList()
@@ -221,12 +259,12 @@ namespace MCDA.ViewModel
 
             foreach (MCDAWorkspaceContainer currentMCDAWorkspaceContainer in MCDAExtension.GetAllMCDAWorkspaceContainerFromShadowWorkspace())
             {
-                //this list should include only one element, becauseone tool has only one result
+                //this list should include only one element, because one tool has only one result
                 IList<IField> fields = MCDAExtension.GetExtension().GetListOfFieldsFromFeatureClass(currentMCDAWorkspaceContainer.FeatureClass).Where(f => f.Name.Equals(currentMCDAWorkspaceContainer.Tool.DefaultResultColumnName)).ToList();
 
                     ResultContainer temp = new ResultContainer();
                     temp.Field = fields.FirstOrDefault();
-                    temp.MCDAWorkspaceContainer = currentMCDAWorkspaceContainer;
+                    temp.RenderContainer = currentMCDAWorkspaceContainer;
 
                     _resultList.Add(temp);    
             }
@@ -279,15 +317,15 @@ namespace MCDA.ViewModel
         {
             if (_selectedResult != null)
             {
-                if (_selectedResult.MCDAWorkspaceContainer.Renderer == Renderer.None)
+                if (_selectedResult.RenderContainer.Renderer == Renderer.None)
                     return;
 
-                if (_selectedResult.MCDAWorkspaceContainer.Renderer == Renderer.ClassBreaksRenderer)
+                if (_selectedResult.RenderContainer.Renderer == Renderer.ClassBreaksRenderer)
                 {
-                    _selectedClassificationMethod = _selectedResult.MCDAWorkspaceContainer.ClassBreaksRendererContainer.ClassificationMethod;
-                    _selectedNumberOfClasses = _selectedResult.MCDAWorkspaceContainer.ClassBreaksRendererContainer.NumberOfClasses;
-                    _selectedStartColor = _selectedResult.MCDAWorkspaceContainer.ClassBreaksRendererContainer.StartColor;
-                    _selectedEndColor = _selectedResult.MCDAWorkspaceContainer.ClassBreaksRendererContainer.EndColor;
+                    _selectedClassificationMethod = _selectedResult.RenderContainer.ClassBreaksRendererContainer.ClassificationMethod;
+                    _selectedNumberOfClasses = _selectedResult.RenderContainer.ClassBreaksRendererContainer.NumberOfClasses;
+                    _selectedStartColor = _selectedResult.RenderContainer.ClassBreaksRendererContainer.StartColor;
+                    _selectedEndColor = _selectedResult.RenderContainer.ClassBreaksRendererContainer.EndColor;
 
                     PropertyChanged.Notify(() => SelectedClassificationMethod);
                     PropertyChanged.Notify(() => SelectedNumberOfClasses);
@@ -295,12 +333,12 @@ namespace MCDA.ViewModel
                     PropertyChanged.Notify(() => SelectedEndColor);
                 }
 
-                if (_selectedResult.MCDAWorkspaceContainer.Renderer == Renderer.BiPolarRenderer)
+                if (_selectedResult.RenderContainer.Renderer == Renderer.BiPolarRenderer)
                 {
-                    _selectedBiPolarNegativColor = _selectedResult.MCDAWorkspaceContainer.BiPolarRendererContainer.NegativColor;
-                    _selectedBiPolarPositivColor = _selectedResult.MCDAWorkspaceContainer.BiPolarRendererContainer.PositivColor;
-                    _selectedBiPolarNeutralColor = _selectedResult.MCDAWorkspaceContainer.BiPolarRendererContainer.NeutralColor;
-                    _biPolarColorSliderValue = _selectedResult.MCDAWorkspaceContainer.BiPolarRendererContainer.NeutralColorPosition;
+                    _selectedBiPolarNegativColor = _selectedResult.RenderContainer.BiPolarRendererContainer.NegativColor;
+                    _selectedBiPolarPositivColor = _selectedResult.RenderContainer.BiPolarRendererContainer.PositivColor;
+                    _selectedBiPolarNeutralColor = _selectedResult.RenderContainer.BiPolarRendererContainer.NeutralColor;
+                    _biPolarColorSliderValue = _selectedResult.RenderContainer.BiPolarRendererContainer.NeutralColorPosition;
 
                     PropertyChanged.Notify(() => SelectedBiPolarNegativColor);
                     PropertyChanged.Notify(() => SelectedBiPolarNeutralColor);
@@ -310,24 +348,23 @@ namespace MCDA.ViewModel
             }
         }
 
-
-        private void BiPolarRendererValuesChanged()
+        public void BiPolarRendererValuesChanged()
         {
             if (_isBiPolarRendererApplyCommandExecuted)
             {
-                _selectedResult.MCDAWorkspaceContainer.BiPolarRendererContainer = GetBiPolarContainer();
-                _selectedResult.MCDAWorkspaceContainer.Renderer = Renderer.BiPolarRenderer;
+                _selectedResult.RenderContainer.BiPolarRendererContainer = GetBiPolarContainer();
+                _selectedResult.RenderContainer.Renderer = Renderer.BiPolarRenderer;
 
                 Render();
             }
         }
 
-        private void ClassBreaksRendererValuesChanged()
+        public void ClassBreaksRendererValuesChanged()
         {
             if (_isClassBreaksRendererApplyCommandExecuted)
             {
-                _selectedResult.MCDAWorkspaceContainer.ClassBreaksRendererContainer = GetClassBreaksRendererContainer();
-                _selectedResult.MCDAWorkspaceContainer.Renderer = Renderer.ClassBreaksRenderer;
+                _selectedResult.RenderContainer.ClassBreaksRendererContainer = GetClassBreaksRendererContainer();
+                _selectedResult.RenderContainer.Renderer = Renderer.ClassBreaksRenderer;
 
                 Render();
             }
@@ -349,7 +386,7 @@ namespace MCDA.ViewModel
             }
             else
             {
-                switch (_selectedResult.MCDAWorkspaceContainer.Renderer)
+                switch (_selectedResult.RenderContainer.Renderer)
                 {
                     case Renderer.None: _canBiPolarRendererApplyCommandExecuted = true; _canClassBreaksRendererApplyCommandExecuted = true;
                         break;
@@ -449,7 +486,7 @@ namespace MCDA.ViewModel
             _canBiPolarRendererApplyCommandExecuted = true;
             _canBiPolarRendererRemoveCommandExecuted = false;
 
-            _selectedResult.MCDAWorkspaceContainer.Renderer = Renderer.None;
+            _selectedResult.RenderContainer.Renderer = Renderer.None;
 
             Render();
         }
@@ -478,7 +515,7 @@ namespace MCDA.ViewModel
             _canBiPolarRendererApplyCommandExecuted = true;
             _canBiPolarRendererRemoveCommandExecuted = false;
 
-            _selectedResult.MCDAWorkspaceContainer.Renderer = Renderer.None;
+            _selectedResult.RenderContainer.Renderer = Renderer.None;
 
             Render();
         }
@@ -488,7 +525,7 @@ namespace MCDA.ViewModel
         public class ResultContainer
         {
             public IField Field { get; set; }
-            public MCDAWorkspaceContainer MCDAWorkspaceContainer { get; set; }
+            public IRenderContainer RenderContainer { get; set; }
 
             public override bool Equals(object obj)
             { 
@@ -497,7 +534,7 @@ namespace MCDA.ViewModel
                 if(arg == null)
                     return false;
 
-                return arg.Field == Field && arg.MCDAWorkspaceContainer == MCDAWorkspaceContainer;
+                return arg.Field == Field && arg.RenderContainer == RenderContainer;
             }
         }
 

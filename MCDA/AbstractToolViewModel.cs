@@ -46,6 +46,8 @@ namespace MCDA.ViewModel
         protected ICommand _sendToInMemoryWorkspaceCommand;
         protected ICommand _lockCommand;
         protected ICommand _exportAsCSVCommand;
+        protected ICommand _distributionCommand;
+        protected ICommand _closingCommand;
 
         public ICommand LockCommand
         {
@@ -113,10 +115,46 @@ namespace MCDA.ViewModel
             }
         }
 
+        public ICommand DistributionCommand
+        {
+            get
+            {
+
+                if (_distributionCommand == null)
+                {
+                    _distributionCommand = new RelayCommand(
+                        p => this.DoDistributionCommand(),
+                        p => true
+                        );
+                }
+
+                return _distributionCommand;
+            }
+        }
+
+        public ICommand ClosingCommand
+        {
+            get
+            {
+
+                if (_closingCommand == null)
+                {
+                    _closingCommand = new RelayCommand(
+                        p => this.DoClosingCommand(),
+                        p => true
+                        );
+                }
+
+                return _closingCommand;
+            }
+        }
+
        protected abstract void DoLockCommand();
        protected abstract void DoStandardizationSelectionCommand();
        protected abstract void DoSendToInMemoryWorkspaceCommand();
        protected abstract void DoExportAsCSVCommand();
+       protected abstract void DoDistributionCommand();
+       protected abstract void DoClosingCommand();
 
     }
 }

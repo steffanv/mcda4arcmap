@@ -19,7 +19,7 @@ namespace MCDA
 
             obj.PropertyChanged += (sender, args) =>
                 {
-                    if (args.PropertyName == propertyName && handlerDelegate != null)
+                    if (args.PropertyName.Equals(propertyName) && handlerDelegate != null)
                         handlerDelegate(sender, args);
                 };
         }
@@ -32,16 +32,16 @@ namespace MCDA
 
             obj.PropertyChanged -= (sender, args) =>
             {
-                if (args.PropertyName == propertyName && handlerDelegate != null)
+                if (args.PropertyName.Equals(propertyName) && handlerDelegate != null)
                     handlerDelegate(sender, args);
             };
         }
 
-        public static void Notify<T>(this PropertyChangedEventHandler eventHandler, object sender, Expression<Func<T>> propertyExpression)
-        {
-            var handler = eventHandler;
-            if (handler != null) handler(sender, new PropertyChangedEventArgs(GetPropertyName(propertyExpression)));
-        }
+        //public static void Notify<T>(this PropertyChangedEventHandler eventHandler, object sender, Expression<Func<T>> propertyExpression)
+        //{
+        //    var handler = eventHandler;
+        //    if (handler != null) handler(sender, new PropertyChangedEventArgs(GetPropertyName(propertyExpression)));
+        //}
 
         private static string GetPropertyName(LambdaExpression propertyExpression)
         {

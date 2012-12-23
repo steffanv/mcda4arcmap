@@ -4,6 +4,7 @@ using System.Text;
 using System.IO;
 using ESRI.ArcGIS.esriSystem;
 using ESRI.ArcGIS.Framework;
+using System.Windows.Interop;
 
 
 namespace MCDA
@@ -16,13 +17,18 @@ namespace MCDA
 
         protected override void OnClick()
         {
-            UID dockWinID = new UIDClass();
-            dockWinID.Value = ThisAddIn.IDs.WLCToolView;
+            var parentHandle = new IntPtr(ArcMap.Application.hWnd);
 
-            IDockableWindow w = ArcMap.DockableWindowManager.GetDockableWindow(dockWinID);
+            var wpfWindow = new WLCToolView();
 
-            w.Show(true);
+            var helper = new WindowInteropHelper(wpfWindow);
+
+            helper.Owner = parentHandle;
+
+            wpfWindow.Show();
         }
+
+        
 
         protected override void OnUpdate()
         {

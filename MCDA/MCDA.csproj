@@ -125,6 +125,12 @@
       <DependentUpon>AlphaSelectionView.xaml</DependentUpon>
     </Compile>
     <Compile Include="AlphaSelectionViewModel.cs" />
+    <Compile Include="FlipControl.xaml.cs">
+      <DependentUpon>FlipControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="IRenderContainer.cs" />
+    <Compile Include="ProgressDialog.cs" />
+    <Compile Include="RenderContainer.cs" />
     <Compile Include="RendererContainer.cs" />
     <Compile Include="Classification.cs" />
     <Compile Include="CollectionExtension.cs" />
@@ -236,6 +242,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="FlipControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Histogram.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -285,9 +295,6 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <AddInContent Include="Images\ArcGISAddin1.png" />
-  </ItemGroup>
-  <ItemGroup>
     <AddInContent Include="Images\OWAToolView.png" />
   </ItemGroup>
   <ItemGroup>
@@ -324,6 +331,9 @@
     </AddInContent>
     <AddInContent Include="Images\VisualizationView.png" />
     <Resource Include="Images\toolbargraphics\Alpha.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\toolbargraphics\Distribution.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
     <Content Include="README.txt" />

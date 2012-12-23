@@ -41,14 +41,6 @@ namespace MCDA.ViewModel
             if (_mcdaExtension.SelectedLayer != null)
                 _mcdaExtension.SelectedLayer.Fields.ForEach(x => x.RegisterPropertyHandler(f => f.IsSelected, FieldPropertyChanged));
 
-            _toolParameter = new BindingList<IToolParameter>(_owaTool.ToolParameterContainer.ToolParameter);
-
-            _toolParameter.ForEach(t => t.RegisterPropertyHandler(b => b.IsBenefitCriterion, BenefitCriterionChanged));
-            _toolParameter.ForEach(t => t.RegisterPropertyHandler(w => w.Weight, WeightChanged));
-
-            PropertyChanged.Notify(() => OWAParameter);
-            PropertyChanged.Notify(() => OWAResult);
-
             //we have to call our own update method to make sure we have a result column
             MCDAExtensionPropertyChanged(this, null);
 
@@ -77,14 +69,19 @@ namespace MCDA.ViewModel
 
             _owaResultDataTable = _owaTool.Data;
 
+            RegisterToolParameterEvents();
+
+            PropertyChanged.Notify(() => OWAParameter);
+            PropertyChanged.Notify(() => OWAResult);
+        }
+
+        private void RegisterToolParameterEvents()
+        {
             _toolParameter.ForEach(t => t.UnRegisterPropertyHandler(b => b.IsBenefitCriterion, BenefitCriterionChanged));
             _toolParameter.ForEach(t => t.UnRegisterPropertyHandler(w => w.Weight, WeightChanged));
 
             _toolParameter.ForEach(t => t.RegisterPropertyHandler(b => b.IsBenefitCriterion, BenefitCriterionChanged));
             _toolParameter.ForEach(t => t.RegisterPropertyHandler(w => w.Weight, WeightChanged));
-
-            PropertyChanged.Notify(() => OWAParameter);
-            PropertyChanged.Notify(() => OWAResult);
         }
 
         private void MCDAExtensionPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -102,10 +99,11 @@ namespace MCDA.ViewModel
 
             if (_mcdaExtension.SelectedLayer != null)
             {
-
                 _mcdaExtension.SelectedLayer.Fields.ForEach(x => x.UnRegisterPropertyHandler(f => f.IsSelected, FieldPropertyChanged));
                 _mcdaExtension.SelectedLayer.Fields.ForEach(x => x.RegisterPropertyHandler(f => f.IsSelected, FieldPropertyChanged));
             }
+
+            RegisterToolParameterEvents();
 
             PropertyChanged.Notify(() => OWAParameter);
             PropertyChanged.Notify(() => OWAResult);
@@ -254,7 +252,7 @@ namespace MCDA.ViewModel
             }
 
             if (_isLocked)
-                _mcdaExtension.EstablishLink(_owaTool);
+                ProgressDialog.ShowProgressDialog("Establish Link", _mcdaExtension.EstablishLink,_owaTool);
 
             if (!_isLocked)
             {
@@ -367,6 +365,26 @@ namespace MCDA.ViewModel
             };
 
             wpfWindow.ShowDialog();
+        }
+
+        protected override void DoDistributionCommand()
+        {
+            _owaTool.ToolParameterContainer.DistributeEquallyToolParameterWeights();
+
+            _owaTool.Run();
+
+            _owaResultDataTable = _owaTool.Data;
+
+            PropertyChanged.Notify(() => OWAParameter);
+            PropertyChanged.Notify(() => OWAResult);
+        }
+
+        protected override void DoClosingCommand()
+        {
+            if (_isLocked || _isSendToInMemoryWorkspaceCommand)
+            {
+                _mcdaExtension.RemoveLink(_owaTool); 
+            }
         }
     }
 }

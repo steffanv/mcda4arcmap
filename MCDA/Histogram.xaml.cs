@@ -13,7 +13,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using MCDA.Model;
 
-namespace MCDA
+namespace MCDA.CustomControls
 {
     /// <summary>
     /// Interaction logic for Histogram.xaml

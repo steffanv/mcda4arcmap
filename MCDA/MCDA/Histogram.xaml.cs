@@ -32,21 +32,13 @@ namespace MCDA.CustomControls
         public double[] Data {
 
             get { return _data; }
-            set { _data = value;
-
-            DrawHistogram();
-
-            }
+            set { _data = value; }
         }
 
         public int[] Frequency {
 
             get { return _freq; }
-            set { _freq = value;
-
-            DrawHistogram();
-            
-            }
+            set { _freq = value; }
         }
 
         public double[] Breaks{
@@ -100,7 +92,7 @@ namespace MCDA.CustomControls
             breaksPolygon.Points = points;
         }
 
-        private void DrawHistogram()
+        public void DrawHistogram()
         {
             if (_data == null || _freq == null)
                 return;

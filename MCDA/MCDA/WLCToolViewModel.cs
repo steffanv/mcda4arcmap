@@ -127,7 +127,8 @@ namespace MCDA.ViewModel
           _wlcResultDataTable = _wlcTool.Data;
 
           if (_isSendToInMemoryWorkspaceCommand)
-              _mcdaExtension.JoinToolResultByOID(_wlcTool, _wlcTool.Data);
+              ProgressDialog.ShowProgressDialog("baba", (Action<AbstractToolTemplate, DataTable>)_mcdaExtension.JoinToolResultByOID, _wlcTool, _wlcTool.Data);
+              //_mcdaExtension.JoinToolResultByOID(_wlcTool, _wlcTool.Data);
 
           _isUpdateAllowed = false;
            
@@ -139,7 +140,8 @@ namespace MCDA.ViewModel
            _wlcResultDataTable = _wlcTool.Data;
 
            if (_isSendToInMemoryWorkspaceCommand)
-               _mcdaExtension.JoinToolResultByOID(_wlcTool, _wlcTool.Data);
+               ProgressDialog.ShowProgressDialog("baba", (Action<AbstractToolTemplate, DataTable>)_mcdaExtension.JoinToolResultByOID, _wlcTool, _wlcTool.Data);
+               //_mcdaExtension.JoinToolResultByOID(_wlcTool, _wlcTool.Data);
        }
 
        protected override void UpdateAnimation()
@@ -253,7 +255,7 @@ namespace MCDA.ViewModel
            }
 
            if(_isLocked)
-               ProgressDialog.ShowProgressDialog("Establish Link", _mcdaExtension.EstablishLink, _wlcTool);
+               ProgressDialog.ShowProgressDialog("Establish Link", (Action<AbstractToolTemplate>) _mcdaExtension.EstablishLink, _wlcTool);
 
            if (!_isLocked)
            {

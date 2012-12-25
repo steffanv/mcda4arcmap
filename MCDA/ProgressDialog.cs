@@ -7,7 +7,7 @@ namespace MCDA.ViewModel
 {
     static class ProgressDialog
     {
-        public static void ShowProgressDialog<T>(string message, Action<T> action, T arg)
+        public static void ShowProgressDialog(string message, Delegate action, params object[] args)
         {
            
              // Create a CancelTracker
@@ -36,7 +36,7 @@ namespace MCDA.ViewModel
             progressDialog2.Animation = ESRI.ArcGIS.Framework.esriProgressAnimationTypes.esriProgressSpiral;
 
             //stepProgressor.StepValue = 2;
-            action.Invoke(arg);
+            action.DynamicInvoke(args);
 
             //stepProgressor.StepValue = 4;
 

@@ -659,9 +659,7 @@ namespace MCDA
                     case Renderer.ClassBreaksRenderer: geoFeatureLayer.Renderer = RendererFactory.NewClassBreaksRenderer( renderContainer);
                         break;
                     case Renderer.BiPolarRenderer: geoFeatureLayer.Renderer = RendererFactory.NewUniqueValueRenderer(renderContainer);
-                        //one could argue that this has not to be done in the model, however, this is the place where the decision takes places
-                        ProgressDialog.ShowProgressDialog("Creating Unique Renderer", PartialRefresh, renderContainer);
-                        return;
+                        break;
                     case Renderer.None: geoFeatureLayer.Renderer = RendererFactory.NewSimpleRenderer();
                         break;
                 }

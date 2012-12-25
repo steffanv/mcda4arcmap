@@ -27,10 +27,7 @@ namespace MCDA.ViewModel
         private int _selectedNumberOfClasses;
         private IClassify _selectedClassificationMethod;
 
-        private PointCollection _histogramPointCollection;
-
         private ClassBreaksRendererContainer _classBreaksRendererContainer = new ClassBreaksRendererContainer();
-        private PointCollection _breaksPointCollection;
 
         private double _biPolarColorSliderValue;
         private Color _selectedBiPolarNegativColor, _selectedBiPolarPositivColor, _selectedBiPolarNeutralColor;
@@ -55,7 +52,6 @@ namespace MCDA.ViewModel
 
         public VisualizationViewModel()
         {
-
             InitializeClassificationArguments();
 
             SelectedStartColor  = Color.FromRgb(255, 0, 0);
@@ -81,6 +77,10 @@ namespace MCDA.ViewModel
         {
             CreateCompleteResultList();
 
+            _selectedResult = _completeResultList.FirstOrDefault(r => r.Equals(_selectedResult));
+
+            PropertyChanged.Notify(() => ResultList);
+            PropertyChanged.Notify(() => SelectedResult);
             PropertyChanged.Notify(() => CompleteResultList);
         }
 
@@ -397,7 +397,6 @@ namespace MCDA.ViewModel
                 }
 
                 RendererContainerToView();
-
             }
         }
 
@@ -526,6 +525,11 @@ namespace MCDA.ViewModel
         {
             public IField Field { get; set; }
             public IRenderContainer RenderContainer { get; set; }
+
+            // why additional properties? for some reason the binding does not work with ESRIs COM objects.
+            public string FieldName { get { return Field.Name; } }
+
+            public string FeatureLayerName { get { return RenderContainer.FeatureLayer.Name; } }
 
             public override bool Equals(object obj)
             { 

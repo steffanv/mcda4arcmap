@@ -16,6 +16,7 @@ using ESRI.ArcGIS.Display;
 using Xceed.Wpf.Toolkit;
 using MCDA.ViewModel;
 using MCDA.Model;
+using System.Collections.ObjectModel;
 
 namespace MCDA
 {
@@ -45,33 +46,51 @@ namespace MCDA
             _viewModel = (VisualizationViewModel) DataContext;
 
             //we have to take care of the histogram if the viewmodel changes
-            //viewModel.RegisterPropertyHandler(p => p.SelectedClassificationMethod, ViewModelPropertyChanged);
-            //viewModel.RegisterPropertyHandler(p => p.SelectedNumberOfClasses, ViewModelPropertyChanged);
+            _viewModel.RegisterPropertyHandler(p => p.SelectedClassificationMethod, ViewModelPropertyChanged);
+            _viewModel.RegisterPropertyHandler(p => p.SelectedNumberOfClasses, ViewModelPropertyChanged);
+            _viewModel.RegisterPropertyHandler(p => p.SelectedResult, ViewModelPropertyChanged);
            
         }
-
-        /*
+  
         void ViewModelPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             //we use this so far only for the histogram
-            if (viewModel.SelectedMCDAWorkspaceContainer == null || viewModel.SelectedMCDAWorkspaceContainer.ClassBreaksRendererContainer == null || !viewModel.SelectedMCDAWorkspaceContainer.ClassBreaksRendererContainer.IsComplete())
+            if (_viewModel.SelectedResult == null || _viewModel.SelectedResult.RenderContainer.ClassBreaksRendererContainer == null || !_viewModel.SelectedResult.RenderContainer.ClassBreaksRendererContainer.IsComplete())
                 return;
 
             double[] data;
             int[] freq;
 
-            Classification.Histogram(viewModel.SelectedMCDAWorkspaceContainer.FeatureClass, viewModel.SelectedIField, out data, out freq);
+            Classification.Histogram(_viewModel.SelectedResult.RenderContainer.FeatureClass, _viewModel.SelectedResult.Field, out data, out freq);
 
             historgram.Data = data;
             historgram.Frequency = freq;
 
-            double[] classes = Classification.Classify(viewModel.SelectedClassificationMethod, viewModel.SelectedMCDAWorkspaceContainer.FeatureClass, viewModel.SelectedIField, viewModel.SelectedNumberOfClasses);
+            historgram.DrawHistogram();
+
+            double[] classes = Classification.Classify(_viewModel.SelectedClassificationMethod, _viewModel.SelectedResult.RenderContainer.FeatureClass, _viewModel.SelectedResult.Field, _viewModel.SelectedNumberOfClasses);
 
             historgram.Breaks = classes;
-        }*/
+        }
 
         private void InitialiazeColorPicker()
         {
+            //create grey colors for the neutral color
+            ObservableCollection<ColorItem> greyScaleColors = new ObservableCollection<ColorItem>();
+
+            for(byte i = 0; i < 254; i+=2){
+
+                greyScaleColors.Add(new ColorItem(Color.FromRgb(i,i,i),"Grey"));
+            }
+
+            _neutralColorPickerForBipolarRenderer.AvailableColors = greyScaleColors;
+            _neutralColorPickerForBipolarRenderer.ShowAdvancedButton = false;
+            _neutralColorPickerForBipolarRenderer.ShowStandardColors = false;
+            _neutralColorPickerForBipolarRenderer.ShowRecentColors = false;
+
+            //why doing all this in the code behind page instead of binding the viewmodel?
+            //if you try to bind... the esri addin magic cannot find the external dll (this behavior was also described by others)
+            //so we have to use this work around
             Binding startColorBinding = new Binding("SelectedStartColor");
             _startColorColorPicker.SetBinding(ColorPicker.SelectedColorProperty, startColorBinding);
 
@@ -146,6 +165,16 @@ namespace MCDA
             viewmodel.BiPolarRendererValuesChanged();
         }
 
+        private void ListView_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            fc.Flip();
+        }
+
+        private void ListView_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            fc.Flip();
+        }
+
       /// <summary>
       /// Implementation class of the dockable window add-in. It is responsible for 
       /// creating and disposing the user interface class of the dockable window.
@@ -174,11 +203,6 @@ namespace MCDA
           base.Dispose(disposing);
         }
 
-      }
-
-      private void button1_Click(object sender, RoutedEventArgs e)
-      {
-          fc.Flip();
       }
 
     }

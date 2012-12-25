@@ -252,7 +252,7 @@ namespace MCDA.ViewModel
             }
 
             if (_isLocked)
-                ProgressDialog.ShowProgressDialog("Establish Link", _mcdaExtension.EstablishLink,_owaTool);
+                ProgressDialog.ShowProgressDialog("Establish Link", (Action<AbstractToolTemplate>) _mcdaExtension.EstablishLink,_owaTool);
 
             if (!_isLocked)
             {

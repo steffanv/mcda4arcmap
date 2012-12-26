@@ -94,7 +94,7 @@ namespace MCDA.CustomControls
 
         public void DrawHistogram()
         {
-            if (_data == null || _freq == null)
+            if (_data == null || _freq == null || _data.Count() == 0)
                 return;
 
             double maxDataValue = _data.Max();
@@ -109,7 +109,7 @@ namespace MCDA.CustomControls
                 values[index] += _freq[i];
             }
 
-            values = Classification.SmoothHistogram(values);
+            //values = Classification.SmoothHistogram(values);
 
             int max = values.Max();
 

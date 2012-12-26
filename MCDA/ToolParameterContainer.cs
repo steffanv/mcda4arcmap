@@ -10,7 +10,6 @@ namespace MCDA.Model
 {  
     public class ToolParameterContainer : INotifyPropertyChanged
     {
-
         public event PropertyChangedEventHandler PropertyChanged;
 
         private IList<IToolParameter> _listOfParameter;
@@ -23,7 +22,6 @@ namespace MCDA.Model
             _listOfParameter = listOfParameter;
 
             _listOfParameter.ForEach(p => p.RegisterPropertyHandler(x => x.Weight, WeightPropertyChanged));
-
         }
 
         void WeightPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -43,13 +41,11 @@ namespace MCDA.Model
         public IWeightDistributionStrategy WeightDistributionStrategy{
 
             get { return _weightDistributionStrategy;}
-            set { _weightDistributionStrategy = value; }
-            
+            set { _weightDistributionStrategy = value; }       
         }
 
         public void DistributeEquallyToolParameterWeights()
-        {
-            
+        {        
             double weight = 100 / (double)_listOfParameter.Count;
 
             _isLocked = true;
@@ -71,7 +67,5 @@ namespace MCDA.Model
                 _listOfParameter.ForEach(p => p.RegisterPropertyHandler(w => w.Weight, WeightPropertyChanged));
             }
         }
-
     }
-
 }

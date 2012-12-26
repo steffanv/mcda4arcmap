@@ -126,7 +126,7 @@ namespace MCDA.ViewModel
             _owaResultDataTable = _owaTool.Data;
 
             if (_isSendToInMemoryWorkspaceCommand)
-                _mcdaExtension.JoinToolResultByOID(_owaTool, _owaTool.Data);
+                ProgressDialog.ShowProgressDialog("Creating Symbology", (Action<AbstractToolTemplate, DataTable>)_mcdaExtension.JoinToolResultByOID, _owaTool, _owaTool.Data);
 
             _isUpdateAllowed = false;
 
@@ -138,7 +138,7 @@ namespace MCDA.ViewModel
             _owaResultDataTable = _owaTool.Data;
 
             if (_isSendToInMemoryWorkspaceCommand)
-                _mcdaExtension.JoinToolResultByOID(_owaTool, _owaTool.Data);
+                ProgressDialog.ShowProgressDialog("Creating Symbology", (Action<AbstractToolTemplate, DataTable>)_mcdaExtension.JoinToolResultByOID, _owaTool, _owaTool.Data);
         }
 
         protected override void UpdateAnimation()
@@ -170,7 +170,7 @@ namespace MCDA.ViewModel
                         _owaResultDataTable = _owaTool.Data;
 
                         if (_isSendToInMemoryWorkspaceCommand)
-                            _mcdaExtension.JoinToolResultByOID(_owaTool, _owaTool.Data);
+                            ProgressDialog.ShowProgressDialog("Creating Symbology", (Action<AbstractToolTemplate, DataTable>)_mcdaExtension.JoinToolResultByOID, _owaTool, _owaTool.Data);
                     }
                 }
 
@@ -180,7 +180,7 @@ namespace MCDA.ViewModel
                 _owaResultDataTable = _owaTool.Data;
 
                 if (_isSendToInMemoryWorkspaceCommand)
-                    _mcdaExtension.JoinToolResultByOID(_owaTool, _owaTool.Data);
+                    ProgressDialog.ShowProgressDialog("Creating Symbology", (Action<AbstractToolTemplate, DataTable>)_mcdaExtension.JoinToolResultByOID, _owaTool, _owaTool.Data);
 
                 _isUpdateAllowed = false;
 
@@ -246,13 +246,17 @@ namespace MCDA.ViewModel
                     return;
                 }
                 if (userResult)
-                    //simulate another send to in memory workspace command
-                    //this actually unlinks everything
-                    DoSendToInMemoryWorkspaceCommand();
+                {
+                    _isSendToInMemoryWorkspaceCommand = !_isSendToInMemoryWorkspaceCommand;
+                    _mcdaExtension.RemoveLink(_owaTool);
+                    this.MCDAExtensionPropertyChanged(this, null);
+                }
+
+                PropertyChanged.Notify(() => IsSendToInMemoryWorkspaceCommand);
             }
 
             if (_isLocked)
-                ProgressDialog.ShowProgressDialog("Establish Link", (Action<AbstractToolTemplate>) _mcdaExtension.EstablishLink,_owaTool);
+                ProgressDialog.ShowProgressDialog("Creating In Memory Representation", (Action<AbstractToolTemplate>)_mcdaExtension.EstablishLink, _owaTool);
 
             if (!_isLocked)
             {
@@ -265,7 +269,6 @@ namespace MCDA.ViewModel
 
         protected override void DoSendToInMemoryWorkspaceCommand()
         {
-
             _isSendToInMemoryWorkspaceCommand = !_isSendToInMemoryWorkspaceCommand;
 
             if (_isSendToInMemoryWorkspaceCommand && !_isLocked)
@@ -273,12 +276,15 @@ namespace MCDA.ViewModel
 
             if (_isSendToInMemoryWorkspaceCommand)
             {
-                _mcdaExtension.JoinToolResultByOID(_owaTool, _owaTool.Data);
                 _mcdaExtension.DisplayLink(_owaTool);
+                ProgressDialog.ShowProgressDialog("Creating Symbology", (Action<AbstractToolTemplate, DataTable>)_mcdaExtension.JoinToolResultByOID, _owaTool, _owaTool.Data);
             }
 
             if (!_isSendToInMemoryWorkspaceCommand)
-                _mcdaExtension.RemoveLink(_owaTool);
+            {
+                //_mcdaExtension.RemoveLink(_owaTool);
+                DoLockCommand();
+            }
 
             PropertyChanged.Notify(() => IsSendToInMemoryWorkspaceCommand);
         }
@@ -377,6 +383,8 @@ namespace MCDA.ViewModel
 
             PropertyChanged.Notify(() => OWAParameter);
             PropertyChanged.Notify(() => OWAResult);
+
+            UpdateRealtime();
         }
 
         protected override void DoClosingCommand()

@@ -127,8 +127,7 @@ namespace MCDA.ViewModel
           _wlcResultDataTable = _wlcTool.Data;
 
           if (_isSendToInMemoryWorkspaceCommand)
-              ProgressDialog.ShowProgressDialog("baba", (Action<AbstractToolTemplate, DataTable>)_mcdaExtension.JoinToolResultByOID, _wlcTool, _wlcTool.Data);
-              //_mcdaExtension.JoinToolResultByOID(_wlcTool, _wlcTool.Data);
+              ProgressDialog.ShowProgressDialog("Creating Symbology", (Action<AbstractToolTemplate, DataTable>)_mcdaExtension.JoinToolResultByOID, _wlcTool, _wlcTool.Data);
 
           _isUpdateAllowed = false;
            
@@ -140,8 +139,7 @@ namespace MCDA.ViewModel
            _wlcResultDataTable = _wlcTool.Data;
 
            if (_isSendToInMemoryWorkspaceCommand)
-               ProgressDialog.ShowProgressDialog("baba", (Action<AbstractToolTemplate, DataTable>)_mcdaExtension.JoinToolResultByOID, _wlcTool, _wlcTool.Data);
-               //_mcdaExtension.JoinToolResultByOID(_wlcTool, _wlcTool.Data);
+               ProgressDialog.ShowProgressDialog("Creating Symbology", (Action<AbstractToolTemplate, DataTable>)_mcdaExtension.JoinToolResultByOID, _wlcTool, _wlcTool.Data);
        }
 
        protected override void UpdateAnimation()
@@ -173,7 +171,7 @@ namespace MCDA.ViewModel
                        _wlcResultDataTable = _wlcTool.Data;
 
                        if (_isSendToInMemoryWorkspaceCommand)
-                           _mcdaExtension.JoinToolResultByOID(_wlcTool, _wlcTool.Data);
+                           ProgressDialog.ShowProgressDialog("Creating Symbology", (Action<AbstractToolTemplate, DataTable>)_mcdaExtension.JoinToolResultByOID, _wlcTool, _wlcTool.Data);
                    }
                }
 
@@ -249,13 +247,17 @@ namespace MCDA.ViewModel
                    return;
                }
                if (userResult)
-                   //simulate another send to in memory workspace command
-                   //this actually unlinks everything
-                   DoSendToInMemoryWorkspaceCommand();
+               {
+                   _isSendToInMemoryWorkspaceCommand = !_isSendToInMemoryWorkspaceCommand;
+                   _mcdaExtension.RemoveLink(_wlcTool);
+                   this.MCDAExtensionPropertyChanged(this, null);
+
+                   PropertyChanged.Notify(() => IsSendToInMemoryWorkspaceCommand);
+               }
            }
 
-           if(_isLocked)
-               ProgressDialog.ShowProgressDialog("Establish Link", (Action<AbstractToolTemplate>) _mcdaExtension.EstablishLink, _wlcTool);
+           if (_isLocked)
+               ProgressDialog.ShowProgressDialog("Creating In Memory Representation", (Action<AbstractToolTemplate>)_mcdaExtension.EstablishLink, _wlcTool);
 
            if (!_isLocked)
            {
@@ -268,7 +270,6 @@ namespace MCDA.ViewModel
 
        protected override void DoSendToInMemoryWorkspaceCommand()
        {
-
            _isSendToInMemoryWorkspaceCommand = !_isSendToInMemoryWorkspaceCommand;
 
            if (_isSendToInMemoryWorkspaceCommand && !_isLocked)
@@ -276,12 +277,13 @@ namespace MCDA.ViewModel
 
            if (_isSendToInMemoryWorkspaceCommand)
            {
-               _mcdaExtension.JoinToolResultByOID(_wlcTool, _wlcTool.Data);
                _mcdaExtension.DisplayLink(_wlcTool);
+               ProgressDialog.ShowProgressDialog("Creating Symbology", (Action<AbstractToolTemplate, DataTable>)_mcdaExtension.JoinToolResultByOID, _wlcTool, _wlcTool.Data);
            }
 
            if (!_isSendToInMemoryWorkspaceCommand)
-               _mcdaExtension.RemoveLink(_wlcTool);
+               //_mcdaExtension.RemoveLink(_wlcTool);
+               DoLockCommand();
 
            PropertyChanged.Notify(() => IsSendToInMemoryWorkspaceCommand);
        }
@@ -330,6 +332,8 @@ namespace MCDA.ViewModel
 
             PropertyChanged.Notify(() => WLCParameter);
             PropertyChanged.Notify(() => WLCResult);
+
+            UpdateRealtime();
         }
 
        protected override void DoClosingCommand()
@@ -337,21 +341,7 @@ namespace MCDA.ViewModel
            if (_isLocked || _isSendToInMemoryWorkspaceCommand)
            {
                _mcdaExtension.RemoveLink(_wlcTool);
-
-               //ESRI.ArcGIS.Framework.IMessageDialog msgBox = new ESRI.ArcGIS.Framework.MessageDialogClass();
-               //bool userResult = msgBox.DoModal("Closing", "Unlocking also removes the existing in memory connection.", "Yes", "No", ArcMap.Application.hWnd);
-
-               ////if the user hit no we have to set the lock state back to locked
-               //if (userResult)
-               //{
-               //    _mcdaExtension.RemoveLink(_wlcTool);
-
-
-               //}
-               //else
-               //{
-
-               //}
+ 
            }
        }
     }

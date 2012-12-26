@@ -55,7 +55,7 @@ namespace MCDA
         void ViewModelPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             //we use this so far only for the histogram
-            if (_viewModel.SelectedResult == null || _viewModel.SelectedResult.RenderContainer.ClassBreaksRendererContainer == null || !_viewModel.SelectedResult.RenderContainer.ClassBreaksRendererContainer.IsComplete())
+            if (_viewModel.SelectedResult == null || _viewModel.SelectedResult.RenderContainer == null)
                 return;
 
             double[] data;

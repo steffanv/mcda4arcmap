@@ -108,7 +108,9 @@ namespace MCDA.ViewModel
         public ResultContainer SelectedResult
         {
             get { return _selectedResult; }
-            set { _selectedResult = value;
+            set
+            {
+                PropertyChanged.ChangeAndNotify(ref _selectedResult, value, () => SelectedResult);
 
             SelectedResultChanged();
 
@@ -162,9 +164,8 @@ namespace MCDA.ViewModel
             get { return _selectedStartColor;  }
             set {
 
-                ClassBreaksRendererValuesChanged();
                 _selectedStartColor = value;
-
+                ClassBreaksRendererValuesChanged();
             }
         }
 
@@ -173,9 +174,8 @@ namespace MCDA.ViewModel
             get { return _selectedEndColor; }
             set
             {
-                ClassBreaksRendererValuesChanged();
                 _selectedEndColor = value;
-
+                ClassBreaksRendererValuesChanged();
             }
         }
         #endregion
@@ -229,7 +229,7 @@ namespace MCDA.ViewModel
 
         private void Render()
         {
-            MCDAExtension.Render(_selectedResult.RenderContainer);
+            ProgressDialog.ShowProgressDialog("Creating Symbology", (Action<IRenderContainer>)MCDAExtension.Render, _selectedResult.RenderContainer);
         }
 
         private void CreateCompleteResultList()
@@ -265,6 +265,10 @@ namespace MCDA.ViewModel
                     ResultContainer temp = new ResultContainer();
                     temp.Field = fields.FirstOrDefault();
                     temp.RenderContainer = currentMCDAWorkspaceContainer;
+
+                    // in case the tool had not a run yet we will not add it, as it does not containa any result data
+                    if(temp.Field == null)
+                        continue;
 
                     _resultList.Add(temp);    
             }

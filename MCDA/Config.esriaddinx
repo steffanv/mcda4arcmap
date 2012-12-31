@@ -6,7 +6,7 @@
   <Image>Images\MCDA Add-in.png</Image>
   <Author>Steffan Voss</Author>
   <Company>Ryerson University</Company>
-  <Date>11/8/2012</Date>
+  <Date>12/25/2012</Date>
   <Targets>
     <Target name="Desktop" version="10.1" />
   </Targets>
@@ -19,6 +19,7 @@
         <Button id="Ryerson_University_MCDA_WLCToolBtn" class="WLCToolBtn" message="" caption="WLC Tool" tip="Weighted Linear Combination." category="Add-In Controls" image="Images\WLCTool.png" />
         <Button id="Ryerson_University_MCDA_ConfigBtn" class="ConfigBtn" message="" caption="Configuration" tip="Add-in command tooltip." category="Add-In Controls" image="Images\ConfigBtn.png" onDemand="false" />
         <Button id="Ryerson_University_MCDA_VisualizationBtn" class="VisualizationBtn" message="" caption="Visualization" tip="Visualization Options." category="Add-In Controls" image="Images\VisualizationBtn.png" onDemand="false" />
+        <Button id="Ryerson_University_MCDA_LWLCToolBtn" class="LWLCToolBtn" message="" caption="LWLC Tool" tip="Local Weighted Linear Combination" category="Add-In Controls" image="Images\LWLCToolBtn.png" />
       </Commands>
       <Extensions>
         <Extension id="Ryerson_University_MCDA_MCDAExtension" class="MCDAExtension" autoLoad="true" showInExtensionDialog="false" />
@@ -55,6 +56,7 @@
           <Items>
             <Button refID="Ryerson_University_MCDA_WLCToolBtn" />
             <Button refID="Ryerson_University_MCDA_OWAToolBtn" />
+            <Button refID="Ryerson_University_MCDA_LWLCToolBtn" />
             <!--<Button refID="Ryerson_University_MCDA_AHPToolBtn" />-->
           </Items>
         </Menu>

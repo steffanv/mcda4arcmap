@@ -36,10 +36,19 @@ namespace MCDA.Model
 
             return owaTool;
         }
-    }
 
-    public enum Tool
-    {
-        WLCTool
+        public static LWLCTool NewLWLCTool()
+        {
+            ToolParameterContainer toolParameter = MCDA.MCDAExtension.GetExtension().GetToolParameterBasedOnSelectedFields();
+            toolParameter.DistributeEquallyToolParameterWeights();
+
+            DataTable dataTable = MCDA.MCDAExtension.GetExtension().GetDataTableForParameterSet(toolParameter.ToolParameter);
+
+            LWLCTool lwlcTool = new LWLCTool(dataTable,toolParameter,MCDA.MCDAExtension.GetExtension().SelectedLayer == null ? null : MCDA.MCDAExtension.GetExtension().SelectedLayer.FeatureClass);
+
+            lwlcTool.DefaultResultColumnName = MCDA.MCDAExtension.GetExtension().GetSuggestNameForResultColumn(lwlcTool.DefaultResultColumnName);
+
+            return lwlcTool;
+        }
     }
 }

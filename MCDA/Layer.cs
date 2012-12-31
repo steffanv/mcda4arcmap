@@ -49,6 +49,11 @@ namespace MCDA.Model
             //RegisterListenerForEveryMemberOfFields();
         }
 
+        public IFeatureClass FeatureClass
+        {
+            get { return _featureLayer.FeatureClass; }
+        }
+
         public ESRI.ArcGIS.Carto.ILayer ESRILayer
         {
             get { return _layer; }

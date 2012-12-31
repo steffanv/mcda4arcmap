@@ -2,16 +2,14 @@
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
-using ESRI.ArcGIS.esriSystem;
-using ESRI.ArcGIS.Framework;
 using System.Windows.Interop;
 
 
 namespace MCDA
 {
-    public class WLCToolBtn : ESRI.ArcGIS.Desktop.AddIns.Button
+    public class LWLCToolBtn : ESRI.ArcGIS.Desktop.AddIns.Button
     {
-        public WLCToolBtn()
+        public LWLCToolBtn()
         {
         }
 
@@ -19,7 +17,7 @@ namespace MCDA
         {
             var parentHandle = new IntPtr(ArcMap.Application.hWnd);
 
-            var wpfWindow = new WLCToolView();
+            var wpfWindow = new LWLCToolView();
 
             var helper = new WindowInteropHelper(wpfWindow);
 

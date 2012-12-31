@@ -580,7 +580,7 @@ namespace MCDA
 
         /// <summary>
         /// Joins the result table of the data table into the feature class of the tool by using the oid/fid.
-        /// Afterwards the method updates the view with the new result. This also includes the update of the class breaks renderer if set.
+        /// Afterwards the method updates the view with the new result. This also includes the update of the class breaks or bi polar renderer if set.
         /// </summary>
         /// <param name="tool"></param>
         /// <param name="dataTable"></param>

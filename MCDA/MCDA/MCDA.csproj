@@ -86,7 +86,7 @@
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </Reference>
     <Reference Include="ESRI.ArcGIS.Geometry, Version=10.1.0.0, Culture=neutral, PublicKeyToken=8fc3cc631e44ad86, processorArchitecture=MSIL">
-      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
     </Reference>
     <Reference Include="ESRI.ArcGIS.System">
       <Private>False</Private>
@@ -125,10 +125,21 @@
       <DependentUpon>AlphaSelectionView.xaml</DependentUpon>
     </Compile>
     <Compile Include="AlphaSelectionViewModel.cs" />
+    <Compile Include="Cluster.cs" />
     <Compile Include="FlipControl.xaml.cs">
       <DependentUpon>FlipControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="IRenderContainer.cs" />
+    <Compile Include="LWLCTool.cs" />
+    <Compile Include="LWLCToolBtn.cs" />
+    <Compile Include="LWLCToolView.xaml.cs">
+      <DependentUpon>LWLCToolView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="LWLCToolViewModel.cs" />
+    <Compile Include="NeighborhoodSelectionView.xaml.cs">
+      <DependentUpon>NeighborhoodSelectionView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="NeighborhoodSelectionViewModel.cs" />
     <Compile Include="ProgressDialog.cs" />
     <Compile Include="RenderContainer.cs" />
     <Compile Include="RendererContainer.cs" />
@@ -250,6 +261,14 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="LWLCToolView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="NeighborhoodSelectionView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="OWAToolView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -336,6 +355,7 @@
     <Resource Include="Images\toolbargraphics\Distribution.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
+    <Content Include="Images\LWLCTool.png" />
     <Content Include="README.txt" />
   </ItemGroup>
   <ItemGroup>

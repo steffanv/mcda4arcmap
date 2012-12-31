@@ -35,7 +35,10 @@ namespace MCDA.ViewModel
             //progressDialog2.Title = "Counting...";
             progressDialog2.Animation = ESRI.ArcGIS.Framework.esriProgressAnimationTypes.esriProgressSpiral;
 
-            //stepProgressor.StepValue = 2;
+
+            stepProgressor.Hide();
+            progressDialog2.ShowDialog();
+
             action.DynamicInvoke(args);
 
             //stepProgressor.StepValue = 4;

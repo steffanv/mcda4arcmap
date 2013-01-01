@@ -19,6 +19,9 @@ namespace MCDA.Model
             _clusterIDs = clusterIDs;
             _dataTable = dt;
             _toolParameterContainer = toolParameterContainer;
+
+            //the feature id is also part of the cluster!
+            _clusterIDs.Add(featureID);
         }
 
         private int GetOIDColumnIndex()
@@ -52,38 +55,38 @@ namespace MCDA.Model
 
             IList<Tuple<IToolParameter, double>> listOfRangeTuple = new List<Tuple<IToolParameter, double>>();
 
-            foreach(IToolParameter currentToolParameter in toolParameterContainer.ToolParameter){
+            foreach (IToolParameter currentToolParameter in toolParameterContainer.ToolParameter)
+            {
 
-                IList<double> data =_dataTable.AsEnumerable().Where(x => _clusterIDs.Contains(x.Field<FieldTypeOID>(oidColumnIndex).OID)).Select(x => x.Field<double>(currentToolParameter.ColumnName)).Distinct().ToList();
+                IList<double> data = _dataTable.AsEnumerable().Where(x => _clusterIDs.Contains(x.Field<FieldTypeOID>(oidColumnIndex).OID)).Select(x => x.Field<double>(currentToolParameter.ColumnName)).Distinct().ToList();
 
                 listOfRangeTuple.Add(Tuple.Create(currentToolParameter, data.Max() - data.Min()));
 
-                }
+            }
 
             return listOfRangeTuple;
         }
 
-        private  IList<Tuple<IToolParameter, double>> Scale(ToolParameterContainer toolParameterContainer, IList<Tuple<IToolParameter, double>> localRangeList)
+        private IList<Tuple<IToolParameter, double>> Scale(ToolParameterContainer toolParameterContainer, IList<Tuple<IToolParameter, double>> localRangeList)
         {
-
             IList<Tuple<IToolParameter, double>> listOfScaledTuple = new List<Tuple<IToolParameter, double>>();
 
-            foreach(IToolParameter currentToolParameter in toolParameterContainer.ToolParameter){
-         
-              Tuple<IToolParameter, double> currentLocalRange =  localRangeList.Where( x => x.Item1 == currentToolParameter).FirstOrDefault();
-    
+            foreach (IToolParameter currentToolParameter in toolParameterContainer.ToolParameter)
+            {
+                Tuple<IToolParameter, double> currentLocalRange = localRangeList.Where(x => x.Item1 == currentToolParameter).FirstOrDefault();
+
                 //todo min - max
 
-            // min
-            // max cluster - _featureInCenter value divided by local range
-            int oidColumnIndex = GetOIDColumnIndex();
+                // min
+                // max cluster - _featureInCenter value divided by local range
+                int oidColumnIndex = GetOIDColumnIndex();
 
                 //max value of the tool parameter for the cluster
-            IList<double> data = _dataTable.AsEnumerable().Where(x => _clusterIDs.Contains(x.Field<FieldTypeOID>(oidColumnIndex).OID)).Select(x => x.Field<double>(currentToolParameter.ColumnName)).Distinct().ToList();
+                IList<double> data = _dataTable.AsEnumerable().Where(x => _clusterIDs.Contains(x.Field<FieldTypeOID>(oidColumnIndex).OID)).Select(x => x.Field<double>(currentToolParameter.ColumnName)).Distinct().ToList();
 
-            double max = data.Max();
+                double max = data.Max();
 
-            double actualValue = _dataTable.AsEnumerable().Where(x => x.Field<FieldTypeOID>(oidColumnIndex).OID == _featureID).Select(x => x.Field<double>(currentToolParameter.ColumnName)).FirstOrDefault();
+                double actualValue = _dataTable.AsEnumerable().Where(x => x.Field<FieldTypeOID>(oidColumnIndex).OID == _featureID).Select(x => x.Field<double>(currentToolParameter.ColumnName)).FirstOrDefault();
 
                 double result = (max - actualValue) / currentLocalRange.Item2;
 
@@ -94,7 +97,7 @@ namespace MCDA.Model
 
         private IList<Tuple<IToolParameter, double>> LocalWeights(ToolParameterContainer toolParameterContainer, IList<Tuple<IToolParameter, double>> localRangeList, IList<Tuple<IToolParameter, double>> globalRangeList)
         {
-            IList<Tuple<IToolParameter, double>> listOfLocalWeigtTupel = new List<Tuple<IToolParameter, double>>();
+            IList<Tuple<IToolParameter, double>> listOfLocalWeightTupel = new List<Tuple<IToolParameter, double>>();
 
             double dividend, divisor = 0;
 
@@ -113,13 +116,13 @@ namespace MCDA.Model
                     divisor += (currentToolParameter2.ScaledWeight * localRange2) / globalRange2;
                 }
 
-                double result =  divisor == 0 ? 0 : dividend / divisor;
+                double result = divisor == 0 ? 0 : dividend / divisor;
 
-                listOfLocalWeigtTupel.Add(new Tuple<IToolParameter, double>(currentToolParameter,result));
+                listOfLocalWeightTupel.Add(new Tuple<IToolParameter, double>(currentToolParameter, result));
 
             }
 
-            return listOfLocalWeigtTupel;
+            return listOfLocalWeightTupel;
         }
         
         // oid/fid, r1,r2, va1, va2, w1, w2, result

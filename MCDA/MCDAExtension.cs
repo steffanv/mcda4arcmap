@@ -272,10 +272,12 @@ namespace MCDA
 
             //we have to take care about FID oid fields http://gis.stackexchange.com/questions/40833/arcobjects-bug-in-oid-field-duplication-while-duplicating-feature-class
             bool isOIDFieldNameFID = false;
+
+            int dataTableOIDOrdinal = 0;
             //in fact no feature can be selected, thus we have to take care about potential null
             if (oidField != null)
             {
-                dataTable.Columns.Add(oidField.FieldName, typeof(FieldTypeOID));
+                dataTableOIDOrdinal = dataTable.Columns.Add(oidField.FieldName, typeof(FieldTypeOID)).Ordinal;
 
                 //and to make it easier add the oidField to the rest of the fields
                 listOfFields.Add(oidField);
@@ -284,8 +286,10 @@ namespace MCDA
                     isOIDFieldNameFID = true;
             }
 
-            //get data for rows
+            //get data for rows and store it in a list of list like a table
            IList<IList<double>> tableData = new List<IList<double>>();
+
+           bool isOIDFieldStartsByZero = false;
 
            int expectedNumbersOfRow = 0;
            foreach (Model.Field currentField in listOfFields)
@@ -295,10 +299,11 @@ namespace MCDA
 
                //each column has the data of all rows in the column
                expectedNumbersOfRow = column.Count;
+
+               if (currentField.IsOID && column.Contains(0d))
+                   isOIDFieldStartsByZero = true;                  
            }
-
-           bool isOIDFieldStartsByZero = false;
-
+           
            //add row
            for (int i = 0; i < expectedNumbersOfRow; i++)
            {
@@ -307,14 +312,8 @@ namespace MCDA
                for (int y = 0; y < tableData.Count; y++)
                {
                    //we have the oid column
-                   if (dataTable.Columns[y].DataType == typeof(FieldTypeOID))
+                   if (y == dataTableOIDOrdinal)
                    {
-                       //the first row
-                       if (i == 0)
-                       {
-                           if((int)tableData[y][i] ==0)
-                             isOIDFieldStartsByZero = true;
-                       }
                        //if the column is FID we have to change the ids 0...x to 1...x+1 because this change will be made after the featureclass is copied into the in memory workspace
                        if (isOIDFieldNameFID && isOIDFieldStartsByZero)
                        {
@@ -333,7 +332,6 @@ namespace MCDA
            }
 
            return dataTable;
-
         }
 
         public IList<MCDAWorkspaceContainer> GetAllMCDAWorkspaceContainerFromShadowWorkspace()
@@ -350,21 +348,16 @@ namespace MCDA
 
             using (ComReleaser comReleaser = new ComReleaser())
             {
-          
-            IFeatureCursor featureCursor = _featureLayer.FeatureClass.Search(null, true);
+                IFeatureCursor featureCursor = _featureLayer.FeatureClass.Search(null, true);
 
-            IFeature feature = featureCursor.NextFeature();
+                int fieldIndex = _featureLayer.FeatureClass.FindField(field.FieldName);
 
-                int fieldIndex = feature.Table.FindField(field.FieldName);
+                IFeature currentFeature;
 
-                ICursor cursor = feature.Table.Search(null, true);
-
-                IRow row = null;
-            
-                while ((row = cursor.NextRow()) != null)
+                while ((currentFeature = featureCursor.NextFeature()) != null)
                 {
                     //we have to cast explicitly ... https://connect.microsoft.com/VisualStudio/feedback/details/534288/ilist-dynamic-cannot-call-a-method-add-without-casting
-                    listOfValuesFromField.Add(Convert.ToDouble(row.get_Value(fieldIndex)));
+                    listOfValuesFromField.Add(Convert.ToDouble(currentFeature.get_Value(fieldIndex)));
                 }
             }
 

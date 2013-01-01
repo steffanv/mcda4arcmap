@@ -20,7 +20,7 @@ namespace MCDA.ViewModel
 
         private MCDAExtension _mcdaExtension;
         private AbstractToolTemplate _lwlcTool;
-        private DataTable _wlcResultDataTable;
+        private DataTable _lwlcResultDataTable;
         private BindingList<IToolParameter> _toolParameter;
         private IList<List<IToolParameter>> _toolParameterStorageForAnimationLikeUpdate = new List<List<IToolParameter>>();
 
@@ -28,13 +28,15 @@ namespace MCDA.ViewModel
         private bool _isSendToInMemoryWorkspaceCommand = false;
         private bool _isUpdateAllowed = false;
 
+        private ICommand _neighborhoodSelectionCommand;
+
         public LWLCToolViewModel()
         {
             _mcdaExtension = MCDAExtension.GetExtension();
 
             _lwlcTool = ToolFactory.NewLWLCTool();
 
-            _wlcResultDataTable = _lwlcTool.Data;
+            _lwlcResultDataTable = _lwlcTool.Data;
 
             _mcdaExtension.RegisterPropertyHandler(x => x.AvailableLayer, MCDAExtensionPropertyChanged);
 
@@ -67,12 +69,12 @@ namespace MCDA.ViewModel
 
             _lwlcTool.Run();
 
-            _wlcResultDataTable = _lwlcTool.Data;
+            _lwlcResultDataTable = _lwlcTool.Data;
 
             RegisterToolParameterEvents();
 
-            PropertyChanged.Notify(() => WLCParameter);
-            PropertyChanged.Notify(() => WLCResult);
+            PropertyChanged.Notify(() => LWLCParameter);
+            PropertyChanged.Notify(() => LWLCResult);
         }
 
         private void RegisterToolParameterEvents()
@@ -95,7 +97,7 @@ namespace MCDA.ViewModel
 
             _lwlcTool.Run();
 
-            _wlcResultDataTable = _lwlcTool.Data;
+            _lwlcResultDataTable = _lwlcTool.Data;
 
             if (_mcdaExtension.SelectedLayer != null)
             {
@@ -106,8 +108,8 @@ namespace MCDA.ViewModel
 
             RegisterToolParameterEvents();
 
-            PropertyChanged.Notify(() => WLCParameter);
-            PropertyChanged.Notify(() => WLCResult);
+            PropertyChanged.Notify(() => LWLCParameter);
+            PropertyChanged.Notify(() => LWLCResult);
         }
 
         //called from the code behind page if something changed
@@ -124,7 +126,7 @@ namespace MCDA.ViewModel
                 return;
 
             _lwlcTool.Run();
-            _wlcResultDataTable = _lwlcTool.Data;
+            _lwlcResultDataTable = _lwlcTool.Data;
 
             if (_isSendToInMemoryWorkspaceCommand)
                 ProgressDialog.ShowProgressDialog("Creating Symbology", (Action<AbstractToolTemplate, DataTable>)_mcdaExtension.JoinToolResultByOID, _lwlcTool, _lwlcTool.Data);
@@ -136,7 +138,7 @@ namespace MCDA.ViewModel
         protected override void UpdateRealtime()
         {
             _lwlcTool.Run();
-            _wlcResultDataTable = _lwlcTool.Data;
+            _lwlcResultDataTable = _lwlcTool.Data;
 
             if (_isSendToInMemoryWorkspaceCommand)
                 ProgressDialog.ShowProgressDialog("Creating Symbology", (Action<AbstractToolTemplate, DataTable>)_mcdaExtension.JoinToolResultByOID, _lwlcTool, _lwlcTool.Data);
@@ -168,7 +170,7 @@ namespace MCDA.ViewModel
                     {
                         _lwlcTool.ToolParameterContainer.ToolParameter = _toolParameterStorageForAnimationLikeUpdate[i];
                         _lwlcTool.Run();
-                        _wlcResultDataTable = _lwlcTool.Data;
+                        _lwlcResultDataTable = _lwlcTool.Data;
 
                         if (_isSendToInMemoryWorkspaceCommand)
                             ProgressDialog.ShowProgressDialog("Creating Symbology", (Action<AbstractToolTemplate, DataTable>)_mcdaExtension.JoinToolResultByOID, _lwlcTool, _lwlcTool.Data);
@@ -178,7 +180,7 @@ namespace MCDA.ViewModel
                 //make sure we add the latest one
                 _lwlcTool.ToolParameterContainer.ToolParameter = latestToolParameter;
                 _lwlcTool.Run();
-                _wlcResultDataTable = _lwlcTool.Data;
+                _lwlcResultDataTable = _lwlcTool.Data;
 
                 if (_isSendToInMemoryWorkspaceCommand)
                     _mcdaExtension.JoinToolResultByOID(_lwlcTool, _lwlcTool.Data);
@@ -191,17 +193,17 @@ namespace MCDA.ViewModel
 
         protected override void AfterUpdate()
         {
-            PropertyChanged.Notify(() => WLCResult);
+            PropertyChanged.Notify(() => LWLCResult);
         }
 
-        public BindingList<IToolParameter> WLCParameter
+        public BindingList<IToolParameter> LWLCParameter
         {
             get { return _toolParameter; }
             set { _toolParameter = value; }
         }
-        public DataView WLCResult
+        public DataView LWLCResult
         {
-            get { return _wlcResultDataTable.DefaultView; }
+            get { return _lwlcResultDataTable.DefaultView; }
         }
 
         public bool IsLocked
@@ -309,13 +311,13 @@ namespace MCDA.ViewModel
                 _lwlcTool.TransformationStrategy = standardizationSelectionViewModel.SelectedTransformationStrategy;
 
                 _lwlcTool.Run();
-                _wlcResultDataTable = _lwlcTool.Data;
+                _lwlcResultDataTable = _lwlcTool.Data;
 
                 _isUpdateAllowed = true;
 
                 base.Update();
 
-                PropertyChanged.Notify(() => WLCResult);
+                PropertyChanged.Notify(() => LWLCResult);
 
             };
 
@@ -328,10 +330,10 @@ namespace MCDA.ViewModel
 
             _lwlcTool.Run();
 
-            _wlcResultDataTable = _lwlcTool.Data;
+            _lwlcResultDataTable = _lwlcTool.Data;
 
-            PropertyChanged.Notify(() => WLCParameter);
-            PropertyChanged.Notify(() => WLCResult);
+            PropertyChanged.Notify(() => LWLCParameter);
+            PropertyChanged.Notify(() => LWLCResult);
 
             UpdateRealtime();
         }
@@ -343,6 +345,56 @@ namespace MCDA.ViewModel
                 _mcdaExtension.RemoveLink(_lwlcTool);
 
             }
+        }
+
+        public ICommand NeighborhoodSelectionCommand
+        {
+            get
+            {
+
+                if (_neighborhoodSelectionCommand == null)
+                {
+                    _neighborhoodSelectionCommand = new RelayCommand(
+                        p => this.DoNeighborhoodSelectionCommand(),
+                        p => true
+                        );
+                }
+
+                return _neighborhoodSelectionCommand;
+            }
+        }
+
+        public void DoNeighborhoodSelectionCommand()
+        {
+            var parentHandle = new IntPtr(ArcMap.Application.hWnd);
+
+            var wpfWindow = new NeighborhoodSelectionView();
+
+            NeighborhoodSelectionViewModel alphaSelectionViewModel = wpfWindow.DataContext as NeighborhoodSelectionViewModel;
+
+            //alphaSelectionViewModel.Alpha = _owaTool.Alpha;
+
+            var helper = new WindowInteropHelper(wpfWindow);
+
+            helper.Owner = parentHandle;
+
+            wpfWindow.Closed += delegate(object sender, EventArgs e)
+            {
+
+                //_owaTool.Alpha = alphaSelectionViewModel.Alpha;
+
+                //_owaTool.Run();
+                //_owaResultDataTable = _owaTool.Data;
+
+                _isUpdateAllowed = true;
+
+                base.Update();
+
+                PropertyChanged.Notify(() => LWLCResult);
+
+            };
+
+            wpfWindow.ShowDialog();
         }
     }
 }

@@ -13,13 +13,13 @@
   <AddIn language="CLR4.0" library="MCDA.dll" namespace="MCDA">
     <ArcMap>
       <Commands>
-        <Button id="Ryerson_University_MCDA_AddDataBtn" class="AddDataBtn" message="" caption="Add data" tip="Manage Critieria." category="MCDA Controls" image="Images\AddDataBtn.png" />
+        <Button id="Ryerson_University_MCDA_AddDataBtn" class="AddDataBtn" message="" caption="Add data" tip="Manage Critieria." category="MCDA Controls" image="Images\AddData.png" />
         <Button id="Ryerson_University_MCDA_AHPToolBtn" class="AHPToolBtn" message="" caption="AHP Tool" tip="Add-in command tooltip." category="Add-In Controls" image="Images\AHPTool.png" />
         <Button id="Ryerson_University_MCDA_OWAToolBtn" class="OWAToolBtn" message="" caption="OWA Tool" tip="Ordered Weighted Averaging." category="Add-In Controls" image="Images\OWATool.png" />
         <Button id="Ryerson_University_MCDA_WLCToolBtn" class="WLCToolBtn" message="" caption="WLC Tool" tip="Weighted Linear Combination." category="Add-In Controls" image="Images\WLCTool.png" />
-        <Button id="Ryerson_University_MCDA_ConfigBtn" class="ConfigBtn" message="" caption="Configuration" tip="Add-in command tooltip." category="Add-In Controls" image="Images\ConfigBtn.png" onDemand="false" />
-        <Button id="Ryerson_University_MCDA_VisualizationBtn" class="VisualizationBtn" message="" caption="Visualization" tip="Visualization Options." category="Add-In Controls" image="Images\VisualizationBtn.png" onDemand="false" />
-        <Button id="Ryerson_University_MCDA_LWLCToolBtn" class="LWLCToolBtn" message="" caption="LWLC Tool" tip="Local Weighted Linear Combination" category="Add-In Controls" image="Images\LWLCToolBtn.png" />
+        <Button id="Ryerson_University_MCDA_ConfigBtn" class="ConfigBtn" message="" caption="Configuration" tip="Add-in command tooltip." category="Add-In Controls" image="Images\Config.png" onDemand="false" />
+        <Button id="Ryerson_University_MCDA_VisualizationBtn" class="VisualizationBtn" message="" caption="Visualization" tip="Visualization Options." category="Add-In Controls" image="Images\Visualization.png" onDemand="false" />
+        <Button id="Ryerson_University_MCDA_LWLCToolBtn" class="LWLCToolBtn" message="" caption="LWLC Tool" tip="Local Weighted Linear Combination" category="Add-In Controls" image="Images\LWLCTool.png" />
       </Commands>
       <Extensions>
         <Extension id="Ryerson_University_MCDA_MCDAExtension" class="MCDAExtension" autoLoad="true" showInExtensionDialog="false" />

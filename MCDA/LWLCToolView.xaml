@@ -40,6 +40,9 @@
                 <Button Command="{Binding Path=StandardizationSelectionCommand}" ToolTip="Choose another standardization strategy.">
                     <Image Source="Images\toolbargraphics\Standardization.png"/>
                 </Button>
+                <Button Command="{Binding Path=NeighborhoodSelectionCommand}" ToolTip="Choose another neighborhood definition.">
+                    <Image Source="Images\toolbargraphics\Neighborhood.png" Width="16" Height="16" />
+                </Button>
                 <Separator />
                 <Button Command="{Binding Path=SendToInMemoryWorkspaceCommand}">
                     <Image >
@@ -69,7 +72,7 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <ListView Name="listView" ItemsSource="{Binding Path=WLCParameter}" DataContext="{Binding}" HorizontalContentAlignment="Stretch">
+                    <ListView Name="listView" ItemsSource="{Binding Path=LWLCParameter}" DataContext="{Binding}" HorizontalContentAlignment="Stretch">
                         <ListView.View>
                             <GridView>
                                 <GridViewColumn  Header="Name"  Width="120">
@@ -108,8 +111,8 @@
                     </ListView >
                 </Grid>
             </TabItem>
-            <TabItem Header="Result Table" Name="wlcResultTabItem">
-                <DataGrid Name="resultDataGrid" ItemsSource="{Binding Path=WLCResult, Mode=OneWay}" CanUserAddRows="False" />
+            <TabItem Header="Result Table" Name="lwlcResultTabItem">
+                <DataGrid Name="resultDataGrid" ItemsSource="{Binding Path=LWLCResult, Mode=OneWay}" CanUserAddRows="False" />
             </TabItem>
         </TabControl>
     </Grid>

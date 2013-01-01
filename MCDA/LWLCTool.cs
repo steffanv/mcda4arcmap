@@ -50,6 +50,7 @@ namespace MCDA.Model
 
             _resultDataTable.Columns.Add(_defaultResultColumnName,typeof(double));
 
+            // k nearest or distance
             foreach (int currentID in _dictionaryOfDistances.Keys)
             {
                 List<Tuple<int,double>> list = new List<Tuple<int,double>>();
@@ -70,22 +71,39 @@ namespace MCDA.Model
 
             using (ComReleaser comReleaser = new ComReleaser())
             {
-                IFeatureCursor pCursor = (IFeatureCursor)_featureClass.Search(null, false);
-                IRow pRow = (IRow)pCursor.NextFeature();
-                //IFeatureSelection pFSel = (IFeatureSelection)_featureClass;
+                IFeatureCursor featureCursor = (IFeatureCursor)_featureClass.Search(null, false);
 
                 int numberOfFeatures = _featureClass.FeatureCount(null);
 
                 int oidColumn = _featureClass.FindField(_featureClass.OIDFieldName);
+               
+                bool zeroOIDExist = false;
+              
+                int centroidArrayIndex = 0;
 
-                for (int p = 0; p < numberOfFeatures; p++)
+                IFeature currentFeature;
+                while ((currentFeature = featureCursor.NextFeature()) != null)
                 {
-                    centroidArray[p, 0] = Convert.ToInt32(_featureClass.GetFeature(p).get_Value(oidColumn));
+                    int oid = Convert.ToInt32(currentFeature.get_Value(oidColumn));
+                    centroidArray[centroidArrayIndex, 0] = oid;
 
-                    IArea area = (IArea)_featureClass.GetFeature(p).Shape;
-                    centroidArray[p, 1] = area.Centroid.X;
-                    centroidArray[p, 2] = area.Centroid.Y;
+                    if(oid == 0)
+                        zeroOIDExist = true;
+
+                    IArea area = (IArea)currentFeature.Shape;
+                    centroidArray[centroidArrayIndex, 1] = area.Centroid.X;
+                    centroidArray[centroidArrayIndex, 2] = area.Centroid.Y;
+
+                    centroidArrayIndex++;
                 }
+
+                // it is possible that the oid column starts at zero and the other program parts expect it at 1, thus we have to check if the name is FID and one oid is zero
+                  if(_featureClass.OIDFieldName.Equals("FID") && zeroOIDExist){
+
+                      for (int i = 0; i < centroidArray.GetLength(0); i++)
+                          centroidArray[i, 0]++;
+                      
+                  }
             }
 
             IDictionary<int, List<Tuple<int, double>>> dictionaryOfDistances = new Dictionary<int, List<Tuple<int, double>>>();
@@ -97,12 +115,13 @@ namespace MCDA.Model
 
                 for (int j = 0; j < centroidArray.GetLength(0); j++)
                 {
-                    //don t add the distance to iitself
+                    //don't add the distance too itself
                     if (i == j)
                         continue;
+
                     //create a distance matrix for each polygon and store in the data table
                     double distance = EuclidianDistance(centroidArray[i, 1], centroidArray[i, 2], centroidArray[j, 1], centroidArray[j, 2]);
-                    int id = Convert.ToInt32(centroidArray[j, 0]); //id
+                    int id = Convert.ToInt32(centroidArray[j, 0]);
 
                     Tuple<int, double> temp = new Tuple<int, double>(id, distance);
 
@@ -110,7 +129,6 @@ namespace MCDA.Model
                 }
 
                 dictionaryOfDistances.Add(Convert.ToInt32(centroidArray[i, 0]), m);
-
             }
 
             return dictionaryOfDistances;

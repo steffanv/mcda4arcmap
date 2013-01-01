@@ -317,7 +317,7 @@
     <AddInContent Include="Images\OWAToolView.png" />
   </ItemGroup>
   <ItemGroup>
-    <AddInContent Include="Images\AddDataBtn.png" />
+    <AddInContent Include="Images\AddData.png" />
     <AddInContent Include="Images\AHPTool.png" />
     <AddInContent Include="Images\OWATool.png" />
     <AddInContent Include="Images\WLCTool.png" />
@@ -341,11 +341,11 @@
     <Resource Include="Images\toolbargraphics\Export.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
-    <AddInContent Include="Images\ConfigBtn.png">
+    <AddInContent Include="Images\Config.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </AddInContent>
     <AddInContent Include="Images\ConfigView.png" />
-    <AddInContent Include="Images\VisualizationBtn.png">
+    <AddInContent Include="Images\Visualization.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </AddInContent>
     <AddInContent Include="Images\VisualizationView.png" />
@@ -356,6 +356,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
     <Content Include="Images\LWLCTool.png" />
+    <Resource Include="Images\toolbargraphics\Neighborhood.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
     <Content Include="README.txt" />
   </ItemGroup>
   <ItemGroup>

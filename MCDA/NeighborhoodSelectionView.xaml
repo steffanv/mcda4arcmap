@@ -2,7 +2,9 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"        
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"  
+             xmlns:viewModel="clr-namespace:MCDA.ViewModel"
+             xmlns:local="clr-namespace:MCDA.Model"
         Title="Neighborhood Selection"
         WindowStyle="ToolWindow"
         ShowInTaskbar="False"
@@ -10,6 +12,9 @@
         WindowStartupLocation="CenterOwner"
     Height="300" Width="300">
     <Grid>
+        <Grid.Resources>
+            <local:EnumToBooleanConverter x:Key="enumToBooleanConverter" />
+        </Grid.Resources>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
@@ -34,29 +39,17 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
-                <TextBox Grid.Row="0"/>
-                <Slider Grid.Row="2"/>
-            </Grid>
-        </GroupBox>
-        <GroupBox Header="K-Nearest" Grid.Column="0" Grid.Row="2">
-            <Grid>
-                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
-                <TextBox Grid.Row="0"/>
+
+                <RadioButton GroupName="Contguity" Content="Threshold Distance" Grid.Row="0"/>
+                <TextBox Grid.Row="1"/>
                 <Slider Grid.Row="2"/>
-            </Grid>
-        </GroupBox>
-        <GroupBox Header="Self blabla" Grid.Column="0" Grid.Row="3">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
-                <TextBox Grid.Row="0"/>
-                <Slider Grid.Row="2"/>
+
+                <RadioButton Grid.Row="3" GroupName="1" IsChecked="{Binding Path=RenderOptions, Converter={StaticResource enumToBooleanConverter}, ConverterParameter={x:Static viewModel:NeighborhoodOptions.KNearestNeighbors}}">K Nearest Neighbors</RadioButton>
+                <ComboBox Grid.Row="5" Height="23" HorizontalAlignment="Left"  Name="comboBox1" VerticalAlignment="Top" Width="20" ItemsSource="{Binding Path=NumberOfKNearestNeighbors, Mode=OneWay}" SelectedValue="{Binding Path=SelectedNumberOfKNearestNeighbors, Mode=TwoWay}"/>
             </Grid>
         </GroupBox>
     </Grid>

@@ -6,7 +6,7 @@ using System.ComponentModel;
 
 namespace MCDA.ViewModel
 {
-    public enum NeighborhoodOptions { KNearestNeighbors, Contiguity, Threshold }
+    public enum NeighborhoodOptions { KNearestNeighbors, Rook, Queen, Threshold, Automatic }
 
     class NeighborhoodSelectionViewModel : INotifyPropertyChanged
     {
@@ -20,6 +20,8 @@ namespace MCDA.ViewModel
         }
 
         public int SelectedNumberOfKNearestNeighbors { get; set; }
+
+        public double Threshold { get; set; }
 
         public NeighborhoodOptions NeighborhoodOption
         {

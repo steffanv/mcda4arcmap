@@ -356,11 +356,7 @@ namespace MCDA.ViewModel
 
             wpfWindow.Closed += delegate(object sender, EventArgs e)
             {
-
-                _owaTool.Alpha = alphaSelectionViewModel.Alpha;
-
-                _owaTool.Run();
-                _owaResultDataTable = _owaTool.Data;
+                 _owaTool.Alpha = alphaSelectionViewModel.Alpha;
 
                 _isUpdateAllowed = true;
 

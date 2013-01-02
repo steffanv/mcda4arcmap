@@ -19,7 +19,7 @@ namespace MCDA.ViewModel
         public event PropertyChangedEventHandler PropertyChanged;
 
         private MCDAExtension _mcdaExtension;
-        private AbstractToolTemplate _lwlcTool;
+        private LWLCTool _lwlcTool;
         private DataTable _lwlcResultDataTable;
         private BindingList<IToolParameter> _toolParameter;
         private IList<List<IToolParameter>> _toolParameterStorageForAnimationLikeUpdate = new List<List<IToolParameter>>();
@@ -370,9 +370,11 @@ namespace MCDA.ViewModel
 
             var wpfWindow = new NeighborhoodSelectionView();
 
-            NeighborhoodSelectionViewModel alphaSelectionViewModel = wpfWindow.DataContext as NeighborhoodSelectionViewModel;
+            NeighborhoodSelectionViewModel neighborhoodSelectionViewModel = wpfWindow.DataContext as NeighborhoodSelectionViewModel;
 
-            //alphaSelectionViewModel.Alpha = _owaTool.Alpha;
+            neighborhoodSelectionViewModel.NeighborhoodOption = _lwlcTool.NeighborhoodOptions;
+            neighborhoodSelectionViewModel.SelectedNumberOfKNearestNeighbors = _lwlcTool.NumberOfKNearestNeighbors;
+            neighborhoodSelectionViewModel.Threshold = _lwlcTool.Threshold;
 
             var helper = new WindowInteropHelper(wpfWindow);
 
@@ -381,10 +383,9 @@ namespace MCDA.ViewModel
             wpfWindow.Closed += delegate(object sender, EventArgs e)
             {
 
-                //_owaTool.Alpha = alphaSelectionViewModel.Alpha;
-
-                //_owaTool.Run();
-                //_owaResultDataTable = _owaTool.Data;
+                _lwlcTool.NeighborhoodOptions = neighborhoodSelectionViewModel.NeighborhoodOption;
+                _lwlcTool.NumberOfKNearestNeighbors = neighborhoodSelectionViewModel.SelectedNumberOfKNearestNeighbors;
+                _lwlcTool.Threshold = neighborhoodSelectionViewModel.Threshold;
 
                 _isUpdateAllowed = true;
 

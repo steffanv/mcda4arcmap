@@ -8,6 +8,7 @@ using ESRI.ArcGIS.Geometry;
 using System.Data;
 using System.Collections;
 using ESRI.ArcGIS.ADF;
+using MCDA.ViewModel;
 
 namespace MCDA.Model
 {
@@ -18,7 +19,12 @@ namespace MCDA.Model
        private TransformationStrategy _tranformationStrategy;
        private IFeatureClass _featureClass;
        private DataTable _dataTable, _resultDataTable;
+
        private IDictionary<int, List<Tuple<int, double>>> _dictionaryOfDistances;
+
+       private NeighborhoodOptions _neighborhoodOption = NeighborhoodOptions.KNearestNeighbors;
+       private int _numberOfKNearestNeighbors = 3;
+       private double _threshold;
 
        public LWLCTool(DataTable dataTable, ToolParameterContainer toolParameterContainer, IFeatureClass featureClass)
        {
@@ -32,12 +38,17 @@ namespace MCDA.Model
            if(_featureClass == null)
                 return;
 
-           if(_dictionaryOfDistances == null)
-               _dictionaryOfDistances = BuildDictioninaryOfDistances();
-
+           switch (_neighborhoodOption)
+           {
+               case NeighborhoodOptions.KNearestNeighbors: case NeighborhoodOptions.Threshold:
+                    if(_dictionaryOfDistances == null)
+                        _dictionaryOfDistances = BuildDictioninaryOfDistancesByCentroid();
+                   break;
+               case NeighborhoodOptions.Queen: case NeighborhoodOptions.Rook:
+                   break;
+           }
+          
             _resultDataTable = new DataTable();
-
-            _resultDataTable.BeginLoadData();
 
             _resultDataTable.Columns.Add(_featureClass.OIDFieldName,typeof(FieldTypeOID));
 
@@ -48,24 +59,57 @@ namespace MCDA.Model
                 _resultDataTable.Columns.Add("weight " + _currentToolParameter.ColumnName, typeof(double));
             }
 
+            //result column
             _resultDataTable.Columns.Add(_defaultResultColumnName,typeof(double));
 
-            // k nearest or distance
-            foreach (int currentID in _dictionaryOfDistances.Keys)
-            {
-                List<Tuple<int,double>> list = new List<Tuple<int,double>>();
+            _resultDataTable.BeginLoadData();
 
-                _dictionaryOfDistances.TryGetValue(currentID, out list);
-                //todo make sure that n > count
-                Cluster c = new Cluster(currentID, list.OrderBy(t => t.Item2).Take(3).Select(t => t.Item1).ToList(), _dataTable, _toolParameterContainer);
-                
-                _resultDataTable.Rows.Add((c.CalculateLWCL(_resultDataTable.NewRow())));
+            switch (_neighborhoodOption)
+            {
+                case NeighborhoodOptions.KNearestNeighbors:
+                    C();
+                    break;
+                case NeighborhoodOptions.Threshold:
+                    B();
+                    break;
+                case NeighborhoodOptions.Queen:
+                case NeighborhoodOptions.Rook:
+                    break;
             }
 
             _resultDataTable.EndLoadData();
         }
 
-        private IDictionary<int, List<Tuple<int, double>>> BuildDictioninaryOfDistances()
+        private void C()
+        {
+            // k nearest or distance
+            foreach (int currentID in _dictionaryOfDistances.Keys)
+            {
+                List<Tuple<int, double>> list = new List<Tuple<int, double>>();
+
+                _dictionaryOfDistances.TryGetValue(currentID, out list);
+                //todo make sure that n > count
+                Cluster c = new Cluster(currentID, list.OrderBy(t => t.Item2).Take(_numberOfKNearestNeighbors).Select(t => t.Item1).ToList(), _dataTable, _toolParameterContainer);
+
+                _resultDataTable.Rows.Add((c.CalculateLWCL(_resultDataTable.NewRow())));
+            }
+        }
+
+        private void B()
+        {  
+            foreach (int currentID in _dictionaryOfDistances.Keys)
+            {
+                List<Tuple<int, double>> list = new List<Tuple<int, double>>();
+
+                _dictionaryOfDistances.TryGetValue(currentID, out list);
+
+                Cluster c = new Cluster(currentID, list.Where(t => t.Item2 <= _threshold).Select(t => t.Item1).ToList(), _dataTable, _toolParameterContainer);
+
+                _resultDataTable.Rows.Add((c.CalculateLWCL(_resultDataTable.NewRow())));
+            }
+        } 
+
+        private IDictionary<int, List<Tuple<int, double>>> BuildDictioninaryOfDistancesByCentroid()
         {
             double[,] centroidArray = new double[_featureClass.FeatureCount(null), 3];
 
@@ -142,6 +186,24 @@ namespace MCDA.Model
         protected override void PerformScaling()
         {
             //todo
+        }
+
+        public int NumberOfKNearestNeighbors
+        {
+            get { return _numberOfKNearestNeighbors; }
+            set { _numberOfKNearestNeighbors = value; }
+        }
+
+        public double Threshold
+        {
+            get { return _threshold; }
+            set { _threshold = value; }
+        }
+
+        public NeighborhoodOptions NeighborhoodOptions
+        {
+            get { return _neighborhoodOption; }
+            set { _neighborhoodOption = value; }
         }
 
         public override string DefaultResultColumnName

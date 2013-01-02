@@ -22,7 +22,6 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <GroupBox Header="Contiguity" Grid.Column="0" Grid.Row="0">
             <Grid>
@@ -30,8 +29,8 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
-                <RadioButton GroupName="Contguity" Content="Rook Contiguity" Grid.Row="0"/>
-                <RadioButton GroupName="Contguity" Content="Queen Contiguity" Grid.Row="1" />
+                <RadioButton GroupName="NeighborhoodOption" IsChecked="{Binding Path=RenderOptions, Converter={StaticResource enumToBooleanConverter}, ConverterParameter={x:Static viewModel:NeighborhoodOptions.Rook}}" Content="Rook Contiguity" Grid.Row="0"/>
+                <RadioButton GroupName="NeighborhoodOption" IsChecked="{Binding Path=RenderOptions, Converter={StaticResource enumToBooleanConverter}, ConverterParameter={x:Static viewModel:NeighborhoodOptions.Queen}}" Content="Queen Contiguity" Grid.Row="1" />
             </Grid>
         </GroupBox>
         <GroupBox Header="Distance" Grid.Column="0" Grid.Row="1">
@@ -43,13 +42,23 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
-
-                <RadioButton GroupName="Contguity" Content="Threshold Distance" Grid.Row="0"/>
-                <TextBox Grid.Row="1"/>
-                <Slider Grid.Row="2"/>
-
-                <RadioButton Grid.Row="3" GroupName="1" IsChecked="{Binding Path=RenderOptions, Converter={StaticResource enumToBooleanConverter}, ConverterParameter={x:Static viewModel:NeighborhoodOptions.KNearestNeighbors}}">K Nearest Neighbors</RadioButton>
-                <ComboBox Grid.Row="5" Height="23" HorizontalAlignment="Left"  Name="comboBox1" VerticalAlignment="Top" Width="20" ItemsSource="{Binding Path=NumberOfKNearestNeighbors, Mode=OneWay}" SelectedValue="{Binding Path=SelectedNumberOfKNearestNeighbors, Mode=TwoWay}"/>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <RadioButton GroupName="NeighborhoodOption" Content="Threshold Distance" Grid.Row="0"/>
+                <Slider Name="weightSlider" Grid.Row="1" Grid.Column="0" Value="{Binding Path=Threshold, Mode=TwoWay}"  HorizontalContentAlignment="Stretch" Minimum="0" Maximum="1000" TickFrequency="0.01" />
+                <TextBox Name="weightSliderTextblock" Grid.Row="1" Grid.Column="1" Width="50" Text="{Binding ElementName=weightSlider, Path=Value }" />
+                <RadioButton GroupName="NeighborhoodOption" Grid.Row="3" Grid.Column="0" IsChecked="{Binding Path=RenderOptions, Converter={StaticResource enumToBooleanConverter}, ConverterParameter={x:Static viewModel:NeighborhoodOptions.KNearestNeighbors}}">K Nearest Neighbors</RadioButton>
+                <ComboBox Grid.Row="4" Grid.Column="1" Height="23" HorizontalAlignment="Center"  Name="comboBox1"  Width="30" ItemsSource="{Binding Path=NumberOfKNearestNeighbors, Mode=OneWay}" SelectedValue="{Binding Path=SelectedNumberOfKNearestNeighbors, Mode=TwoWay}"/>
+            </Grid>
+        </GroupBox>
+        <GroupBox Header="Custom" Grid.Column="0" Grid.Row="2">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <RadioButton GroupName="NeighborhoodOption" IsChecked="{Binding Path=RenderOptions, Converter={StaticResource enumToBooleanConverter}, ConverterParameter={x:Static viewModel:NeighborhoodOptions.Automatic}}" Content="Automatic" Grid.Row="0"/>
             </Grid>
         </GroupBox>
     </Grid>

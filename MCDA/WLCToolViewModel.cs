@@ -139,7 +139,7 @@ namespace MCDA.ViewModel
            _wlcResultDataTable = _wlcTool.Data;
 
            if (_isSendToInMemoryWorkspaceCommand)
-               ProgressDialog.ShowProgressDialog("Creating Symbology", (Action<AbstractToolTemplate, DataTable>)_mcdaExtension.JoinToolResultByOID, _wlcTool, _wlcTool.Data);
+               _mcdaExtension.JoinToolResultByOID(_wlcTool, _wlcTool.Data);
        }
 
        protected override void UpdateAnimation()
@@ -171,7 +171,7 @@ namespace MCDA.ViewModel
                        _wlcResultDataTable = _wlcTool.Data;
 
                        if (_isSendToInMemoryWorkspaceCommand)
-                           ProgressDialog.ShowProgressDialog("Creating Symbology", (Action<AbstractToolTemplate, DataTable>)_mcdaExtension.JoinToolResultByOID, _wlcTool, _wlcTool.Data);
+                           _mcdaExtension.JoinToolResultByOID(_wlcTool, _wlcTool.Data);
                    }
                }
 
@@ -308,15 +308,9 @@ namespace MCDA.ViewModel
 
                _wlcTool.TransformationStrategy = standardizationSelectionViewModel.SelectedTransformationStrategy;
 
-               _wlcTool.Run();
-               _wlcResultDataTable = _wlcTool.Data;
-
                _isUpdateAllowed = true;
 
                base.Update();
-
-               PropertyChanged.Notify(() => WLCResult);
-
            };
 
            wpfWindow.ShowDialog();
@@ -326,14 +320,10 @@ namespace MCDA.ViewModel
         {
             _wlcTool.ToolParameterContainer.DistributeEquallyToolParameterWeights();
 
-            _wlcTool.Run();
-
-            _wlcResultDataTable = _wlcTool.Data;
+            UpdateRealtime();
 
             PropertyChanged.Notify(() => WLCParameter);
             PropertyChanged.Notify(() => WLCResult);
-
-            UpdateRealtime();
         }
 
        protected override void DoClosingCommand()

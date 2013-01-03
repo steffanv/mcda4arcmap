@@ -141,7 +141,7 @@ namespace MCDA.ViewModel
             _lwlcResultDataTable = _lwlcTool.Data;
 
             if (_isSendToInMemoryWorkspaceCommand)
-                ProgressDialog.ShowProgressDialog("Creating Symbology", (Action<AbstractToolTemplate, DataTable>)_mcdaExtension.JoinToolResultByOID, _lwlcTool, _lwlcTool.Data);
+               _mcdaExtension.JoinToolResultByOID(_lwlcTool, _lwlcTool.Data);
         }
 
         protected override void UpdateAnimation()
@@ -173,7 +173,7 @@ namespace MCDA.ViewModel
                         _lwlcResultDataTable = _lwlcTool.Data;
 
                         if (_isSendToInMemoryWorkspaceCommand)
-                            ProgressDialog.ShowProgressDialog("Creating Symbology", (Action<AbstractToolTemplate, DataTable>)_mcdaExtension.JoinToolResultByOID, _lwlcTool, _lwlcTool.Data);
+                            _mcdaExtension.JoinToolResultByOID(_lwlcTool, _lwlcTool.Data);
                     }
                 }
 
@@ -310,14 +310,9 @@ namespace MCDA.ViewModel
 
                 _lwlcTool.TransformationStrategy = standardizationSelectionViewModel.SelectedTransformationStrategy;
 
-                _lwlcTool.Run();
-                _lwlcResultDataTable = _lwlcTool.Data;
-
                 _isUpdateAllowed = true;
 
                 base.Update();
-
-                PropertyChanged.Notify(() => LWLCResult);
 
             };
 
@@ -328,14 +323,10 @@ namespace MCDA.ViewModel
         {
             _lwlcTool.ToolParameterContainer.DistributeEquallyToolParameterWeights();
 
-            _lwlcTool.Run();
-
-            _lwlcResultDataTable = _lwlcTool.Data;
+            UpdateRealtime();
 
             PropertyChanged.Notify(() => LWLCParameter);
-            PropertyChanged.Notify(() => LWLCResult);
-
-            UpdateRealtime();
+            PropertyChanged.Notify(() => LWLCResult);      
         }
 
         protected override void DoClosingCommand()
@@ -392,7 +383,6 @@ namespace MCDA.ViewModel
                 base.Update();
 
                 PropertyChanged.Notify(() => LWLCResult);
-
             };
 
             wpfWindow.ShowDialog();

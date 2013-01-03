@@ -355,7 +355,7 @@
     <Resource Include="Images\toolbargraphics\Distribution.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
-    <Content Include="Images\LWLCTool.png" />
+    <AddInContent Include="Images\LWLCTool.png" />
     <Resource Include="Images\toolbargraphics\Neighborhood.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>

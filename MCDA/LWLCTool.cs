@@ -9,6 +9,7 @@ using System.Data;
 using System.Collections;
 using ESRI.ArcGIS.ADF;
 using MCDA.ViewModel;
+using MCDA.Extensions;
 
 namespace MCDA.Model
 {
@@ -21,6 +22,7 @@ namespace MCDA.Model
        private DataTable _dataTable, _resultDataTable;
 
        private IDictionary<int, List<Tuple<int, double>>> _dictionaryOfDistances;
+       private IDictionary<int, List<int>> _dictionaryOfQueentContiguity;
 
        private NeighborhoodOptions _neighborhoodOption = NeighborhoodOptions.KNearestNeighbors;
        private int _numberOfKNearestNeighbors = 3;
@@ -45,6 +47,8 @@ namespace MCDA.Model
                         _dictionaryOfDistances = BuildDictioninaryOfDistancesByCentroid();
                    break;
                case NeighborhoodOptions.Queen: case NeighborhoodOptions.Rook:
+                   if (_dictionaryOfQueentContiguity == null)
+                       _dictionaryOfQueentContiguity = BuildDictioninaryOfContiguity();
                    break;
            }
           
@@ -67,12 +71,14 @@ namespace MCDA.Model
             switch (_neighborhoodOption)
             {
                 case NeighborhoodOptions.KNearestNeighbors:
-                    C();
+                    BuildKNearestNeighborTable();
                     break;
                 case NeighborhoodOptions.Threshold:
-                    B();
+                    BuildThresholdTable();
                     break;
                 case NeighborhoodOptions.Queen:
+                    BuildQueenContiguityTable();
+                    break;
                 case NeighborhoodOptions.Rook:
                     break;
             }
@@ -80,7 +86,21 @@ namespace MCDA.Model
             _resultDataTable.EndLoadData();
         }
 
-        private void C()
+        private void BuildQueenContiguityTable()
+        {
+            foreach (int currentID in _dictionaryOfQueentContiguity.Keys)
+            {
+                List<int> list = new List<int>();
+
+                _dictionaryOfQueentContiguity.TryGetValue(currentID, out list);
+                //todo make sure that n > count
+                Cluster c = new Cluster(currentID, list, _dataTable, _toolParameterContainer);
+
+                _resultDataTable.Rows.Add((c.CalculateLWCL(_resultDataTable.NewRow())));
+            }
+        }
+
+        private void BuildKNearestNeighborTable()
         {
             // k nearest or distance
             foreach (int currentID in _dictionaryOfDistances.Keys)
@@ -95,7 +115,7 @@ namespace MCDA.Model
             }
         }
 
-        private void B()
+        private void BuildThresholdTable()
         {  
             foreach (int currentID in _dictionaryOfDistances.Keys)
             {
@@ -116,6 +136,8 @@ namespace MCDA.Model
             using (ComReleaser comReleaser = new ComReleaser())
             {
                 IFeatureCursor featureCursor = (IFeatureCursor)_featureClass.Search(null, false);
+
+                comReleaser.ManageLifetime(featureCursor);
 
                 int numberOfFeatures = _featureClass.FeatureCount(null);
 
@@ -145,8 +167,7 @@ namespace MCDA.Model
                   if(_featureClass.OIDFieldName.Equals("FID") && zeroOIDExist){
 
                       for (int i = 0; i < centroidArray.GetLength(0); i++)
-                          centroidArray[i, 0]++;
-                      
+                          centroidArray[i, 0]++;                     
                   }
             }
 
@@ -176,6 +197,75 @@ namespace MCDA.Model
             }
 
             return dictionaryOfDistances;
+        }
+
+        private IDictionary<int, List<int>> BuildDictioninaryOfContiguity()
+        {
+            IDictionary<int, List<int>> neighborDictionary = new Dictionary<int, List<int>>();
+
+            bool zeroOIDExist = false;
+
+            using (ComReleaser comReleaser = new ComReleaser())
+            { 
+                IFeatureCursor featureCursor = (IFeatureCursor)_featureClass.Search(null, false);
+
+                comReleaser.ManageLifetime(featureCursor);
+
+                IFeature currentFeature;
+                while ((currentFeature = featureCursor.NextFeature()) != null)
+                {      
+                    ISpatialFilter spatialFilter = new SpatialFilterClass();
+                    spatialFilter.Geometry = currentFeature.Shape;
+                    spatialFilter.GeometryField = _featureClass.ShapeFieldName;
+                    spatialFilter.SpatialRel = esriSpatialRelEnum.esriSpatialRelTouches;
+ 
+                    ISelectionSet selectionSet = _featureClass.Select(spatialFilter,
+                        esriSelectionType.esriSelectionTypeIDSet,
+                        esriSelectionOption.esriSelectionOptionNormal, null);
+
+                    List<int> neighborIDs = new List<int>(selectionSet.Count);
+                  
+                   
+                    IEnumIDs enumIDs = selectionSet.IDs;
+
+                    int ID = enumIDs.Next();
+                    // thats ridiculous - someone at ESRI does not unterstand the iterator pattern...
+                    while(ID != -1)
+                    {
+                        neighborIDs.Add(ID);
+
+                        ID = enumIDs.Next();
+                    }
+
+                    // the selection set contains the selected feature id, thus we have to remove it
+                    neighborIDs.Remove(currentFeature.OID);
+
+                    neighborDictionary.Add(currentFeature.OID, neighborIDs);
+
+                    if (currentFeature.OID == 0)
+                        zeroOIDExist = true;
+                }
+
+                // it is possible that the oid column starts at zero and the other program parts expect it at 1, thus we have to check if the name is FID and one oid is zero
+                if (_featureClass.OIDFieldName.Equals("FID") && zeroOIDExist)
+                {
+                    // the easiest way is to build a new dictionary
+                    IDictionary<int, List<int>> newNeighborDictionary = new Dictionary<int, List<int>>();
+
+                    foreach (int currentKey in neighborDictionary.Keys)
+                    {
+                        List<int> values;
+                        neighborDictionary.TryGetValue(currentKey, out values);
+
+                        values.ModifyEach(v => v + 1);
+                        newNeighborDictionary.Add(currentKey + 1, values);
+                    }
+
+                    return newNeighborDictionary;
+                }
+            }
+
+            return neighborDictionary;
         }
 
         private double EuclidianDistance(double x1, double y1, double x2, double y2)

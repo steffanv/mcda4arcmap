@@ -138,7 +138,7 @@ namespace MCDA.ViewModel
             _owaResultDataTable = _owaTool.Data;
 
             if (_isSendToInMemoryWorkspaceCommand)
-                ProgressDialog.ShowProgressDialog("Creating Symbology", (Action<AbstractToolTemplate, DataTable>)_mcdaExtension.JoinToolResultByOID, _owaTool, _owaTool.Data);
+                _mcdaExtension.JoinToolResultByOID(_owaTool, _owaTool.Data);
         }
 
         protected override void UpdateAnimation()
@@ -170,7 +170,7 @@ namespace MCDA.ViewModel
                         _owaResultDataTable = _owaTool.Data;
 
                         if (_isSendToInMemoryWorkspaceCommand)
-                            ProgressDialog.ShowProgressDialog("Creating Symbology", (Action<AbstractToolTemplate, DataTable>)_mcdaExtension.JoinToolResultByOID, _owaTool, _owaTool.Data);
+                            _mcdaExtension.JoinToolResultByOID(_owaTool, _owaTool.Data);
                     }
                 }
 
@@ -180,7 +180,7 @@ namespace MCDA.ViewModel
                 _owaResultDataTable = _owaTool.Data;
 
                 if (_isSendToInMemoryWorkspaceCommand)
-                    ProgressDialog.ShowProgressDialog("Creating Symbology", (Action<AbstractToolTemplate, DataTable>)_mcdaExtension.JoinToolResultByOID, _owaTool, _owaTool.Data);
+                    _mcdaExtension.JoinToolResultByOID(_owaTool, _owaTool.Data);
 
                 _isUpdateAllowed = false;
 
@@ -309,14 +309,9 @@ namespace MCDA.ViewModel
 
                 _owaTool.TransformationStrategy = standardizationSelectionViewModel.SelectedTransformationStrategy;
 
-                _owaTool.Run();
-                _owaResultDataTable = _owaTool.Data;
-
                 _isUpdateAllowed = true;
 
                 base.Update();
-
-                PropertyChanged.Notify(() => OWAResult);
 
             };
 
@@ -327,7 +322,6 @@ namespace MCDA.ViewModel
         {
             get
             {
-
                 if (_alphaSelectionCommand == null)
                 {
                     _alphaSelectionCommand = new RelayCommand(
@@ -361,9 +355,6 @@ namespace MCDA.ViewModel
                 _isUpdateAllowed = true;
 
                 base.Update();
-
-                PropertyChanged.Notify(() => OWAResult);
-
             };
 
             wpfWindow.ShowDialog();
@@ -373,14 +364,10 @@ namespace MCDA.ViewModel
         {
             _owaTool.ToolParameterContainer.DistributeEquallyToolParameterWeights();
 
-            _owaTool.Run();
-
-            _owaResultDataTable = _owaTool.Data;
+            UpdateRealtime();
 
             PropertyChanged.Notify(() => OWAParameter);
             PropertyChanged.Notify(() => OWAResult);
-
-            UpdateRealtime();
         }
 
         protected override void DoClosingCommand()

@@ -350,6 +350,8 @@ namespace MCDA
             {
                 IFeatureCursor featureCursor = _featureLayer.FeatureClass.Search(null, true);
 
+                comReleaser.ManageLifetime(featureCursor);
+
                 int fieldIndex = _featureLayer.FeatureClass.FindField(field.FieldName);
 
                 IFeature currentFeature;
@@ -579,32 +581,35 @@ namespace MCDA
         /// <param name="dataTable"></param>
         public void JoinToolResultByOID(AbstractToolTemplate tool, DataTable dataTable)
         {
-            
+
             MCDAWorkspaceContainer mcdaWorkspaceContainer;
             if (!_dictionaryOfLinks.TryGetValue(tool, out mcdaWorkspaceContainer))
                 return;
 
             IFeatureClass fc = mcdaWorkspaceContainer.FeatureClass;
 
-            using (ComReleaser comReleaser = new ComReleaser())
+
+            if (fc.FindField(tool.DefaultResultColumnName) < 0)
             {
 
-                if (fc.FindField(tool.DefaultResultColumnName) < 0)
-                {
+                IField newField = new FieldClass();
+                IFieldEdit newFieldEdit = (IFieldEdit)newField;
+                newFieldEdit.Type_2 = esriFieldType.esriFieldTypeDouble;
+                newFieldEdit.Name_2 = tool.DefaultResultColumnName;
+                newFieldEdit.AliasName_2 = tool.DefaultResultColumnName;
 
-                    IField newField = new FieldClass();
-                    IFieldEdit newFieldEdit = (IFieldEdit)newField;
-                    newFieldEdit.Type_2 = esriFieldType.esriFieldTypeDouble;
-                    newFieldEdit.Name_2 = tool.DefaultResultColumnName;
-                    newFieldEdit.AliasName_2 = tool.DefaultResultColumnName;
+                fc.AddField(newField);
+            }
 
-                    fc.AddField(newField);
-                }
+            using (ComReleaser comReleaser = new ComReleaser())
+            {
 
                 // StartEditing(_shadowWorkspace);
                 // _editor.StartOperation();
 
                 IFeatureCursor featureCursor = fc.Update(null, true);
+
+                comReleaser.ManageLifetime(featureCursor);
 
                 IFeature feature = null;
 
@@ -625,15 +630,15 @@ namespace MCDA
                     feature.set_Value(fieldIndex, dRow[tool.DefaultResultColumnName]);
 
                     feature.Store();
-                    
+
                     feature = featureCursor.NextFeature();
                 }
 
             }
 
-           Render(mcdaWorkspaceContainer);
+            Render(mcdaWorkspaceContainer);
 
-           PropertyChanged.Notify(() => LinkDictionary);
+            PropertyChanged.Notify(() => LinkDictionary);
         }
 
         /// <summary>

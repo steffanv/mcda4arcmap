@@ -64,6 +64,9 @@ namespace MCDA.CustomControls
 
             for (int i = 0; i < _breaks.Length; i++)
             {
+                if (double.IsNaN(_breaks[i]))
+                    continue;
+
                 int index = (int)Math.Round(_breaks[i] * (size / maxDataValue), 0);
                 values[index] = 15;
             }
@@ -77,13 +80,10 @@ namespace MCDA.CustomControls
             for (int i = 0; i < values.Length; i++)
             {
                 if (values[i] > 0)
-                {
                     points.Add(new Point(i, max - values[i]));
-                }
+
                 else
-                {
                     points.Add(new Point(i, max));
-                }
 
             }
             // last point (lower-right corner)
@@ -105,6 +105,9 @@ namespace MCDA.CustomControls
 
             for (int i = 0; i < _data.Length; i++)
             {
+                if(Double.IsNaN(_data[i]))
+                    continue;
+
                 int index = (int) Math.Round(_data[i] * (size / maxDataValue),0);
                 values[index] += _freq[i];
             }

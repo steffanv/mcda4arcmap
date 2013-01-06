@@ -195,7 +195,7 @@ namespace MCDA
         {
             IList<IToolParameter> toolParameter = new List<IToolParameter>();
             
-            AvailableLayer.Where(l => l.IsSelected).ForEach(l => l.Fields.Where(f => f.IsSelected && f.IsNumber).ForEach(f => toolParameter.Add(new WLCToolParameter(f.FieldName))));
+            AvailableLayer.Where(l => l.IsSelected).ForEach(l => l.Fields.Where(f => f.IsSelected && f.IsNumber).ForEach(f => toolParameter.Add(new ToolParameter(f.FieldName))));
 
             return new ToolParameterContainer(toolParameter);
         }
@@ -355,7 +355,6 @@ namespace MCDA
                 int fieldIndex = _featureLayer.FeatureClass.FindField(field.FieldName);
 
                 IFeature currentFeature;
-
                 while ((currentFeature = featureCursor.NextFeature()) != null)
                 {
                     //we have to cast explicitly ... https://connect.microsoft.com/VisualStudio/feedback/details/534288/ilist-dynamic-cannot-call-a-method-add-without-casting
@@ -548,7 +547,7 @@ namespace MCDA
 
             //IFeatureClass fc = mcdaWorkspaceContainer.FeatureClass;
 
-            //createn feature layer to display the result on a map
+            //create feature layer to display the result on a map
             IFeatureLayer newfl = new FeatureLayerClass();
             newfl.FeatureClass = mcdaWorkspaceContainer.FeatureClass;
 
@@ -560,7 +559,7 @@ namespace MCDA
 
             PropertyChanged.Notify(() => LinkDictionary);
 
-            //return fcCopy;
+            //return mcdaWorkspaceContainer;
         }
 
         private String CreateLayerName(AbstractToolTemplate tool)
@@ -603,7 +602,6 @@ namespace MCDA
 
             using (ComReleaser comReleaser = new ComReleaser())
             {
-
                 // StartEditing(_shadowWorkspace);
                 // _editor.StartOperation();
 
@@ -621,7 +619,6 @@ namespace MCDA
 
                 while (feature != null)
                 {
-
                     int oid = Convert.ToInt32(feature.get_Value(oidIndex));
                     EnumerableRowCollection<DataRow> dataRows = dataTable.AsEnumerable().Where(dr => dr.Field<FieldTypeOID>(fc.OIDFieldName).OID == oid);
 

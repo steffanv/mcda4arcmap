@@ -37,19 +37,28 @@ namespace MCDA
         private void weightSlider_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
         {
             LWLCToolViewModel viewmodel = (LWLCToolViewModel)DataContext;
-            viewmodel.UpdateAllowedEvent();
+            //viewmodel.Update();
+            viewmodel.UpdateAllowedEvent(true);
+
+            viewmodel.Update();
         }
 
-        private void benefitCriteriaCheckBox_Click(object sender, RoutedEventArgs e)
+        private void weightSlider_DragStarted(object sender, System.Windows.Controls.Primitives.DragStartedEventArgs e)
         {
             LWLCToolViewModel viewmodel = (LWLCToolViewModel)DataContext;
-            viewmodel.UpdateAllowedEvent();
+            viewmodel.UpdateAllowedEvent(false);
         }
 
-        private void weightSliderTextblock_PreviewTextInput(object sender, TextCompositionEventArgs e)
-        {
-            LWLCToolViewModel viewmodel = (LWLCToolViewModel)DataContext;
-            viewmodel.UpdateAllowedEvent();
-        }
+        //private void benefitCriteriaCheckBox_Click(object sender, RoutedEventArgs e)
+        //{
+        //    LWLCToolViewModel viewmodel = (LWLCToolViewModel)DataContext;
+        //    viewmodel.UpdateAllowedEvent();
+        //}
+
+        //private void weightSliderTextblock_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        //{
+        //    LWLCToolViewModel viewmodel = (LWLCToolViewModel)DataContext;
+        //    viewmodel.UpdateAllowedEvent();
+        //}
     }
 }

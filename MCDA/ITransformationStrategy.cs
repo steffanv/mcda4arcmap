@@ -9,5 +9,7 @@ namespace MCDA.Model
     public interface ITransformationStrategy
     {
         void Transform(DataColumn column, bool benefitCriterion = true);
+
+        double? Transform(IList<double> data, double actualValue, bool benefitCriterion = false);
     }
 }

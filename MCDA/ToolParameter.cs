@@ -8,12 +8,12 @@ using System.ComponentModel;
 namespace MCDA.Model
 {
 
-   public class WLCToolParameter : AbstractToolParameter
+   public class ToolParameter : AbstractToolParameter
    {
         
         private static IToolParameter _lastWeightChangedToolParameter;
 
-        public WLCToolParameter(string columnName)
+        public ToolParameter(string columnName)
         {
             _columnName = columnName;
         }
@@ -29,13 +29,14 @@ namespace MCDA.Model
             get { return _weight; }
             set { _lastWeightChangedToolParameter = this;
             _weight = value;
+
             OnPropertyChanged(new PropertyChangedEventArgs("Weight"));
             }
         }
 
         public override IToolParameter DeepClone()
         {
-            WLCToolParameter copy = new WLCToolParameter(_columnName);
+            ToolParameter copy = new ToolParameter(_columnName);
 
             copy._isBenefitCriterion = _isBenefitCriterion;
             copy._isLocked = _isLocked;

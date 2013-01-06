@@ -16,6 +16,7 @@ namespace MCDA.Model
         protected double _weight = 0;
         protected string _columnName;
         protected bool _isOID = false;
+        protected bool _isWeightNotificationDisabled = false;
 
         protected virtual void OnPropertyChanged(PropertyChangedEventArgs e)
         {

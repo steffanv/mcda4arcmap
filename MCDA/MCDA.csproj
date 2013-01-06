@@ -175,7 +175,6 @@
     <Compile Include="ObjectExtension.cs" />
     <Compile Include="OWATool.cs" />
     <Compile Include="OWAToolBtn.cs" />
-    <Compile Include="OWAToolParameter.cs" />
     <Compile Include="OWAToolView.xaml.cs">
       <DependentUpon>OWAToolView.xaml</DependentUpon>
     </Compile>
@@ -198,7 +197,7 @@
       <DependentUpon>VisualizationView.xaml</DependentUpon>
     </Compile>
     <Compile Include="VisualizationViewModel.cs" />
-    <Compile Include="WLCToolParameter.cs" />
+    <Compile Include="ToolParameter.cs" />
     <Compile Include="TransformationStrategyFactory.cs" />
     <Compile Include="WeightDistributionStrategyFactory.cs" />
     <Compile Include="ToolParameterContainer.cs" />

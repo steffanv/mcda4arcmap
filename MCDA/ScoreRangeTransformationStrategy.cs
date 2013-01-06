@@ -8,11 +8,25 @@ namespace MCDA.Model
 {
     class ScoreRangeTransformationStrategy : ITransformationStrategy
     {
+        public double? Transform(IList<double> data, double actualValue, bool benefitCriterion = false)
+        {
+            double localRange = data.Max() - data.Min();
+
+            if (localRange == 0)
+                return null;
+
+            if (benefitCriterion)
+                return (actualValue - data.Min()) / localRange;
+            else
+                return (data.Max() - actualValue) / localRange;            
+        }
+
         public void Transform(DataColumn column, bool benefitCriterion = true)
         {
             double maxValue = (double)column.Table.Compute("max(" + column.ColumnName + ")", String.Empty);
             double minValue = (double)column.Table.Compute("min(" + column.ColumnName + ")", String.Empty);
-            double maxMinDifference = maxValue - minValue;
+
+            double range = maxValue - minValue;
 
             int columnIndex = column.Ordinal;
 
@@ -20,16 +34,16 @@ namespace MCDA.Model
             {
                 if (benefitCriterion)
                 {
-                    if (maxMinDifference != 0)
+                    if (range != 0)
                     {
-                        currentDataRow[columnIndex] = ((double)currentDataRow.ItemArray[columnIndex] - minValue) / maxMinDifference;
+                        currentDataRow[columnIndex] = ((double)currentDataRow.ItemArray[columnIndex] - minValue) / range;
                     }
                 }
                 else
                 {
-                    if (maxMinDifference != 0)
+                    if (range != 0)
                     {
-                        currentDataRow[columnIndex] = (maxValue - (double) currentDataRow.ItemArray[columnIndex]) / maxMinDifference;
+                        currentDataRow[columnIndex] = (maxValue - (double) currentDataRow.ItemArray[columnIndex]) / range;
                     }
                 }
             }

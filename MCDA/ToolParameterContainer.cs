@@ -45,7 +45,7 @@ namespace MCDA.Model
         }
 
         public void DistributeEquallyToolParameterWeights()
-        {        
+        {
             double weight = 100 / (double)_listOfParameter.Count;
 
             _isLocked = true;

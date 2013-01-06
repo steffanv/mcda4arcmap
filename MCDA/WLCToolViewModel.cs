@@ -38,9 +38,6 @@ namespace MCDA.ViewModel
 
            _mcdaExtension.RegisterPropertyHandler(x => x.AvailableLayer, MCDAExtensionPropertyChanged);
 
-           if(_mcdaExtension.SelectedLayer != null)
-               _mcdaExtension.SelectedLayer.Fields.ForEach(x => x.RegisterPropertyHandler(f => f.IsSelected, FieldPropertyChanged));
-
            //we have to call our own update method to make sure we have a result column
             MCDAExtensionPropertyChanged(this, null);
 
@@ -53,7 +50,9 @@ namespace MCDA.ViewModel
 
        private void BenefitCriterionChanged(object sender, PropertyChangedEventArgs e)
        {
-           UpdateRealtime();
+           _isUpdateAllowed = true;
+
+           base.Update();
        }
 
        private void FieldPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -259,7 +258,7 @@ namespace MCDA.ViewModel
            if (_isLocked)
                ProgressDialog.ShowProgressDialog("Creating In Memory Representation", (Action<AbstractToolTemplate>)_mcdaExtension.EstablishLink, _wlcTool);
 
-           if (!_isLocked)
+           if (!_isLocked && !_isSendToInMemoryWorkspaceCommand)
            {
                _mcdaExtension.RemoveLink(_wlcTool);
                this.MCDAExtensionPropertyChanged(this, null);

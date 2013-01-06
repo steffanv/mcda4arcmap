@@ -19,6 +19,5 @@ namespace MCDA.Model
         bool IsOID { get; set; }
 
         bool IsBenefitCriterion { get; set; }
-
     }
 }

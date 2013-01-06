@@ -40,8 +40,8 @@ namespace MCDA.ViewModel
 
             _mcdaExtension.RegisterPropertyHandler(x => x.AvailableLayer, MCDAExtensionPropertyChanged);
 
-            if (_mcdaExtension.SelectedLayer != null)
-                _mcdaExtension.SelectedLayer.Fields.ForEach(x => x.RegisterPropertyHandler(f => f.IsSelected, FieldPropertyChanged));
+            //if (_mcdaExtension.SelectedLayer != null)
+            //    _mcdaExtension.SelectedLayer.Fields.ForEach(x => x.RegisterPropertyHandler(f => f.IsSelected, FieldPropertyChanged));
 
             //we have to call our own update method to make sure we have a result column
             MCDAExtensionPropertyChanged(this, null);
@@ -55,7 +55,9 @@ namespace MCDA.ViewModel
 
         private void BenefitCriterionChanged(object sender, PropertyChangedEventArgs e)
         {
-            UpdateRealtime();
+            _isUpdateAllowed = true;
+
+            base.Update();
         }
 
         private void FieldPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -67,7 +69,7 @@ namespace MCDA.ViewModel
 
             _toolParameter = new BindingList<IToolParameter>(_lwlcTool.ToolParameterContainer.ToolParameter);
 
-            _lwlcTool.Run();
+            ProgressDialog.ShowProgressDialog("Running LWLC Tool", (Action)_lwlcTool.Run);
 
             _lwlcResultDataTable = _lwlcTool.Data;
 
@@ -95,13 +97,12 @@ namespace MCDA.ViewModel
 
             _toolParameter = new BindingList<IToolParameter>(_lwlcTool.ToolParameterContainer.ToolParameter);
 
-            _lwlcTool.Run();
+            ProgressDialog.ShowProgressDialog("Running LWLC Tool", (Action)_lwlcTool.Run);
 
             _lwlcResultDataTable = _lwlcTool.Data;
 
             if (_mcdaExtension.SelectedLayer != null)
             {
-
                 _mcdaExtension.SelectedLayer.Fields.ForEach(x => x.UnRegisterPropertyHandler(f => f.IsSelected, FieldPropertyChanged));
                 _mcdaExtension.SelectedLayer.Fields.ForEach(x => x.RegisterPropertyHandler(f => f.IsSelected, FieldPropertyChanged));
             }
@@ -112,12 +113,10 @@ namespace MCDA.ViewModel
             PropertyChanged.Notify(() => LWLCResult);
         }
 
-        //called from the code behind page if something changed
-        public void UpdateAllowedEvent()
+        // called from the code behind page if something changed
+        public void UpdateAllowedEvent(bool isUpdateAllowed)
         {
-            _isUpdateAllowed = true;
-            base.Update();
-
+            _isUpdateAllowed = isUpdateAllowed;
         }
 
         protected override void UpdateDrag()
@@ -125,23 +124,13 @@ namespace MCDA.ViewModel
             if (!_isUpdateAllowed)
                 return;
 
-            _lwlcTool.Run();
+            ProgressDialog.ShowProgressDialog("Running LWLC Tool", (Action)_lwlcTool.Run);
             _lwlcResultDataTable = _lwlcTool.Data;
 
             if (_isSendToInMemoryWorkspaceCommand)
                 ProgressDialog.ShowProgressDialog("Creating Symbology", (Action<AbstractToolTemplate, DataTable>)_mcdaExtension.JoinToolResultByOID, _lwlcTool, _lwlcTool.Data);
 
             _isUpdateAllowed = false;
-
-        }
-
-        protected override void UpdateRealtime()
-        {
-            _lwlcTool.Run();
-            _lwlcResultDataTable = _lwlcTool.Data;
-
-            if (_isSendToInMemoryWorkspaceCommand)
-               _mcdaExtension.JoinToolResultByOID(_lwlcTool, _lwlcTool.Data);
         }
 
         protected override void UpdateAnimation()
@@ -185,10 +174,19 @@ namespace MCDA.ViewModel
                 if (_isSendToInMemoryWorkspaceCommand)
                     _mcdaExtension.JoinToolResultByOID(_lwlcTool, _lwlcTool.Data);
 
-                _isUpdateAllowed = false;
+                //_isUpdateAllowed = false;
 
                 _toolParameterStorageForAnimationLikeUpdate.Clear();
             }
+        }
+
+        protected override void UpdateRealtime()
+        {
+            _lwlcTool.Run();
+            _lwlcResultDataTable = _lwlcTool.Data;
+
+            if (_isSendToInMemoryWorkspaceCommand)
+                _mcdaExtension.JoinToolResultByOID(_lwlcTool, _lwlcTool.Data);
         }
 
         protected override void AfterUpdate()
@@ -259,9 +257,13 @@ namespace MCDA.ViewModel
             }
 
             if (_isLocked)
+            {
                 ProgressDialog.ShowProgressDialog("Creating In Memory Representation", (Action<AbstractToolTemplate>)_mcdaExtension.EstablishLink, _lwlcTool);
+                // the lwlc depends on the fc data, thus we have to make sure that we work on the fc of the in memory workspace
+                _lwlcTool.FeatureClass = _mcdaExtension.LinkDictionary[_lwlcTool].FeatureClass;
+            }
 
-            if (!_isLocked)
+            if (!_isLocked && !_isSendToInMemoryWorkspaceCommand)
             {
                 _mcdaExtension.RemoveLink(_lwlcTool);
                 this.MCDAExtensionPropertyChanged(this, null);
@@ -292,7 +294,6 @@ namespace MCDA.ViewModel
 
         protected override void DoStandardizationSelectionCommand()
         {
-
             var parentHandle = new IntPtr(ArcMap.Application.hWnd);
 
             var wpfWindow = new StandardizationSelectionView();
@@ -311,9 +312,7 @@ namespace MCDA.ViewModel
                 _lwlcTool.TransformationStrategy = standardizationSelectionViewModel.SelectedTransformationStrategy;
 
                 _isUpdateAllowed = true;
-
                 base.Update();
-
             };
 
             wpfWindow.ShowDialog();
@@ -321,9 +320,13 @@ namespace MCDA.ViewModel
 
         protected override void DoDistributionCommand()
         {
+            // in order to prevent the tool to run for every single step
+            _isUpdateAllowed = false;
+
             _lwlcTool.ToolParameterContainer.DistributeEquallyToolParameterWeights();
 
-            UpdateRealtime();
+            _isUpdateAllowed = true;
+            base.Update();
 
             PropertyChanged.Notify(() => LWLCParameter);
             PropertyChanged.Notify(() => LWLCResult);      
@@ -379,7 +382,6 @@ namespace MCDA.ViewModel
                 _lwlcTool.Threshold = neighborhoodSelectionViewModel.Threshold;
 
                 _isUpdateAllowed = true;
-
                 base.Update();
 
                 PropertyChanged.Notify(() => LWLCResult);

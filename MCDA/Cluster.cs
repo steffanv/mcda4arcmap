@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Data;
+using MCDA.Extensions;
 
 namespace MCDA.Model
 {
@@ -114,6 +115,9 @@ namespace MCDA.Model
                 divisor = divisor + ((currentToolParameter2.ScaledWeight * localRange2) / globalRange2);
             }
 
+            if (divisor == 0)
+                divisor = null;
+
             foreach (IToolParameter currentToolParameter in toolParameterContainer.ToolParameter)
             {
                 double localRange = localRangeList.Where(x => x.Item1 == currentToolParameter).FirstOrDefault().Item2;
@@ -142,12 +146,39 @@ namespace MCDA.Model
              scaledValues = Scale(_toolParameterContainer, localRange);
              weights = LocalWeights(_toolParameterContainer, localRange, globalRange);
         }
+
+        public bool IsResultNull()
+        {
+            Calculate();
+
+            foreach (IToolParameter currentToolParameter in _toolParameterContainer.ToolParameter)
+            {
+                double? scaledValue = scaledValues.Where(x => x.Item1 == currentToolParameter).FirstOrDefault().Item2;
+                double? weight = weights.Where(x => x.Item1 == currentToolParameter).FirstOrDefault().Item2;
+
+                if (!scaledValue.HasValue || !weight.HasValue)
+                    return true;
+            }
+
+            return false;
+        }
         
         // oid/fid, r1,s1, w1, r2, s2, w3, result
         public DataRow FillRowWithResults(DataRow row)
         {
             row[0] = new FieldTypeOID(){ OID = _featureID};
-            row[1] = ((List<int>)_clusterIDs).ConvertAll<string>(x => x.ToString());
+
+            StringBuilder sb = new StringBuilder();
+
+            foreach(int currentID in _clusterIDs){
+
+                if(sb.Length == 0)
+                    sb.Append(currentID);
+                else
+                    sb.Append("; " + currentID);
+            }
+
+            row[1] = sb.ToString();
 
             int index = 2;
             double? result = 0;
@@ -178,7 +209,7 @@ namespace MCDA.Model
             }
 
             if(result.HasValue)
-                row.SetField(row.ItemArray.Length - 1, Math.Round(result.Value,10));
+                row.SetField(row.ItemArray.Length - 1, Math.Round(result.Value, 6));
             else
                 row.SetField(row.ItemArray.Length - 1, DBNull.Value);
 

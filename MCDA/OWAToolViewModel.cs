@@ -363,7 +363,8 @@ namespace MCDA.ViewModel
         {
             _owaTool.ToolParameterContainer.DistributeEquallyToolParameterWeights();
 
-            UpdateRealtime();
+            _isUpdateAllowed = true;
+            base.Update();
 
             PropertyChanged.Notify(() => OWAParameter);
             PropertyChanged.Notify(() => OWAResult);

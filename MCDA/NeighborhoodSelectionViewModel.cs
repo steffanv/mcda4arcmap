@@ -21,6 +21,8 @@ namespace MCDA.ViewModel
 
         public int SelectedNumberOfKNearestNeighbors { get; set; }
 
+        public int SelectedNumberOfKNearestNeighborsForAutomatic { get; set; }
+
         public double Threshold { get; set; }
 
         public NeighborhoodOptions NeighborhoodOption

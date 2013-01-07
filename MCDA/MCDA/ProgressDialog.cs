@@ -23,13 +23,17 @@ namespace MCDA.ViewModel
             ESRI.ArcGIS.Framework.IProgressDialog2 progressDialog2 = (ESRI.ArcGIS.Framework.IProgressDialog2)stepProgressor;
 
             // Set the properties of the ProgressDialog
-            progressDialog2.CancelEnabled = true;
+            progressDialog2.CancelEnabled = false;
             progressDialog2.Description = message;
             progressDialog2.Animation = ESRI.ArcGIS.Framework.esriProgressAnimationTypes.esriProgressSpiral;
 
             progressDialog2.ShowDialog();
 
+            progressDialog2.CancelEnabled = false;
+
             action.DynamicInvoke(args);
+
+            progressDialog2.CancelEnabled = false;
 
             trackCancel = null;
             stepProgressor = null;

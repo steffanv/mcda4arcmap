@@ -319,7 +319,8 @@ namespace MCDA.ViewModel
         {
             _wlcTool.ToolParameterContainer.DistributeEquallyToolParameterWeights();
 
-            UpdateRealtime();
+            _isUpdateAllowed = true;
+            base.Update();
 
             PropertyChanged.Notify(() => WLCParameter);
             PropertyChanged.Notify(() => WLCResult);

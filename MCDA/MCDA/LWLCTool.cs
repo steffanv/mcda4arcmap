@@ -29,6 +29,7 @@ namespace MCDA.Model
 
        private NeighborhoodOptions _neighborhoodOption = NeighborhoodOptions.KNearestNeighbors;
        private int _numberOfKNearestNeighbors = 3;
+       private int _numberOfKNearestNeighborsForAutomatic = 3;
        private double _threshold;
 
        public LWLCTool(DataTable dataTable, ToolParameterContainer toolParameterContainer, IFeatureClass featureClass)
@@ -47,7 +48,7 @@ namespace MCDA.Model
 
            switch (_neighborhoodOption)
            {
-               case NeighborhoodOptions.KNearestNeighbors: case NeighborhoodOptions.Threshold:
+               case NeighborhoodOptions.KNearestNeighbors: case NeighborhoodOptions.Threshold: case NeighborhoodOptions.Automatic:
                     if(_dictionaryOfDistances == null)
                         _dictionaryOfDistances = BuildDictionaryOfDistancesByCentroid();
                    break;
@@ -92,9 +93,41 @@ namespace MCDA.Model
                 case NeighborhoodOptions.Rook:
                     BuildRookContiguityTable();
                     break;
+                case NeighborhoodOptions.Automatic:
+                    BuildAutomaticTable();
+                    break;
             }
 
             _resultDataTable.EndLoadData();
+        }
+
+        private void BuildAutomaticTable()
+        {
+            object lockObject = new object();
+
+            Parallel.ForEach(_dictionaryOfDistances.Keys, currentID =>
+            {
+                List<Tuple<int, double>> list = new List<Tuple<int, double>>();
+
+                _dictionaryOfDistances.TryGetValue(currentID, out list);
+
+                int maxElements = list.Count();
+                int tryKNearestNeighbors = _numberOfKNearestNeighborsForAutomatic;
+
+                Cluster c = new Cluster(currentID, list.OrderBy(t => t.Item2).Take(tryKNearestNeighbors).Select(t => t.Item1).ToList(), _dataTable, _toolParameterContainer, _tranformationStrategy);
+
+                // lets try another value
+                while(c.IsResultNull() && tryKNearestNeighbors <= maxElements){
+
+                    tryKNearestNeighbors++;
+                    c = new Cluster(currentID, list.OrderBy(t => t.Item2).Take(tryKNearestNeighbors).Select(t => t.Item1).ToList(), _dataTable, _toolParameterContainer, _tranformationStrategy);
+                }
+
+                lock (lockObject)
+                {
+                    _resultDataTable.Rows.Add((c.FillRowWithResults(_resultDataTable.NewRow())));
+                }
+            });
         }
 
         private void BuildRookContiguityTable()
@@ -143,7 +176,7 @@ namespace MCDA.Model
                 List<Tuple<int, double>> list = new List<Tuple<int, double>>();
 
                 _dictionaryOfDistances.TryGetValue(currentID, out list);
-                //todo make sure that n > count
+               
                 Cluster c = new Cluster(currentID, list.OrderBy(t => t.Item2).Take(_numberOfKNearestNeighbors).Select(t => t.Item1).ToList(), _dataTable, _toolParameterContainer, _tranformationStrategy);
 
                 c.Calculate();
@@ -153,7 +186,6 @@ namespace MCDA.Model
                     _resultDataTable.Rows.Add((c.FillRowWithResults(_resultDataTable.NewRow())));
                 }
             });
- 
         }
 
         private void BuildThresholdTable()
@@ -397,6 +429,12 @@ namespace MCDA.Model
         {
             get { return _featureClass; }
             set { _featureClass = value; }
+        }
+
+        public int NumberOfKNearestNeighborsForAutomatic
+        {
+            get { return _numberOfKNearestNeighborsForAutomatic; }
+            set { _numberOfKNearestNeighborsForAutomatic = value; }
         }
 
         public int NumberOfKNearestNeighbors

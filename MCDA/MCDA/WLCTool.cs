@@ -65,7 +65,7 @@ namespace MCDA.Model
 
                 foreach (DataRow currentDataRow in dataTable.Rows)
                 {
-                    currentDataRow[columnIndex] = Math.Round(Convert.ToDouble(currentDataRow.ItemArray[columnIndex]) * currentToolParameter.ScaledWeight, 10);
+                    currentDataRow[columnIndex] = Convert.ToDouble(currentDataRow.ItemArray[columnIndex]) * currentToolParameter.ScaledWeight;
                 }
             }
 
@@ -77,13 +77,12 @@ namespace MCDA.Model
             int wlcRankIndex = dataTable.Columns.IndexOf(_wlcResultColumnName);
 
             foreach (DataRow currentDataRow in dataTable.Rows)
-                 {
-                
+                 {          
                      double sum = currentDataRow.ItemArray.Where(o => o.GetType() == typeof(double)).Sum(o => (double)o);
 
                      //the trick is that the result table is still without a value? or at least 0 for the result column
                       //and 0 is the neutral element for the + operator
-                     currentDataRow[wlcRankIndex] = sum;
+                     currentDataRow[wlcRankIndex] = Math.Round(sum,6);
                  }
         
         }

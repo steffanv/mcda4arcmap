@@ -369,6 +369,7 @@ namespace MCDA.ViewModel
             neighborhoodSelectionViewModel.NeighborhoodOption = _lwlcTool.NeighborhoodOptions;
             neighborhoodSelectionViewModel.SelectedNumberOfKNearestNeighbors = _lwlcTool.NumberOfKNearestNeighbors;
             neighborhoodSelectionViewModel.Threshold = _lwlcTool.Threshold;
+            neighborhoodSelectionViewModel.SelectedNumberOfKNearestNeighborsForAutomatic = _lwlcTool.NumberOfKNearestNeighborsForAutomatic;
 
             var helper = new WindowInteropHelper(wpfWindow);
 
@@ -380,6 +381,7 @@ namespace MCDA.ViewModel
                 _lwlcTool.NeighborhoodOptions = neighborhoodSelectionViewModel.NeighborhoodOption;
                 _lwlcTool.NumberOfKNearestNeighbors = neighborhoodSelectionViewModel.SelectedNumberOfKNearestNeighbors;
                 _lwlcTool.Threshold = neighborhoodSelectionViewModel.Threshold;
+                _lwlcTool.NumberOfKNearestNeighborsForAutomatic = neighborhoodSelectionViewModel.SelectedNumberOfKNearestNeighborsForAutomatic;
 
                 _isUpdateAllowed = true;
                 base.Update();

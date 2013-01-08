@@ -63,7 +63,7 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
-                <RadioButton GroupName="NeighborhoodOption" IsChecked="{Binding Path=RenderOption, Converter={StaticResource enumToBooleanConverter}, ConverterParameter={x:Static viewModel:NeighborhoodOptions.Automatic}}" Content="Automatic (Extends neighborhood)" Grid.Row="0"/>
+                <RadioButton GroupName="NeighborhoodOption" IsChecked="{Binding Path=NeighborhoodOption, Converter={StaticResource enumToBooleanConverter}, ConverterParameter={x:Static viewModel:NeighborhoodOptions.Automatic}}" Content="Automatic (Extends neighborhood)" Grid.Row="0"/>
                 <ComboBox Grid.Row="1" Grid.Column="1" Height="23" HorizontalAlignment="Center"  Name="comboBox2"  Width="50" ItemsSource="{Binding Path=NumberOfKNearestNeighbors, Mode=OneWay}" SelectedValue="{Binding Path=SelectedNumberOfKNearestNeighborsForAutomatic, Mode=TwoWay}"/>
             </Grid>
         </GroupBox>

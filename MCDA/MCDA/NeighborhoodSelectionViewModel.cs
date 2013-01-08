@@ -16,7 +16,7 @@ namespace MCDA.ViewModel
 
         public BindingList<int> NumberOfKNearestNeighbors
         {
-            get { return new BindingList<int>(Enumerable.Range(2, 19).ToList()); }
+            get { return new BindingList<int>(Enumerable.Range(1, 19).ToList()); }
         }
 
         public int SelectedNumberOfKNearestNeighbors { get; set; }

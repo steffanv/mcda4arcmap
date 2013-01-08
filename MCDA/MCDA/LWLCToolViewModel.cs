@@ -227,7 +227,15 @@ namespace MCDA.ViewModel
 
             if (result == true)
             {
-                Export.ToCSV(_lwlcTool.Data, _lwlcTool.ToolParameterContainer.ToolParameter, saveFileDialog.FileName);
+
+                IList<Tuple<string, object>> param = new List<Tuple<string, object>>();
+
+                param.Add(Tuple.Create<string,object>(Util.GetPropertyName(() => _lwlcTool.NeighborhoodOptions), _lwlcTool.NeighborhoodOptions));
+                param.Add(Tuple.Create<string, object>(Util.GetPropertyName(() => _lwlcTool.NumberOfKNearestNeighbors), _lwlcTool.NumberOfKNearestNeighbors));
+                param.Add(Tuple.Create<string, object>(Util.GetPropertyName(() => _lwlcTool.NumberOfKNearestNeighborsForAutomatic), _lwlcTool.NumberOfKNearestNeighborsForAutomatic));
+                param.Add(Tuple.Create<string, object>(Util.GetPropertyName(() => _lwlcTool.Threshold), _lwlcTool.Threshold));
+
+                Export.ToCSV<IToolParameter>(_lwlcTool.Data, _lwlcTool.ToolParameterContainer.ToolParameter, saveFileDialog.FileName, param.ToArray());
             }
         }
 

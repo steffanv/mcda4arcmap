@@ -224,10 +224,8 @@ namespace MCDA.ViewModel
 
            Nullable<bool> result = saveFileDialog.ShowDialog();
 
-           if (result == true)
-           {
-               Export.ToCSV(_wlcTool.Data,_wlcTool.ToolParameterContainer.ToolParameter, saveFileDialog.FileName);
-           }
+           if(result == true)
+               Export.ToCSV<IToolParameter>(_wlcTool.Data,_wlcTool.ToolParameterContainer.ToolParameter, saveFileDialog.FileName);
        }
 
        protected override void DoLockCommand()

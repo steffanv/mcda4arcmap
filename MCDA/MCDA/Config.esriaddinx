@@ -5,8 +5,8 @@
   <Version>1.0</Version>
   <Image>Images\MCDA Add-in.png</Image>
   <Author>Steffan Voss</Author>
-  <Company>Ryerson University</Company>
-  <Date>12/25/2012</Date>
+  <Company>-</Company>
+  <Date>01/10/2013</Date>
   <Targets>
     <Target name="Desktop" version="10.1" />
   </Targets>
@@ -26,7 +26,7 @@
       </Extensions>
       <DockableWindows>
         <DockableWindow id="Ryerson_University_MCDA_AddDataView" class="AddDataView+AddinImpl" caption="Data Manager" image="Images\AddDataWindow.png">
-          <InitialPlacement height="500" width="300" state="pinned" position="float" />
+          <InitialPlacement height="500" width="300" state="pinned" position="left" />
         </DockableWindow>
         <!--<DockableWindow id="Ryerson_University_MCDA_OWAToolView" class="OWAToolView+AddinImpl" caption="OWA Tool" image="Images\OWAToolView.png">
           <InitialPlacement height="500" width="400" state="pinned" position="float" />
@@ -35,10 +35,10 @@
           <InitialPlacement height="300" width="500" state="pinned" position="group" />
         </DockableWindow>-->
         <DockableWindow id="Ryerson_University_MCDA_ConfigView" class="ConfigView+AddinImpl" caption="Configuration" image="Images\ConfigView.png">
-          <InitialPlacement height="300" width="300" state="pinned" position="group" />
+          <InitialPlacement height="300" width="300" state="unpinned" position="float" />
         </DockableWindow>
         <DockableWindow id="Ryerson_University_MCDA_VisualizationView" class="VisualizationView+AddinImpl" caption="Visualization" image="Images\VisualizationView.png">
-          <InitialPlacement height="300" width="500" state="pinned" position="group" />
+          <InitialPlacement height="300" width="500" state="unpinned" position="group" />
         </DockableWindow>
       </DockableWindows>
       <Toolbars>

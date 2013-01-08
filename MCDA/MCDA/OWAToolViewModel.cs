@@ -9,6 +9,7 @@ using System.Data;
 using Microsoft.Win32;
 using System.Windows.Interop;
 using System.Windows.Input;
+using System.Linq.Expressions;
 
 namespace MCDA.ViewModel
 {
@@ -224,9 +225,7 @@ namespace MCDA.ViewModel
             Nullable<bool> result = saveFileDialog.ShowDialog();
 
             if (result == true)
-            {
-                Export.ToCSV(_owaTool.Data, _owaTool.ToolParameterContainer.ToolParameter, saveFileDialog.FileName);
-            }
+                Export.ToCSV<IToolParameter>(_owaTool.Data, _owaTool.ToolParameterContainer.ToolParameter, saveFileDialog.FileName, Tuple.Create<string,object>(Util.GetPropertyName(() => _owaTool.Alpha), _owaTool.Alpha));
         }
 
         protected override void DoLockCommand()
@@ -290,7 +289,6 @@ namespace MCDA.ViewModel
 
         protected override void DoStandardizationSelectionCommand()
         {
-
             var parentHandle = new IntPtr(ArcMap.Application.hWnd);
 
             var wpfWindow = new StandardizationSelectionView();
@@ -305,13 +303,11 @@ namespace MCDA.ViewModel
 
             wpfWindow.Closed += delegate(object sender, EventArgs e)
             {
-
                 _owaTool.TransformationStrategy = standardizationSelectionViewModel.SelectedTransformationStrategy;
 
                 _isUpdateAllowed = true;
 
                 base.Update();
-
             };
 
             wpfWindow.ShowDialog();

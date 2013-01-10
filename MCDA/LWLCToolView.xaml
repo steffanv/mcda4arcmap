@@ -87,7 +87,7 @@
                                         <DataTemplate>
                                             <StackPanel HorizontalAlignment="Stretch" Orientation="Horizontal">
                                                 <Slider Name="weightSlider" Value="{Binding Path=Weight, Mode=TwoWay}" Thumb.DragCompleted="weightSlider_DragCompleted" Thumb.DragStarted="weightSlider_DragStarted" Width="130" HorizontalContentAlignment="Stretch" Minimum="0" Maximum="100" TickFrequency="0.1" />
-                                                <TextBox Name="weightSliderTextblock" Width="40" Text="{Binding ElementName=weightSlider, Path=Value, StringFormat={}{0:0.##}}" />
+                                                <TextBox Name="weightSliderTextblock" Width="40" Text="{Binding ElementName=weightSlider, Path=Value, StringFormat={}{0:0.##}}" PreviewTextInput="weightSliderTextblock_PreviewTextInput" />
                                             </StackPanel>
                                         </DataTemplate>
                                     </GridViewColumn.CellTemplate>

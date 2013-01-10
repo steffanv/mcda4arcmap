@@ -97,7 +97,13 @@ namespace MCDA.Model
                 pClassSymbol.Style = esriSimpleFillStyle.esriSFSSolid;
                 pClassSymbol.Outline.Width = 0.4;
 
-                string classValue = currentClassValue.ToString();
+                // the format is important, because the normal to string will represent the power as E-05 or something like that
+                // the result are mismatches between the renderer value and the column value
+                //string classValue = currentClassValue.ToString("N20"); does not reallz work
+
+                decimal dirtyTrick = (decimal) currentClassValue;
+
+                string classValue = dirtyTrick.ToString();
 
                 uniqueValueRenderer.AddValue(classValue, fieldName, (ISymbol)pClassSymbol);
                 uniqueValueRenderer.set_Label(classValue, classValue);

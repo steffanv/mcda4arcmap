@@ -42,7 +42,7 @@
         </DockableWindow>
       </DockableWindows>
       <Toolbars>
-        <Toolbar id="Ryerson_University_MCDA_MCDA_Toolbar" caption="MCDA Toolbar" showInitially="true">
+        <Toolbar id="Ryerson_University_MCDA_MCDA_Toolbar" caption="MCDA" showInitially="true">
           <Items>
             <Button refID="Ryerson_University_MCDA_AddDataBtn" />
             <Menu refID="Ryerson_University_MCDA_MCDA_Methods" />

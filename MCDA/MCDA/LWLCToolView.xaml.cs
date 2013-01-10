@@ -37,7 +37,6 @@ namespace MCDA
         private void weightSlider_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
         {
             LWLCToolViewModel viewmodel = (LWLCToolViewModel)DataContext;
-            //viewmodel.Update();
             viewmodel.UpdateAllowedEvent(true);
 
             viewmodel.Update();
@@ -49,16 +48,12 @@ namespace MCDA
             viewmodel.UpdateAllowedEvent(false);
         }
 
-        //private void benefitCriteriaCheckBox_Click(object sender, RoutedEventArgs e)
-        //{
-        //    LWLCToolViewModel viewmodel = (LWLCToolViewModel)DataContext;
-        //    viewmodel.UpdateAllowedEvent();
-        //}
 
-        //private void weightSliderTextblock_PreviewTextInput(object sender, TextCompositionEventArgs e)
-        //{
-        //    LWLCToolViewModel viewmodel = (LWLCToolViewModel)DataContext;
-        //    viewmodel.UpdateAllowedEvent();
-        //}
+        private void weightSliderTextblock_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+            LWLCToolViewModel viewmodel = (LWLCToolViewModel)DataContext;
+            viewmodel.UpdateAllowedEvent(true);
+            //viewmodel.Update();
+        }
     }
 }

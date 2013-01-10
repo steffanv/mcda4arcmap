@@ -28,7 +28,13 @@ namespace MCDA.Model
         {
             get { return _weight; }
             set { _lastWeightChangedToolParameter = this;
-            _weight = value;
+
+                if(value < 0)
+                    _weight = 0;
+                else if (value > 100)
+                    _weight = 100;
+                else
+                    _weight = value;
 
             OnPropertyChanged(new PropertyChangedEventArgs("Weight"));
             }

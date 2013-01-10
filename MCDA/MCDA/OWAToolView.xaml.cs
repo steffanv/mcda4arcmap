@@ -72,16 +72,11 @@ namespace MCDA
             viewmodel.UpdateAllowedEvent();
         }
 
-        private void benefitCriteriaCheckBox_Click(object sender, RoutedEventArgs e)
-        {
-            OWAToolViewModel viewmodel = (OWAToolViewModel)DataContext;
-            viewmodel.UpdateAllowedEvent();
-        }
-
         private void weightSliderTextblock_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
             OWAToolViewModel viewmodel = (OWAToolViewModel)DataContext;
             viewmodel.UpdateAllowedEvent();
+            viewmodel.Update();
         }
        
     }

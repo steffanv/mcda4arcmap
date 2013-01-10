@@ -13,6 +13,7 @@ using MCDA.Extensions;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Collections.Concurrent;
+using System.Threading;
 
 namespace MCDA.Model
 {
@@ -116,7 +117,7 @@ namespace MCDA.Model
 
                 Cluster c = new Cluster(currentID, list.OrderBy(t => t.Item2).Take(tryKNearestNeighbors).Select(t => t.Item1).ToList(), _dataTable, _toolParameterContainer, _tranformationStrategy);
 
-                // lets try another value
+                // lets try another value - IsResultNull also calculates all required stuff for NewRow
                 while(c.IsResultNull() && tryKNearestNeighbors <= maxElements){
 
                     tryKNearestNeighbors++;
@@ -139,6 +140,8 @@ namespace MCDA.Model
                 _dictionaryOfRookContiguity.TryGetValue(currentID, out list);
 
                 Cluster c = new Cluster(currentID, list, _dataTable, _toolParameterContainer,_tranformationStrategy);
+
+                c.Calculate();
 
                 _resultDataTable.Rows.Add((c.FillRowWithResults(_resultDataTable.NewRow())));
             }
@@ -343,9 +346,78 @@ namespace MCDA.Model
             return neighborDictionary;
         }
 
+        //public class TaskInfo
+        //{
+        //    public IDictionary<int, List<int>> NeighborDictionaryForRookContiguityThreading { get; set; }
+        //    public IFeature Feature { get; set; }
+        //    public ManualResetEvent DoneEvent { get; set; }
+        //}
+
+        //private void X(object o)
+        //{
+        //    TaskInfo taskInfo = (TaskInfo)o;
+
+        //    ISpatialFilter spatialFilter = new SpatialFilterClass();
+        //    spatialFilter.Geometry = taskInfo.Feature.Shape;
+        //    spatialFilter.GeometryField = _featureClass.ShapeFieldName;
+        //    spatialFilter.SpatialRel = esriSpatialRelEnum.esriSpatialRelTouches;
+
+        //    ISelectionSet selectionSet = _featureClass.Select(spatialFilter,
+        //        esriSelectionType.esriSelectionTypeIDSet,
+        //        esriSelectionOption.esriSelectionOptionNormal, null);
+
+        //    ITopologicalOperator topologicalOperator = (ITopologicalOperator) taskInfo.Feature.Shape;
+
+        //    List<int> neighborIDs = new List<int>(selectionSet.Count);
+
+        //    IEnumIDs enumIDs = selectionSet.IDs;
+
+        //    int ID = enumIDs.Next();
+        //    // thats ridiculous - someone at ESRI does not unterstand the iterator pattern...
+        //    while (ID != -1)
+        //    {
+        //        // http://resources.arcgis.com/en/help/main/10.1/index.html#//00080000000z000000
+        //        IPointCollection pointCollection = (IPointCollection)topologicalOperator.Intersect(_featureClass.GetFeature(ID).Shape, esriGeometryDimension.esriGeometry0Dimension);
+
+        //        // do not add if we have one point in the collection, because that means they touch in exactly one point -> !rook
+        //        if (!(pointCollection.PointCount == 1))
+        //            neighborIDs.Add(ID);
+
+        //        ID = enumIDs.Next();
+        //    }
+
+        //    _neighborDictionaryForRookContiguityThreading.Add(taskInfo.Feature.OID, neighborIDs);
+
+        //    taskInfo.DoneEvent.Set();
+        //}
+
+        //private void Y(object O)
+        //{
+        //    List<IFeature> features = (List<IFeature>) O;
+        //    IList<ManualResetEvent> doneEvents = new List<ManualResetEvent>();
+
+        //    foreach (IFeature currentFeature in features)
+        //    {
+        //        TaskInfo info = new TaskInfo();
+        //        info.Feature = currentFeature;
+        //        //info.NeighborDictionaryForRookContiguityThreading = _neighborDictionaryForRookContiguityThreading;
+
+        //        ManualResetEvent doneEvent = new ManualResetEvent(false);
+        //        doneEvents.Add(doneEvent);
+        //        info.DoneEvent = doneEvent;
+
+        //        Thread temp = new Thread(new ParameterizedThreadStart(X));
+        //        temp.SetApartmentState(ApartmentState.STA);
+
+        //        temp.Start(info);
+        //    }
+
+        //    WaitHandle.WaitAll(doneEvents.ToArray());
+        //}
+
         private IDictionary<int, List<int>> BuildDictionaryOfRookContiguity()
         {
-            IDictionary<int, List<int>> neighborDictionary = new Dictionary<int, List<int>>();
+            IDictionary<int, List<int>> neighborDictionary = new ConcurrentDictionary<int, List<int>>();
 
             bool zeroOIDExist = false;
 
@@ -358,6 +430,9 @@ namespace MCDA.Model
                 IFeature currentFeature;
                 while ((currentFeature = featureCursor.NextFeature()) != null)
                 {
+                    if (currentFeature.OID == 0)
+                        zeroOIDExist = true;
+
                     ISpatialFilter spatialFilter = new SpatialFilterClass();
                     spatialFilter.Geometry = currentFeature.Shape;
                     spatialFilter.GeometryField = _featureClass.ShapeFieldName;
@@ -367,7 +442,7 @@ namespace MCDA.Model
                         esriSelectionType.esriSelectionTypeIDSet,
                         esriSelectionOption.esriSelectionOptionNormal, null);
 
-                    ITopologicalOperator topologicalOperator = (ITopologicalOperator) currentFeature.Shape;
+                    ITopologicalOperator topologicalOperator = (ITopologicalOperator)currentFeature.Shape;
 
                     List<int> neighborIDs = new List<int>(selectionSet.Count);
 
@@ -378,38 +453,36 @@ namespace MCDA.Model
                     while (ID != -1)
                     {
                         // http://resources.arcgis.com/en/help/main/10.1/index.html#//00080000000z000000
-                        IPointCollection pointCollection = (IPointCollection) topologicalOperator.Intersect(_featureClass.GetFeature(ID).Shape, esriGeometryDimension.esriGeometry0Dimension);
-                       
+                        IPointCollection pointCollection = (IPointCollection)topologicalOperator.Intersect(_featureClass.GetFeature(ID).Shape, esriGeometryDimension.esriGeometry0Dimension);
+
                         // do not add if we have one point in the collection, because that means they touch in exactly one point -> !rook
-                        if(!(pointCollection.PointCount == 1))
+                        if (!(pointCollection.PointCount == 1))
                             neighborIDs.Add(ID);
 
                         ID = enumIDs.Next();
                     }
 
                     neighborDictionary.Add(currentFeature.OID, neighborIDs);
-
-                    if (currentFeature.OID == 0)
-                        zeroOIDExist = true;
                 }
+            }
 
-                // it is possible that the oid column starts at zero and the other program parts expect it at 1, thus we have to check if the name is FID and one oid is zero
-                if (_featureClass.OIDFieldName.Equals("FID") && zeroOIDExist)
+            
+
+            // it is possible that the oid column starts at zero and the other program parts expect it at 1, thus we have to check if the name is FID and one oid is zero
+            if (_featureClass.OIDFieldName.Equals("FID") && zeroOIDExist)
+            {
+                // the easiest way is to build a new dictionary
+                IDictionary<int, List<int>> newNeighborDictionary = new Dictionary<int, List<int>>();
+
+                foreach (int currentKey in neighborDictionary.Keys)
                 {
-                    // the easiest way is to build a new dictionary
-                    IDictionary<int, List<int>> newNeighborDictionary = new Dictionary<int, List<int>>();
+                    List<int> values = neighborDictionary[currentKey];
 
-                    foreach (int currentKey in neighborDictionary.Keys)
-                    {
-                        List<int> values;
-                        neighborDictionary.TryGetValue(currentKey, out values);
-
-                        values.ModifyEach(v => v + 1);
-                        newNeighborDictionary.Add(currentKey + 1, values);
-                    }
-
-                    return newNeighborDictionary;
+                    values.ModifyEach(v => v + 1);
+                    newNeighborDictionary.Add(currentKey + 1, values);
                 }
+
+                return newNeighborDictionary;
             }
 
             return neighborDictionary;

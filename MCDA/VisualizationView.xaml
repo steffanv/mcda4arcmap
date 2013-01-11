@@ -31,7 +31,7 @@
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>
-                            <GridViewColumn  Header="Owner"  Width="100">
+                            <GridViewColumn  Header="Owner"  Width="200">
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate>
                                         <Label Content="{Binding Path=FeatureLayerName, Mode=OneWay}"/>

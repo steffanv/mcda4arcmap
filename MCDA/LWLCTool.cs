@@ -293,14 +293,16 @@ namespace MCDA.Model
 
                 comReleaser.ManageLifetime(featureCursor);
 
+                ISpatialFilter spatialFilter = new SpatialFilterClass();
+                spatialFilter.SpatialRel = esriSpatialRelEnum.esriSpatialRelIntersects;
+
                 IFeature currentFeature;
                 while ((currentFeature = featureCursor.NextFeature()) != null)
                 {      
-                    ISpatialFilter spatialFilter = new SpatialFilterClass();
+                 
                     spatialFilter.Geometry = currentFeature.Shape;
                     spatialFilter.GeometryField = _featureClass.ShapeFieldName;
-                    spatialFilter.SpatialRel = esriSpatialRelEnum.esriSpatialRelTouches;
- 
+                    
                     ISelectionSet selectionSet = _featureClass.Select(spatialFilter,
                         esriSelectionType.esriSelectionTypeIDSet,
                         esriSelectionOption.esriSelectionOptionNormal, null);
@@ -427,16 +429,17 @@ namespace MCDA.Model
 
                 comReleaser.ManageLifetime(featureCursor);
 
+                ISpatialFilter spatialFilter = new SpatialFilterClass();
+                spatialFilter.SpatialRel = esriSpatialRelEnum.esriSpatialRelIntersects;
+
                 IFeature currentFeature;
                 while ((currentFeature = featureCursor.NextFeature()) != null)
                 {
                     if (currentFeature.OID == 0)
                         zeroOIDExist = true;
 
-                    ISpatialFilter spatialFilter = new SpatialFilterClass();
                     spatialFilter.Geometry = currentFeature.Shape;
                     spatialFilter.GeometryField = _featureClass.ShapeFieldName;
-                    spatialFilter.SpatialRel = esriSpatialRelEnum.esriSpatialRelTouches;
 
                     ISelectionSet selectionSet = _featureClass.Select(spatialFilter,
                         esriSelectionType.esriSelectionTypeIDSet,
@@ -453,10 +456,17 @@ namespace MCDA.Model
                     while (ID != -1)
                     {
                         // http://resources.arcgis.com/en/help/main/10.1/index.html#//00080000000z000000
-                        IPointCollection pointCollection = (IPointCollection)topologicalOperator.Intersect(_featureClass.GetFeature(ID).Shape, esriGeometryDimension.esriGeometry0Dimension);
+                        IGeometryCollection polylineCollection = (IGeometryCollection)topologicalOperator.Intersect(_featureClass.GetFeature(ID).Shape, esriGeometryDimension.esriGeometry1Dimension);
 
-                        // do not add if we have one point in the collection, because that means they touch in exactly one point -> !rook
-                        if (!(pointCollection.PointCount == 1))
+                        // we have one or more polylines in common => add
+                        if (polylineCollection.GeometryCount >= 1)
+                            neighborIDs.Add(ID);
+
+                       
+                        IGeometryCollection polygonCollection = (IGeometryCollection)topologicalOperator.Intersect(_featureClass.GetFeature(ID).Shape, esriGeometryDimension.esriGeometry2Dimension);
+
+                        // we have one or more polygons in common => add
+                        if (polygonCollection.GeometryCount >= 1)
                             neighborIDs.Add(ID);
 
                         ID = enumIDs.Next();

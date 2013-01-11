@@ -42,7 +42,7 @@ namespace MCDA.ViewModel
 
             if (feature != null)
             {
-                List<Field> field = feature.Fields.Where(f => f.IsNumber).ToList();
+                List<Field> field = feature.Fields.Where(f => f.IsNumber && f.HasDifferentNumericValues()).ToList();
 
                 _fields = new BindingList<Field>(field);
             }

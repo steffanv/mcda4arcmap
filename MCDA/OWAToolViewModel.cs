@@ -326,6 +326,7 @@ namespace MCDA.ViewModel
 
         protected override void DoCancelStandardizationCommand()
         {
+            _standardizationViewModel.SelectedTransformationStrategy = _owaTool.TransformationStrategy;
             _standardizationView.Close();
         }
 
@@ -431,6 +432,7 @@ namespace MCDA.ViewModel
 
         private void DoCancelAlphaSelectionCommand()
         {
+            _alphaSelectionViewModel.Alpha = _owaTool.Alpha;
             _alphaSelectionView.Close();
         }
 

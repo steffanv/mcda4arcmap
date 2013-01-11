@@ -61,7 +61,7 @@ namespace MCDA
 
         public IList<Model.Layer> AvailableFeatureLayer
         {
-            get { return AvailableLayer.Where(l => l.IsFeatureLayer).ToList().OrderBy(f => f.LayerName).ToList(); }
+            get { return AvailableLayer.Where(l => l.IsFeatureLayer && l.HasAreaAndTopologicalOperator()).ToList().OrderBy(f => f.LayerName).ToList(); }
         }
 
         public IDictionary<AbstractToolTemplate, MCDAWorkspaceContainer> LinkDictionary
@@ -235,9 +235,7 @@ namespace MCDA
             {
                 //remove what we tried before
                 if (extension > 0)
-                {
                     preferredName = preferredName.Remove(preferredName.Length - (extension).ToString().Length);
-                }
 
                 extension++;
                 preferredName += extension;          
@@ -374,9 +372,7 @@ namespace MCDA
             for (int i = 0; i <= fields.FieldCount - 1; i++)
             {
                 if (fields.get_Field(i).Type <= esriFieldType.esriFieldTypeDouble)
-                {
                     fieldsList.Add(fields.get_Field(i));
-                }
             }
 
             return fieldsList;
@@ -564,12 +560,12 @@ namespace MCDA
 
         private String CreateLayerName(AbstractToolTemplate tool)
         {
-            return tool.ToString() + DateTime.Now.ToString("MMddHHmmssffff");
+            return tool.ToString() + DateTime.Now.ToString("ddHHmmssffff");
         }
 
         private String CreateTimeStamp()
         {
-            return DateTime.Now.ToString("yyyyMMddHHmmssffff");
+            return DateTime.Now.ToString("ddHHmmssffff");
         }
 
         /// <summary>

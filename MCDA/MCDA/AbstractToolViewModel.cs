@@ -9,6 +9,14 @@ namespace MCDA.ViewModel
 {
     abstract class AbstractToolViewModel
     {
+        public AbstractToolViewModel()
+        {
+            _standardizationViewModel.CancelCommand = CancelStandardizationCommand;
+            _standardizationViewModel.ApplyCommand = ApplyStandardizationCommand;
+            _standardizationViewModel.OkayCommand = OkayStandardizationCommand;
+
+            _standardizationView.DataContext = _standardizationViewModel;
+        }
 
         protected virtual void BeforeUpdate(){}
         protected abstract void UpdateDrag();
@@ -156,5 +164,62 @@ namespace MCDA.ViewModel
        protected abstract void DoDistributionCommand();
        protected abstract void DoClosingCommand();
 
+
+       #region standardization
+
+       protected StandardizationSelectionView _standardizationView = new StandardizationSelectionView();
+       protected StandardizationSelectionViewModel _standardizationViewModel = new StandardizationSelectionViewModel();
+
+       private ICommand _applyStandardizationCommand;
+       private ICommand _okayStandardizationCommand;
+       private ICommand _cancelStandardizationCommand;
+
+       private ICommand CancelStandardizationCommand
+       {
+           get
+           {
+               if (_cancelStandardizationCommand == null)
+               {
+                   _cancelStandardizationCommand = new RelayCommand(
+                       p => this.DoCancelStandardizationCommand(),
+                       p => true);
+               }
+               return _cancelStandardizationCommand;
+           }
+       }
+
+       private ICommand OkayStandardizationCommand
+       {
+           get
+           {
+               if (_okayStandardizationCommand == null)
+               {
+                   _okayStandardizationCommand = new RelayCommand(
+                       p => this.DoOkayStandardizationCommand(),
+                       p => true);
+               }
+               return _okayStandardizationCommand;
+           }
+       }
+
+       private ICommand ApplyStandardizationCommand
+       {
+           get
+           {
+               if (_applyStandardizationCommand == null)
+               {
+                   _applyStandardizationCommand = new RelayCommand(
+                       p => this.DoApplyStandardizationCommand(),
+                       p => true);
+               }
+               return _applyStandardizationCommand;
+           }
+       }
+
+       protected abstract void DoApplyStandardizationCommand();
+       protected abstract void DoCancelStandardizationCommand();
+       protected abstract void DoOkayStandardizationCommand();
+
+       #endregion
     }
 }

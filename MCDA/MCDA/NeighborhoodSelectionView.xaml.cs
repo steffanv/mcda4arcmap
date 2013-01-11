@@ -25,6 +25,16 @@ namespace MCDA
             InitializeComponent();
 
             DataContext = new NeighborhoodSelectionViewModel();
+
+            DataContextChanged += new DependencyPropertyChangedEventHandler(NeighborhoodSelectionView_DataContextChanged);
         }
+
+        void NeighborhoodSelectionView_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            NeighborhoodSelectionViewModel context = (NeighborhoodSelectionViewModel) DataContext;
+
+            weightSlider.Minimum = context.ThresholdMin;
+            weightSlider.Maximum = context.ThresholdMax;
+        }     
     }
 }

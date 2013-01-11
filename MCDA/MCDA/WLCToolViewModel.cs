@@ -287,30 +287,40 @@ namespace MCDA.ViewModel
 
        protected override void DoStandardizationSelectionCommand()
        {
-
            var parentHandle = new IntPtr(ArcMap.Application.hWnd);
 
-           var wpfWindow = new StandardizationSelectionView();
+           _standardizationView = new StandardizationSelectionView();
 
-           StandardizationSelectionViewModel standardizationSelectionViewModel = wpfWindow.DataContext as StandardizationSelectionViewModel;
+           _standardizationView.DataContext = _standardizationViewModel;
 
-           standardizationSelectionViewModel.SelectedTransformationStrategy = _wlcTool.TransformationStrategy;
+           _standardizationViewModel.SelectedTransformationStrategy = _wlcTool.TransformationStrategy;
 
-           var helper = new WindowInteropHelper(wpfWindow);
+           var helper = new WindowInteropHelper(_standardizationView);
 
            helper.Owner = parentHandle;
 
-           wpfWindow.Closed += delegate(object sender, EventArgs e)
-           {
+           _standardizationView.ShowDialog();
+       }
 
-               _wlcTool.TransformationStrategy = standardizationSelectionViewModel.SelectedTransformationStrategy;
+       protected override void DoApplyStandardizationCommand()
+       {
+           _wlcTool.TransformationStrategy = _standardizationViewModel.SelectedTransformationStrategy;
 
-               _isUpdateAllowed = true;
+           _isUpdateAllowed = true;
+           base.Update();
+       }
 
-               base.Update();
-           };
+       protected override void DoCancelStandardizationCommand()
+       {
+           _standardizationView.Close();
+       }
 
-           wpfWindow.ShowDialog();
+       protected override void DoOkayStandardizationCommand()
+       {
+           if (_wlcTool.TransformationStrategy != _standardizationViewModel.SelectedTransformationStrategy)
+               DoApplyStandardizationCommand();
+
+           _standardizationView.Close();
        }
 
        protected override void DoDistributionCommand()

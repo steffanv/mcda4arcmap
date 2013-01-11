@@ -21,21 +21,30 @@ namespace MCDA.Model
             if (listOfToolParameter.Where(t => t.IsLocked).Count() == listOfToolParameter.Count() - 1)
                 lastWeightChangedToolParameter.Weight += difference;
 
-            //assume values = 0 are only close to zero (0.01) otherwise we could never increase the value while distributing the weight
-            double hundredPercentValueOfWeights = listOfToolParameter.Where(t => t.IsLocked == false && t != lastWeightChangedToolParameter).Sum(t => t.Weight);
-            listOfToolParameter.Where(t => t.IsLocked == false && t != lastWeightChangedToolParameter && t.Weight == 0).ForEach(t => t.Weight = 0.01);
+            // this is also true if all are locked
+            else if (listOfToolParameter.Where(t => t.IsLocked).Count() == listOfToolParameter.Count())
+                lastWeightChangedToolParameter.Weight += difference;
 
-            foreach (IToolParameter currentToolParameter in listOfToolParameter.Where(t => t.IsLocked == false && t != lastWeightChangedToolParameter).ToList())
+            else if (listOfToolParameter.Where(t => !t.IsLocked && t != lastWeightChangedToolParameter).Sum(t => t.Weight) == 0 && difference < 0)
+                lastWeightChangedToolParameter.Weight += difference;
+
+            else
             {
-                double weight = currentToolParameter.Weight;
+                //assume values = 0 are only close to zero (0.01) otherwise we could never increase the value while distributing the weight
+                double hundredPercentValueOfWeights = listOfToolParameter.Where(t => t.IsLocked == false && t != lastWeightChangedToolParameter).Sum(t => t.Weight);
+                listOfToolParameter.Where(t => t.IsLocked == false && t != lastWeightChangedToolParameter && t.Weight == 0).ForEach(t => t.Weight = 0.01);
 
-                // this is the case were all non last changed values are zero thus we can simply add equalily the difference
-                if (hundredPercentValueOfWeights == 0)
-                    currentToolParameter.Weight = difference / listOfToolParameter.Count();
-                else
-                    currentToolParameter.Weight = weight + ((weight == 0 ? 0.01 : weight) / hundredPercentValueOfWeights) * difference;
+                foreach (IToolParameter currentToolParameter in listOfToolParameter.Where(t => t.IsLocked == false && t != lastWeightChangedToolParameter).ToList())
+                {
+                    double weight = currentToolParameter.Weight;
+
+                    // this is the case were all non last changed values are zero thus we can simply add equalily the difference
+                    if (hundredPercentValueOfWeights == 0)
+                        currentToolParameter.Weight = difference / listOfToolParameter.Count();
+                    else
+                        currentToolParameter.Weight = weight + ((weight == 0 ? 0.01 : weight) / hundredPercentValueOfWeights) * difference;
+                }
             }
-
 
             listOfToolParameter.Where(t => t.Weight <= 0.01).ForEach(t => t.Weight = 0);
 

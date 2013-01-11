@@ -5,6 +5,7 @@ using System.Text;
 using MCDA.Model;
 using System.ComponentModel;
 using MCDA.Extensions;
+using System.Windows.Input;
 
 namespace MCDA.ViewModel
 {
@@ -14,37 +15,32 @@ namespace MCDA.ViewModel
    
         private TransformationStrategy _selectedTtransformationStrategy;
 
-        public bool IsScoreRangeProcedure
-        {
-            get { return _selectedTtransformationStrategy == TransformationStrategy.ScoreRangeTransformationStrategy; }
-            set { _selectedTtransformationStrategy = TransformationStrategy.ScoreRangeTransformationStrategy;
-
-            PropertyChanged.Notify(() => IsMaximumScoreRangeProcedure);
-            PropertyChanged.Notify(() => IsScoreRangeProcedure);
-            }
-            
-        }
-        public bool IsMaximumScoreRangeProcedure
-        {
-            get { return _selectedTtransformationStrategy == TransformationStrategy.MaximumScoreTransformationStrategy; }
-            set { _selectedTtransformationStrategy = TransformationStrategy.MaximumScoreTransformationStrategy;
-
-            PropertyChanged.Notify(() => IsMaximumScoreRangeProcedure);
-            PropertyChanged.Notify(() => IsScoreRangeProcedure);
-
-            }
-        }
+        private ICommand _applyCommand;
+        private ICommand _okayCommand;
+        private ICommand _cancelCommand;
 
         public TransformationStrategy SelectedTransformationStrategy{
 
             get{ return _selectedTtransformationStrategy; }
+            set { _selectedTtransformationStrategy = value; }
+        }
 
-            set { _selectedTtransformationStrategy = value;
+        public ICommand ApplyCommand
+        {
+            get { return _applyCommand; }
+            set { _applyCommand = value; }
+        }
 
-            PropertyChanged.Notify(() => IsMaximumScoreRangeProcedure);
-            PropertyChanged.Notify(() => IsScoreRangeProcedure);
+        public ICommand CancelCommand
+        {
+            get { return _cancelCommand; }
+            set { _cancelCommand = value; }
+        }
 
-            }
+        public ICommand OkayCommand
+        {
+            get { return _okayCommand; }
+            set { _okayCommand = value; }
         }
     }
 }

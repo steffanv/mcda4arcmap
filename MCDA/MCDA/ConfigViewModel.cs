@@ -8,7 +8,6 @@ namespace MCDA.ViewModel
 {
     public class ConfigViewModel
     {
-
         public RenderOption RenderOptions
         {
             get { return ConfigSingleton.Instance.SelectedRenderoption; }

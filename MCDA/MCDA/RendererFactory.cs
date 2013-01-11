@@ -133,7 +133,11 @@ namespace MCDA.Model
 
             secondColorRamp.Size = right;
 
-            Parallel.Invoke(() => firstColorRamp.CreateRamp(out bOK), () => secondColorRamp.CreateRamp(out bOK));
+            firstColorRamp.CreateRamp(out bOK);
+            secondColorRamp.CreateRamp(out bOK);
+
+            // STA ... we can't do this :(
+            //Parallel.Invoke(() => firstColorRamp.CreateRamp(out bOK), () => secondColorRamp.CreateRamp(out bOK));
 
             IEnumColors firstEnumColors = firstColorRamp.Colors;
             IEnumColors secondEnumColors = secondColorRamp.Colors;

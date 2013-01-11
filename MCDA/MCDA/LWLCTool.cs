@@ -498,6 +498,34 @@ namespace MCDA.Model
             // done in cluster
         }
 
+        public double ThresholdMin
+        {
+            get
+            {
+                if (_featureClass == null || _toolParameterContainer.ToolParameter.Count() == 0)
+                    return 0;
+
+                if (_dictionaryOfDistances == null)
+                    _dictionaryOfDistances = BuildDictionaryOfDistancesByCentroid();
+
+                return _dictionaryOfDistances.Values.Min(l => l.Min(t => t.Item2));
+            }
+        }
+
+        public double ThresholdMax
+        {
+            get
+            {
+                if (_featureClass == null || _toolParameterContainer.ToolParameter.Count() == 0)
+                    return 0;
+
+                if (_dictionaryOfDistances == null)
+                    _dictionaryOfDistances = BuildDictionaryOfDistancesByCentroid();
+
+                return _dictionaryOfDistances.Values.Min(l => l.Max(t => t.Item2));
+            }
+        }
+
         public IFeatureClass FeatureClass
         {
             get { return _featureClass; }

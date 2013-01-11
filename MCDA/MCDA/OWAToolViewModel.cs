@@ -27,7 +27,13 @@ namespace MCDA.ViewModel
         private bool _isSendToInMemoryWorkspaceCommand = false;
         private bool _isUpdateAllowed = false;
 
+        private AlphaSelectionView _alphaSelectionView;
+        private AlphaSelectionViewModel _alphaSelectionViewModel = new AlphaSelectionViewModel();
         private ICommand _alphaSelectionCommand;
+
+        private ICommand _applyAlphaSelectionCommand;
+        private ICommand _okayAlphaSelectionCommand;
+        private ICommand _cancelAlphaSelectionCommand;
 
         public OWAToolViewModel()
         {
@@ -41,6 +47,12 @@ namespace MCDA.ViewModel
 
             //we have to call our own update method to make sure we have a result column
             MCDAExtensionPropertyChanged(this, null);
+
+            // init stuff for the alpha selection
+            // all commands are defined in this class and set here
+            _alphaSelectionViewModel.CancelCommand = CancelAlphaSelectionCommand;
+            _alphaSelectionViewModel.ApplyCommand = ApplyAlphaSelectionCommand;
+            _alphaSelectionViewModel.OkayCommand = OkayAlphaSelectionCommand;
 
         }
 
@@ -291,26 +303,38 @@ namespace MCDA.ViewModel
         {
             var parentHandle = new IntPtr(ArcMap.Application.hWnd);
 
-            var wpfWindow = new StandardizationSelectionView();
+            _standardizationView = new StandardizationSelectionView();
 
-            StandardizationSelectionViewModel standardizationSelectionViewModel = wpfWindow.DataContext as StandardizationSelectionViewModel;
+            _standardizationView.DataContext = _standardizationViewModel;
 
-            standardizationSelectionViewModel.SelectedTransformationStrategy = _owaTool.TransformationStrategy;
+            _standardizationViewModel.SelectedTransformationStrategy = _owaTool.TransformationStrategy;
 
-            var helper = new WindowInteropHelper(wpfWindow);
+            var helper = new WindowInteropHelper(_standardizationView);
 
             helper.Owner = parentHandle;
 
-            wpfWindow.Closed += delegate(object sender, EventArgs e)
-            {
-                _owaTool.TransformationStrategy = standardizationSelectionViewModel.SelectedTransformationStrategy;
+            _standardizationView.ShowDialog();
+        }
 
-                _isUpdateAllowed = true;
+        protected override void DoApplyStandardizationCommand()
+        {
+            _owaTool.TransformationStrategy = _standardizationViewModel.SelectedTransformationStrategy;
 
-                base.Update();
-            };
+            _isUpdateAllowed = true;
+            base.Update();
+        }
 
-            wpfWindow.ShowDialog();
+        protected override void DoCancelStandardizationCommand()
+        {
+            _standardizationView.Close();
+        }
+
+        protected override void DoOkayStandardizationCommand()
+        {
+            if (_owaTool.TransformationStrategy != _standardizationViewModel.SelectedTransformationStrategy)
+                DoApplyStandardizationCommand();
+
+            _standardizationView.Close();
         }
 
         public ICommand AlphaSelectionCommand
@@ -333,26 +357,81 @@ namespace MCDA.ViewModel
         {
             var parentHandle = new IntPtr(ArcMap.Application.hWnd);
 
-            var wpfWindow = new AlphaSelectionView();
+            _alphaSelectionView = new AlphaSelectionView();
 
-            AlphaSelectionViewModel alphaSelectionViewModel = wpfWindow.DataContext as AlphaSelectionViewModel;
+            _alphaSelectionViewModel.Alpha = _owaTool.Alpha;
 
-            alphaSelectionViewModel.Alpha = _owaTool.Alpha;
+            _alphaSelectionView.DataContext = _alphaSelectionViewModel;
 
-            var helper = new WindowInteropHelper(wpfWindow);
+            var helper = new WindowInteropHelper(_alphaSelectionView);
 
             helper.Owner = parentHandle;
 
-            wpfWindow.Closed += delegate(object sender, EventArgs e)
+            _alphaSelectionView.ShowDialog();
+        }
+
+        private ICommand ApplyAlphaSelectionCommand
+        {
+            get
             {
-                 _owaTool.Alpha = alphaSelectionViewModel.Alpha;
+                if (_applyAlphaSelectionCommand == null)
+                {
+                    _applyAlphaSelectionCommand = new RelayCommand(
+                        p => this.DoApplyAlphaSelectionCommand(),
+                        p => true);
+                }
+                return _applyAlphaSelectionCommand;
+            }
+        }
 
-                _isUpdateAllowed = true;
+        private void DoApplyAlphaSelectionCommand()
+        {
+            _owaTool.Alpha = _alphaSelectionViewModel.Alpha;
 
-                base.Update();
-            };
+            _isUpdateAllowed = true;
 
-            wpfWindow.ShowDialog();
+            base.Update();
+        }
+
+        private ICommand OkayAlphaSelectionCommand
+        {
+            get
+            {
+                if (_okayAlphaSelectionCommand == null)
+                {
+                    _okayAlphaSelectionCommand = new RelayCommand(
+                        p => this.DoOkayAlphaSelectionCommand(),
+                        p => true);
+                }
+                return _okayAlphaSelectionCommand;
+            }
+        }
+
+        private void DoOkayAlphaSelectionCommand()
+        {
+            if (_owaTool.Alpha != _alphaSelectionViewModel.Alpha)
+                DoApplyAlphaSelectionCommand();
+
+            _alphaSelectionView.Close();
+        }
+
+        private ICommand CancelAlphaSelectionCommand
+        {
+            get
+            {
+                if (_cancelAlphaSelectionCommand == null)
+                {
+                    _cancelAlphaSelectionCommand = new RelayCommand(
+                        p => this.DoCancelAlphaSelectionCommand(),
+                        p => true);
+                }
+                return _cancelAlphaSelectionCommand;
+            }
+        }
+
+        private void DoCancelAlphaSelectionCommand()
+        {
+            _alphaSelectionView.Close();
         }
 
         protected override void DoDistributionCommand()

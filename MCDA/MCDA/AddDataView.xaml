@@ -21,7 +21,7 @@
                                         </DataTemplate>
                                     </GridViewColumn.CellTemplate>
                                 </GridViewColumn>
-                                <GridViewColumn  Header="Layer"  Width="200">
+                                <GridViewColumn  Header="Layer"  Width="300">
                                     <GridViewColumn.CellTemplate>
                                         <DataTemplate>
                                             <TextBlock Name="layerLabel"  Text="{Binding Path=LayerName, Mode=OneWay}"/>
@@ -38,8 +38,6 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-
-
                     <ListView Name="criteriaListView"  ItemsSource="{Binding Path=Fields}" HorizontalContentAlignment="Stretch" DataContext="{Binding}">
                         <ListView.View>
                             <GridView>

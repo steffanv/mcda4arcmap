@@ -339,6 +339,7 @@ namespace MCDA.ViewModel
 
         protected override void DoCancelStandardizationCommand()
         {
+            _standardizationViewModel.SelectedTransformationStrategy = _lwlcTool.TransformationStrategy;
             _standardizationView.Close();
         }
 
@@ -460,6 +461,11 @@ namespace MCDA.ViewModel
 
         private void DoCancelNeighborhoodSelectionCommand()
         {
+            _neighborhoodSelectionViewModel.NeighborhoodOption = _lwlcTool.NeighborhoodOptions;
+            _neighborhoodSelectionViewModel.SelectedNumberOfKNearestNeighbors = _lwlcTool.NumberOfKNearestNeighbors;
+            _neighborhoodSelectionViewModel.SelectedNumberOfKNearestNeighborsForAutomatic = _lwlcTool.NumberOfKNearestNeighborsForAutomatic;
+            _neighborhoodSelectionViewModel.Threshold = _lwlcTool.Threshold;
+
             _neighborhoodSelectionView.Close();
         }
 

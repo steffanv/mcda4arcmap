@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using MCDA.Extensions;
 using System.ComponentModel;
+using ESRI.ArcGIS.Geodatabase;
+using ESRI.ArcGIS.ADF;
 
 namespace MCDA.Model
 {
@@ -13,8 +15,8 @@ namespace MCDA.Model
 
         private bool _isSelected;
         private bool _isOID = false;
-        private ESRI.ArcGIS.Geodatabase.IField _field;
         private bool _isNumber = false;
+        private ESRI.ArcGIS.Geodatabase.IField _field;
         private Layer _layer;
 
         public Field(ESRI.ArcGIS.Geodatabase.IField field, Layer layer)
@@ -50,9 +52,45 @@ namespace MCDA.Model
 
             get { return _layer; }
         }
+
         public bool IsOID
         {
             get { return _isOID; }
+        }
+
+        public bool HasDifferentNumericValues()
+        {
+            if(!IsNumber)
+                return false;
+
+            using (ComReleaser comReleaser = new ComReleaser())
+            {
+                IFeatureCursor featureCursor = _layer.FeatureClass.Search(null, true);
+
+                comReleaser.ManageLifetime(featureCursor);
+
+                int fieldIndex = _layer.FeatureClass.FindField(FieldName);
+
+                IFeature currentFeature = featureCursor.NextFeature();
+
+                double value = 0;
+                if (currentFeature != null)
+                {
+                    value = (Convert.ToDouble(currentFeature.get_Value(fieldIndex)));
+                }
+                else
+                    return false;
+
+                while ((currentFeature = featureCursor.NextFeature()) != null)
+                {
+                    double t = (Convert.ToDouble(currentFeature.get_Value(fieldIndex)));
+
+                    if (t != value)
+                        return true;
+                }
+
+                return false;
+            }
         }
     }
 }

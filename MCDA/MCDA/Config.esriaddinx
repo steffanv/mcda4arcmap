@@ -26,7 +26,7 @@
       </Extensions>
       <DockableWindows>
         <DockableWindow id="Ryerson_University_MCDA_AddDataView" class="AddDataView+AddinImpl" caption="Data Manager" image="Images\AddDataWindow.png">
-          <InitialPlacement height="500" width="300" state="pinned" position="left" />
+          <InitialPlacement height="500" width="300" state="pinned" position="float" />
         </DockableWindow>
         <!--<DockableWindow id="Ryerson_University_MCDA_OWAToolView" class="OWAToolView+AddinImpl" caption="OWA Tool" image="Images\OWAToolView.png">
           <InitialPlacement height="500" width="400" state="pinned" position="float" />
@@ -35,10 +35,10 @@
           <InitialPlacement height="300" width="500" state="pinned" position="group" />
         </DockableWindow>-->
         <DockableWindow id="Ryerson_University_MCDA_ConfigView" class="ConfigView+AddinImpl" caption="Configuration" image="Images\ConfigView.png">
-          <InitialPlacement height="300" width="300" state="unpinned" position="float" />
+          <InitialPlacement height="300" width="300" state="pinned" position="float" />
         </DockableWindow>
         <DockableWindow id="Ryerson_University_MCDA_VisualizationView" class="VisualizationView+AddinImpl" caption="Visualization" image="Images\VisualizationView.png">
-          <InitialPlacement height="300" width="500" state="unpinned" position="group" />
+          <InitialPlacement height="300" width="500" state="pinned" position="float" />
         </DockableWindow>
       </DockableWindows>
       <Toolbars>

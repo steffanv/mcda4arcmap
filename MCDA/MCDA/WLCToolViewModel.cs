@@ -40,7 +40,6 @@ namespace MCDA.ViewModel
 
            //we have to call our own update method to make sure we have a result column
             MCDAExtensionPropertyChanged(this, null);
-
        }
 
        private void WeightChanged(object sender, PropertyChangedEventArgs e)
@@ -312,6 +311,7 @@ namespace MCDA.ViewModel
 
        protected override void DoCancelStandardizationCommand()
        {
+           _standardizationViewModel.SelectedTransformationStrategy = _wlcTool.TransformationStrategy;
            _standardizationView.Close();
        }
 

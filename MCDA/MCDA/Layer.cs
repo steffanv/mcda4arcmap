@@ -49,6 +49,17 @@ namespace MCDA.Model
             //RegisterListenerForEveryMemberOfFields();
         }
 
+        public bool HasAreaAndTopologicalOperator()
+        {
+            switch(FeatureLayer.ShapeType){
+
+                case ESRI.ArcGIS.Geometry.esriGeometryType.esriGeometryPolygon:
+                    return true;
+            }
+
+            return false;
+        }
+
         public IFeatureClass FeatureClass
         {
             get { return _featureLayer.FeatureClass; }
@@ -61,7 +72,6 @@ namespace MCDA.Model
 
         public static string toUniqueLayerName(ESRI.ArcGIS.Carto.IFeatureLayer2 featureLayer)
         {
-
             return featureLayer.FeatureClass.Fields.ToString() + featureLayer.ToString();
         }
 

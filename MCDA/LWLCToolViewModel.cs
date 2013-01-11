@@ -28,7 +28,13 @@ namespace MCDA.ViewModel
         private bool _isSendToInMemoryWorkspaceCommand = false;
         private bool _isUpdateAllowed = false;
 
+        private NeighborhoodSelectionView _neighborhoodSelectionView;
+        private NeighborhoodSelectionViewModel _neighborhoodSelectionViewModel = new NeighborhoodSelectionViewModel();
         private ICommand _neighborhoodSelectionCommand;
+
+        private ICommand _applyNeighborhoodSelectionCommand;
+        private ICommand _okayNeighborhoodSelectionCommand;
+        private ICommand _cancelNeighborhoodSelectionCommand;
 
         public LWLCToolViewModel()
         {
@@ -40,11 +46,17 @@ namespace MCDA.ViewModel
 
             _mcdaExtension.RegisterPropertyHandler(x => x.AvailableLayer, MCDAExtensionPropertyChanged);
 
-            //if (_mcdaExtension.SelectedLayer != null)
-            //    _mcdaExtension.SelectedLayer.Fields.ForEach(x => x.RegisterPropertyHandler(f => f.IsSelected, FieldPropertyChanged));
-
             //we have to call our own update method to make sure we have a result column
             MCDAExtensionPropertyChanged(this, null);
+
+            // init stuff for the neigborhood selection
+            // all commands are defined in this class and set here
+            _neighborhoodSelectionViewModel.OkayCommand = OkayNeighborhoodSelectionCommand;
+            _neighborhoodSelectionViewModel.CancelCommand = CancelNeighborhoodSelectionCommand;
+            _neighborhoodSelectionViewModel.ApplyCommand = ApplyNeighborhoodSelectionCommand;
+
+            _neighborhoodSelectionViewModel.SelectedNumberOfKNearestNeighbors = 3;
+            _neighborhoodSelectionViewModel.SelectedNumberOfKNearestNeighborsForAutomatic = 3;
 
         }
 
@@ -304,26 +316,38 @@ namespace MCDA.ViewModel
         {
             var parentHandle = new IntPtr(ArcMap.Application.hWnd);
 
-            var wpfWindow = new StandardizationSelectionView();
+            _standardizationView = new StandardizationSelectionView();
 
-            StandardizationSelectionViewModel standardizationSelectionViewModel = wpfWindow.DataContext as StandardizationSelectionViewModel;
+            _standardizationView.DataContext = _standardizationViewModel;
 
-            standardizationSelectionViewModel.SelectedTransformationStrategy = _lwlcTool.TransformationStrategy;
+            _standardizationViewModel.SelectedTransformationStrategy = _lwlcTool.TransformationStrategy;
 
-            var helper = new WindowInteropHelper(wpfWindow);
+            var helper = new WindowInteropHelper(_standardizationView);
 
             helper.Owner = parentHandle;
 
-            wpfWindow.Closed += delegate(object sender, EventArgs e)
-            {
+            _standardizationView.ShowDialog();
+        }
 
-                _lwlcTool.TransformationStrategy = standardizationSelectionViewModel.SelectedTransformationStrategy;
+        protected override void DoApplyStandardizationCommand()
+        {
+            _lwlcTool.TransformationStrategy = _standardizationViewModel.SelectedTransformationStrategy;
 
-                _isUpdateAllowed = true;
-                base.Update();
-            };
+            _isUpdateAllowed = true;
+            base.Update();
+        }
 
-            wpfWindow.ShowDialog();
+        protected override void DoCancelStandardizationCommand()
+        {
+            _standardizationView.Close();
+        }
+
+        protected override void DoOkayStandardizationCommand()
+        {
+            if (_lwlcTool.TransformationStrategy != _standardizationViewModel.SelectedTransformationStrategy)
+                DoApplyStandardizationCommand();
+
+            _standardizationView.Close();
         }
 
         protected override void DoDistributionCommand()
@@ -353,7 +377,6 @@ namespace MCDA.ViewModel
         {
             get
             {
-
                 if (_neighborhoodSelectionCommand == null)
                 {
                     _neighborhoodSelectionCommand = new RelayCommand(
@@ -370,34 +393,101 @@ namespace MCDA.ViewModel
         {
             var parentHandle = new IntPtr(ArcMap.Application.hWnd);
 
-            var wpfWindow = new NeighborhoodSelectionView();
+            _neighborhoodSelectionView = new NeighborhoodSelectionView();
 
-            NeighborhoodSelectionViewModel neighborhoodSelectionViewModel = wpfWindow.DataContext as NeighborhoodSelectionViewModel;
+            _neighborhoodSelectionViewModel.ThresholdMax = _lwlcTool.ThresholdMax;
+            _neighborhoodSelectionViewModel.ThresholdMin = _lwlcTool.ThresholdMin;
 
-            neighborhoodSelectionViewModel.NeighborhoodOption = _lwlcTool.NeighborhoodOptions;
-            neighborhoodSelectionViewModel.SelectedNumberOfKNearestNeighbors = _lwlcTool.NumberOfKNearestNeighbors;
-            neighborhoodSelectionViewModel.Threshold = _lwlcTool.Threshold;
-            neighborhoodSelectionViewModel.SelectedNumberOfKNearestNeighborsForAutomatic = _lwlcTool.NumberOfKNearestNeighborsForAutomatic;
+            _neighborhoodSelectionView.DataContext = _neighborhoodSelectionViewModel;
 
-            var helper = new WindowInteropHelper(wpfWindow);
+            var helper = new WindowInteropHelper(_neighborhoodSelectionView);
 
             helper.Owner = parentHandle;
 
-            wpfWindow.Closed += delegate(object sender, EventArgs e)
+            _neighborhoodSelectionView.ShowDialog();
+        }
+
+        private ICommand OkayNeighborhoodSelectionCommand
+        {
+            get
             {
+                if (_okayNeighborhoodSelectionCommand == null)
+                {
+                    _okayNeighborhoodSelectionCommand= new RelayCommand(
+                        p => this.DoOkayNeighborhoodSelectionCommand(),
+                        p => true);
+                }
+                return _okayNeighborhoodSelectionCommand;
+            }
+        }
 
-                _lwlcTool.NeighborhoodOptions = neighborhoodSelectionViewModel.NeighborhoodOption;
-                _lwlcTool.NumberOfKNearestNeighbors = neighborhoodSelectionViewModel.SelectedNumberOfKNearestNeighbors;
-                _lwlcTool.Threshold = neighborhoodSelectionViewModel.Threshold;
-                _lwlcTool.NumberOfKNearestNeighborsForAutomatic = neighborhoodSelectionViewModel.SelectedNumberOfKNearestNeighborsForAutomatic;
+        private void DoOkayNeighborhoodSelectionCommand()
+        {
+            bool changed = false;
 
-                _isUpdateAllowed = true;
-                base.Update();
+            if (_neighborhoodSelectionViewModel.NeighborhoodOption != _lwlcTool.NeighborhoodOptions)
+                changed = true;
+                  
+            else {
 
-                PropertyChanged.Notify(() => LWLCResult);
-            };
+                if(_neighborhoodSelectionViewModel.NeighborhoodOption == NeighborhoodOptions.Automatic && _neighborhoodSelectionViewModel.SelectedNumberOfKNearestNeighborsForAutomatic != _lwlcTool.NumberOfKNearestNeighborsForAutomatic)
+                     changed = true;
+                if(_neighborhoodSelectionViewModel.NeighborhoodOption == NeighborhoodOptions.Threshold && _neighborhoodSelectionViewModel.Threshold != _lwlcTool.Threshold)
+                    changed = true;
+                if(_neighborhoodSelectionViewModel.NeighborhoodOption == NeighborhoodOptions.KNearestNeighbors && _neighborhoodSelectionViewModel.SelectedNumberOfKNearestNeighbors != _lwlcTool.NumberOfKNearestNeighbors)
+                    changed = true;
+            }
 
-            wpfWindow.ShowDialog();
+            if(changed)
+                DoApplyNeighborhoodSelectionCommand();
+
+            _neighborhoodSelectionView.Close();
+        }
+
+        private ICommand CancelNeighborhoodSelectionCommand
+        {
+            get
+            {
+                if (_cancelNeighborhoodSelectionCommand == null)
+                {
+                    _cancelNeighborhoodSelectionCommand = new RelayCommand(
+                        p => this.DoCancelNeighborhoodSelectionCommand(),
+                        p => true);
+                }
+                return _cancelNeighborhoodSelectionCommand;
+            }
+        }
+
+        private void DoCancelNeighborhoodSelectionCommand()
+        {
+            _neighborhoodSelectionView.Close();
+        }
+
+        private ICommand ApplyNeighborhoodSelectionCommand
+        {
+            get
+            {
+                if (_applyNeighborhoodSelectionCommand == null)
+                {
+                    _applyNeighborhoodSelectionCommand = new RelayCommand(
+                        p => this.DoApplyNeighborhoodSelectionCommand(),
+                        p => true);
+                }
+                return _applyNeighborhoodSelectionCommand;
+            }
+        }
+
+        private void DoApplyNeighborhoodSelectionCommand()
+        {
+            _lwlcTool.NeighborhoodOptions = _neighborhoodSelectionViewModel.NeighborhoodOption;
+            _lwlcTool.NumberOfKNearestNeighbors = _neighborhoodSelectionViewModel.SelectedNumberOfKNearestNeighbors;
+            _lwlcTool.Threshold = _neighborhoodSelectionViewModel.Threshold;
+            _lwlcTool.NumberOfKNearestNeighborsForAutomatic = _neighborhoodSelectionViewModel.SelectedNumberOfKNearestNeighborsForAutomatic;
+
+            _isUpdateAllowed = true;
+            base.Update();
+
+            PropertyChanged.Notify(() => LWLCResult);
         }
     }
 }

@@ -11,6 +11,7 @@
         ResizeMode="CanResize"
         WindowStartupLocation="CenterOwner"
         Height="300" Width="500">
+    
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
@@ -22,6 +23,16 @@
         <ToolBarTray Grid.Column="0" Grid.Row="0">
             <ToolBar Band="1" BandIndex="1">
                 <Button Name="lockButton" Command="{Binding Path=LockCommand}" ToolTip="Lock the WLC Tool data.">
+                    <!-- no chance to add the style somewhere global... we do not have an app.xaml file in this add in-->
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Style.Triggers>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter Property="Opacity" Value="0.5" />
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
                     <Image >
                         <Image.Style>
                             <Style TargetType="{x:Type Image}">
@@ -39,13 +50,40 @@
                 </Button>
                 <Separator />
                 <Button Command="{Binding Path=DistributionCommand}" ToolTip="Distribute the weights.">
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Style.Triggers>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter Property="Opacity" Value="0.5" />
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
                     <Image Source="Images\toolbargraphics\Distribution.png"/>
                 </Button>
                 <Button Command="{Binding Path=StandardizationSelectionCommand}" ToolTip="Choose another standardization strategy.">
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Style.Triggers>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter Property="Opacity" Value="0.5" />
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
                     <Image Source="Images\toolbargraphics\Standardization.png"/>
                 </Button>
                 <Separator />
                 <Button Command="{Binding Path=SendToInMemoryWorkspaceCommand}">
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Style.Triggers>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter Property="Opacity" Value="0.5" />
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
                     <Image >
                         <Image.Style>
                             <Style TargetType="{x:Type Image}">
@@ -60,9 +98,17 @@
                             </Style>
                         </Image.Style>
                     </Image>
-
                 </Button>
                 <Button Command="{Binding Path=ExportAsCSVCommand}" ToolTip="Export result table and parameters as CSV.">
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Style.Triggers>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter Property="Opacity" Value="0.5" />
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
                     <Image Source="Images\toolbargraphics\Export.png"/>
                 </Button>
             </ToolBar>

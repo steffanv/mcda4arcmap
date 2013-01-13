@@ -50,7 +50,8 @@ namespace MCDA.Model
 
             for (int bin = 1; bin < originalValues.Length - 1; bin++) {
  
-                double smoothedValue = 0; for (int i = 0; i < mask.Length; i++)
+                double smoothedValue = 0; 
+                for (int i = 0; i < mask.Length; i++)
                 { 
                     smoothedValue += originalValues[bin - 1 + i] * mask[i]; 
                 } 

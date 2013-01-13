@@ -77,9 +77,7 @@ namespace MCDA.Model
 
         public ESRI.ArcGIS.Carto.IFeatureLayer2 FeatureLayer
         {
-
             get { return _featureLayer; }
-            private set { ;}
         }
 
         public string UniqueLayerName

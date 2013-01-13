@@ -259,7 +259,7 @@ namespace MCDA
 
            DataTable dataTable = new DataTable();
 
-            //add columns
+           //add columns
            foreach (Model.Field currentField in listOfFields)
            {
                dataTable.Columns.Add(currentField.FieldName, typeof(double));
@@ -278,10 +278,16 @@ namespace MCDA
                 dataTableOIDOrdinal = dataTable.Columns.Add(oidField.FieldName, typeof(FieldTypeOID)).Ordinal;
 
                 //and to make it easier add the oidField to the rest of the fields
-                listOfFields.Add(oidField);
+                // it is important to take care of the order of the columns! later we depend if we add data
+                listOfFields.Insert(0, oidField);
 
                 if(oidField.FieldName.Equals("FID"))
                     isOIDFieldNameFID = true;
+
+                //make the oid column the first column
+                dataTable.Columns[dataTableOIDOrdinal].SetOrdinal(0);
+                //should be 0...
+                dataTableOIDOrdinal = 0;
             }
 
             //get data for rows and store it in a list of list like a table
@@ -302,7 +308,8 @@ namespace MCDA
                    isOIDFieldStartsByZero = true;                  
            }
            
-           //add row
+           // add rows
+           // the table data list has the same order as the datatable columns!
            for (int i = 0; i < expectedNumbersOfRow; i++)
            {
                DataRow row = dataTable.NewRow();
@@ -446,8 +453,10 @@ namespace MCDA
             //add
             foreach (ILayer currentNewLayer in newLayerList)
             {
+                //think about this lambda foreach "bug"
+                ILayer freshReference = currentNewLayer;
                 //is the new layer part in the mcda layer list?
-                if(!_listOfAvailableLayer.Any(l => l.ESRILayer == currentNewLayer))
+                if(!_listOfAvailableLayer.Any(l => l.ESRILayer == freshReference))
                     _listOfAvailableLayer.Add(new Model.Layer(currentNewLayer));
             }
 
@@ -534,7 +543,7 @@ namespace MCDA
 
         public void EstablishLink(AbstractToolTemplate tool)
         {
-            IFeatureLayer2 fl = AvailableFeatureLayer.Where(l => l.IsSelected).ToList().FirstOrDefault().FeatureLayer;
+            IFeatureLayer2 fl = AvailableFeatureLayer.Where(l => l.IsSelected).ToList().First().FeatureLayer;
             IFeatureClass fc = fl.FeatureClass;
 
             IFeatureClass fcCopy = CopyFeatureClassIntoNewWorkspace(fc, _shadowWorkspace, tool.ToString() + CreateTimeStamp());

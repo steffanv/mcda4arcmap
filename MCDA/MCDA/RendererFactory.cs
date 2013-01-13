@@ -51,6 +51,15 @@ namespace MCDA.Model
             
             IUniqueValueRenderer uniqueValueRenderer = new UniqueValueRendererClass();
 
+            ISimpleFillSymbol noDataSymbol = new SimpleFillSymbolClass();
+            noDataSymbol.Style = esriSimpleFillStyle.esriSFSDiagonalCross;
+            noDataSymbol.Outline.Width = .3;
+            noDataSymbol.Color = ToColor(Color.FromRgb(255, 255, 255));
+
+            //uniqueValueRenderer.UseDefaultSymbol = true;
+            uniqueValueRenderer.DefaultLabel = "No Data";
+            uniqueValueRenderer.DefaultSymbol = (ISymbol) noDataSymbol;
+
             ISimpleFillSymbol pSimpleFillSymbol = new SimpleFillSymbolClass();
             pSimpleFillSymbol.Style = esriSimpleFillStyle.esriSFSSolid;
             pSimpleFillSymbol.Outline.Width = 0.4;

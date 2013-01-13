@@ -9,10 +9,6 @@ namespace MCDA
 {
     public class AddDataBtn : ESRI.ArcGIS.Desktop.AddIns.Button
     {
-        public AddDataBtn()
-        {
-        }
-
         protected override void OnClick()
         {
              UID dockWinID = new UIDClass();

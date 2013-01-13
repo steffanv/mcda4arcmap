@@ -79,11 +79,17 @@ namespace MCDA.ViewModel
 
             _lwlcTool = ToolFactory.NewLWLCTool();
 
-            _toolParameter = new BindingList<IToolParameter>(_lwlcTool.ToolParameterContainer.ToolParameter);
-
-            ProgressDialog.ShowProgressDialog("Running LWLC Tool", (Action)_lwlcTool.Run);
-
             _lwlcResultDataTable = _lwlcTool.Data;
+
+            if (_mcdaExtension.SelectedLayer.Fields.Count(f => f.IsSelected) >= 1){
+                HasCriteriaSelected = true;
+
+                _toolParameter = new BindingList<IToolParameter>(_lwlcTool.ToolParameterContainer.ToolParameter);
+
+                ProgressDialog.ShowProgressDialog("Running LWLC Tool", (Action)_lwlcTool.Run);
+            }
+            else
+                HasCriteriaSelected = false;
 
             RegisterToolParameterEvents();
 
@@ -109,14 +115,24 @@ namespace MCDA.ViewModel
 
             _toolParameter = new BindingList<IToolParameter>(_lwlcTool.ToolParameterContainer.ToolParameter);
 
-            ProgressDialog.ShowProgressDialog("Running LWLC Tool", (Action)_lwlcTool.Run);
-
-            _lwlcResultDataTable = _lwlcTool.Data;
+          
 
             if (_mcdaExtension.SelectedLayer != null)
             {
                 _mcdaExtension.SelectedLayer.Fields.ForEach(x => x.UnRegisterPropertyHandler(f => f.IsSelected, FieldPropertyChanged));
                 _mcdaExtension.SelectedLayer.Fields.ForEach(x => x.RegisterPropertyHandler(f => f.IsSelected, FieldPropertyChanged));
+
+                if (_mcdaExtension.SelectedLayer.Fields.Count(f => f.IsSelected) >= 1){
+
+                    HasCriteriaSelected = true;
+
+                    ProgressDialog.ShowProgressDialog("Running LWLC Tool", (Action)_lwlcTool.Run);
+
+                    _lwlcResultDataTable = _lwlcTool.Data;
+
+                }
+                else
+                    HasCriteriaSelected = false;
             }
 
             RegisterToolParameterEvents();
@@ -327,6 +343,11 @@ namespace MCDA.ViewModel
             helper.Owner = parentHandle;
 
             _standardizationView.ShowDialog();
+
+            _standardizationView.Closed += delegate (object sender, EventArgs e){
+
+                DoCancelStandardizationCommand();
+            };
         }
 
         protected override void DoApplyStandardizationCommand()
@@ -382,7 +403,7 @@ namespace MCDA.ViewModel
                 {
                     _neighborhoodSelectionCommand = new RelayCommand(
                         p => this.DoNeighborhoodSelectionCommand(),
-                        p => true
+                        p => HasCriteriaSelected
                         );
                 }
 
@@ -406,6 +427,16 @@ namespace MCDA.ViewModel
             helper.Owner = parentHandle;
 
             _neighborhoodSelectionView.ShowDialog();
+
+            _neighborhoodSelectionView.Closing += NeighborhoodSelectionViewClosing;
+        }
+
+        void NeighborhoodSelectionViewClosing(object sender, CancelEventArgs e)
+        {
+            _neighborhoodSelectionViewModel.NeighborhoodOption = _lwlcTool.NeighborhoodOptions;
+            _neighborhoodSelectionViewModel.SelectedNumberOfKNearestNeighbors = _lwlcTool.NumberOfKNearestNeighbors;
+            _neighborhoodSelectionViewModel.SelectedNumberOfKNearestNeighborsForAutomatic = _lwlcTool.NumberOfKNearestNeighborsForAutomatic;
+            _neighborhoodSelectionViewModel.Threshold = _lwlcTool.Threshold;
         }
 
         private ICommand OkayNeighborhoodSelectionCommand
@@ -442,6 +473,7 @@ namespace MCDA.ViewModel
             if(changed)
                 DoApplyNeighborhoodSelectionCommand();
 
+            _neighborhoodSelectionView.Closing -= NeighborhoodSelectionViewClosing;
             _neighborhoodSelectionView.Close();
         }
 
@@ -466,6 +498,7 @@ namespace MCDA.ViewModel
             _neighborhoodSelectionViewModel.SelectedNumberOfKNearestNeighborsForAutomatic = _lwlcTool.NumberOfKNearestNeighborsForAutomatic;
             _neighborhoodSelectionViewModel.Threshold = _lwlcTool.Threshold;
 
+            _neighborhoodSelectionView.Closing -= NeighborhoodSelectionViewClosing;
             _neighborhoodSelectionView.Close();
         }
 

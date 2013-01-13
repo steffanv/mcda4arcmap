@@ -78,7 +78,7 @@ namespace MCDA.Model
 
             foreach (DataRow currentDataRow in dataTable.Rows)
                  {          
-                     double sum = currentDataRow.ItemArray.Where(o => o.GetType() == typeof(double)).Sum(o => (double)o);
+                     double sum = currentDataRow.ItemArray.Where(o => o is double).Sum(o => (double)o);
 
                      //the trick is that the result table is still without a value? or at least 0 for the result column
                       //and 0 is the neutral element for the + operator

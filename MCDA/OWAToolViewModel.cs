@@ -53,7 +53,6 @@ namespace MCDA.ViewModel
             _alphaSelectionViewModel.CancelCommand = CancelAlphaSelectionCommand;
             _alphaSelectionViewModel.ApplyCommand = ApplyAlphaSelectionCommand;
             _alphaSelectionViewModel.OkayCommand = OkayAlphaSelectionCommand;
-
         }
 
         private void WeightChanged(object sender, PropertyChangedEventArgs e)
@@ -77,9 +76,16 @@ namespace MCDA.ViewModel
 
             _toolParameter = new BindingList<IToolParameter>(_owaTool.ToolParameterContainer.ToolParameter);
 
-            _owaTool.Run();
+           
 
-            _owaResultDataTable = _owaTool.Data;
+            if (_mcdaExtension.SelectedLayer.Fields.Count(f => f.IsSelected) >= 1){
+                HasCriteriaSelected = true;
+
+                _owaTool.Run();
+                _owaResultDataTable = _owaTool.Data;
+            }
+            else
+                HasCriteriaSelected = false;
 
             RegisterToolParameterEvents();
 
@@ -105,14 +111,21 @@ namespace MCDA.ViewModel
 
             _toolParameter = new BindingList<IToolParameter>(_owaTool.ToolParameterContainer.ToolParameter);
 
-            _owaTool.Run();
-
-            _owaResultDataTable = _owaTool.Data;
+            
 
             if (_mcdaExtension.SelectedLayer != null)
             {
                 _mcdaExtension.SelectedLayer.Fields.ForEach(x => x.UnRegisterPropertyHandler(f => f.IsSelected, FieldPropertyChanged));
                 _mcdaExtension.SelectedLayer.Fields.ForEach(x => x.RegisterPropertyHandler(f => f.IsSelected, FieldPropertyChanged));
+
+                if (_mcdaExtension.SelectedLayer.Fields.Count(f => f.IsSelected) >= 1){
+                    HasCriteriaSelected = true;
+
+                    _owaTool.Run();
+                    _owaResultDataTable = _owaTool.Data;
+                }
+                else
+                    HasCriteriaSelected = false;
             }
 
             RegisterToolParameterEvents();
@@ -126,7 +139,6 @@ namespace MCDA.ViewModel
         {
             _isUpdateAllowed = true;
             base.Update();
-
         }
 
         protected override void UpdateDrag()
@@ -141,7 +153,6 @@ namespace MCDA.ViewModel
                 ProgressDialog.ShowProgressDialog("Creating Symbology", (Action<AbstractToolTemplate, DataTable>)_mcdaExtension.JoinToolResultByOID, _owaTool, _owaTool.Data);
 
             _isUpdateAllowed = false;
-
         }
 
         protected override void UpdateRealtime()
@@ -314,6 +325,11 @@ namespace MCDA.ViewModel
             helper.Owner = parentHandle;
 
             _standardizationView.ShowDialog();
+
+            _standardizationView.Closed += delegate(object sender, EventArgs e)
+           {
+               DoCancelStandardizationCommand();
+           };
         }
 
         protected override void DoApplyStandardizationCommand()
@@ -346,7 +362,7 @@ namespace MCDA.ViewModel
                 {
                     _alphaSelectionCommand = new RelayCommand(
                         p => this.DoAlphaSelectionCommand(),
-                        p => true
+                        p => HasCriteriaSelected
                         );
                 }
 
@@ -369,6 +385,14 @@ namespace MCDA.ViewModel
             helper.Owner = parentHandle;
 
             _alphaSelectionView.ShowDialog();
+
+            _alphaSelectionView.Closing += AlphaSelectionViewClosing;
+
+        }
+
+        void AlphaSelectionViewClosing(object sender, CancelEventArgs e)
+        {
+            _alphaSelectionViewModel.Alpha = _owaTool.Alpha;
         }
 
         private ICommand ApplyAlphaSelectionCommand
@@ -413,6 +437,7 @@ namespace MCDA.ViewModel
             if (_owaTool.Alpha != _alphaSelectionViewModel.Alpha)
                 DoApplyAlphaSelectionCommand();
 
+            _alphaSelectionView.Closing -= AlphaSelectionViewClosing;
             _alphaSelectionView.Close();
         }
 
@@ -433,6 +458,8 @@ namespace MCDA.ViewModel
         private void DoCancelAlphaSelectionCommand()
         {
             _alphaSelectionViewModel.Alpha = _owaTool.Alpha;
+
+            _alphaSelectionView.Closing -= AlphaSelectionViewClosing;
             _alphaSelectionView.Close();
         }
 

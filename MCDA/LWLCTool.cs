@@ -133,7 +133,9 @@ namespace MCDA.Model
 
         private void BuildRookContiguityTable()
         {
-            foreach (int currentID in _dictionaryOfRookContiguity.Keys)
+            object lockObject = new object();
+
+            Parallel.ForEach(_dictionaryOfRookContiguity.Keys, currentID =>
             {
                 List<int> list = new List<int>();
 
@@ -143,8 +145,12 @@ namespace MCDA.Model
 
                 c.Calculate();
 
-                _resultDataTable.Rows.Add((c.FillRowWithResults(_resultDataTable.NewRow())));
-            }
+                lock (lockObject)
+                {
+                    _resultDataTable.Rows.Add((c.FillRowWithResults(_resultDataTable.NewRow())));
+                }
+
+            });
         }
 
         private void BuildQueenContiguityTable()
@@ -307,7 +313,7 @@ namespace MCDA.Model
                         esriSelectionType.esriSelectionTypeIDSet,
                         esriSelectionOption.esriSelectionOptionNormal, null);
 
-                    List<int> neighborIDs = new List<int>(selectionSet.Count);
+                    ISet<int> neighborIDs = new HashSet<int>();
                   
                     IEnumIDs enumIDs = selectionSet.IDs;
 
@@ -315,12 +321,13 @@ namespace MCDA.Model
                     // thats ridiculous - someone at ESRI does not unterstand the iterator pattern...
                     while(ID != -1)
                     {
-                        neighborIDs.Add(ID);
+                        if (ID != currentFeature.OID)
+                               neighborIDs.Add(ID);
 
                         ID = enumIDs.Next();
                     }
 
-                    neighborDictionary.Add(currentFeature.OID, neighborIDs);
+                    neighborDictionary.Add(currentFeature.OID, neighborIDs.ToList());
 
                     if (currentFeature.OID == 0)
                         zeroOIDExist = true;
@@ -447,7 +454,7 @@ namespace MCDA.Model
 
                     ITopologicalOperator topologicalOperator = (ITopologicalOperator)currentFeature.Shape;
 
-                    List<int> neighborIDs = new List<int>(selectionSet.Count);
+                    ISet<int> neighborIDs = new HashSet<int>();
 
                     IEnumIDs enumIDs = selectionSet.IDs;
 
@@ -455,28 +462,35 @@ namespace MCDA.Model
                     // thats ridiculous - someone at ESRI does not unterstand the iterator pattern...
                     while (ID != -1)
                     {
-                        // http://resources.arcgis.com/en/help/main/10.1/index.html#//00080000000z000000
-                        IGeometryCollection polylineCollection = (IGeometryCollection)topologicalOperator.Intersect(_featureClass.GetFeature(ID).Shape, esriGeometryDimension.esriGeometry1Dimension);
+                        if (ID != currentFeature.OID)
+                        {
+                            // http://resources.arcgis.com/en/help/main/10.1/index.html#//00080000000z000000
+                            IGeometryCollection polylineCollection =
+                                (IGeometryCollection)
+                                topologicalOperator.Intersect(_featureClass.GetFeature(ID).Shape,
+                                                              esriGeometryDimension.esriGeometry1Dimension);
 
-                        // we have one or more polylines in common => add
-                        if (polylineCollection.GeometryCount >= 1)
-                            neighborIDs.Add(ID);
+                            // we have one or more polylines in common => add
+                            if (polylineCollection.GeometryCount >= 1)
+                                neighborIDs.Add(ID);
 
-                       
-                        IGeometryCollection polygonCollection = (IGeometryCollection)topologicalOperator.Intersect(_featureClass.GetFeature(ID).Shape, esriGeometryDimension.esriGeometry2Dimension);
 
-                        // we have one or more polygons in common => add
-                        if (polygonCollection.GeometryCount >= 1)
-                            neighborIDs.Add(ID);
+                            IGeometryCollection polygonCollection =
+                                (IGeometryCollection)
+                                topologicalOperator.Intersect(_featureClass.GetFeature(ID).Shape,
+                                                              esriGeometryDimension.esriGeometry2Dimension);
+
+                            // we have one or more polygons in common => add
+                            if (polygonCollection.GeometryCount >= 1)
+                                neighborIDs.Add(ID);
+                        }
 
                         ID = enumIDs.Next();
                     }
 
-                    neighborDictionary.Add(currentFeature.OID, neighborIDs);
+                    neighborDictionary.Add(currentFeature.OID, neighborIDs.ToList());
                 }
             }
-
-            
 
             // it is possible that the oid column starts at zero and the other program parts expect it at 1, thus we have to check if the name is FID and one oid is zero
             if (_featureClass.OIDFieldName.Equals("FID") && zeroOIDExist)

@@ -15,10 +15,10 @@ namespace MCDA.Model
         private IList<int> _clusterIDs;
         private TransformationStrategy _transformationStrategy;
 
-        private IList<Tuple<IToolParameter, double>> globalRange;
-        private IList<Tuple<IToolParameter, double>> localRange;
-        private IList<Tuple<IToolParameter, double?>> scaledValues;
-        private IList<Tuple<IToolParameter, double?>> weights;
+        private IList<Tuple<IToolParameter, double>> _globalRange;
+        private IList<Tuple<IToolParameter, double>> _localRange;
+        private IList<Tuple<IToolParameter, double?>> _scaledValues;
+        private IList<Tuple<IToolParameter, double?>> _weights;
 
         public Cluster(int featureID, IList<int> clusterIDs, DataTable dt, ToolParameterContainer toolParameterContainer, TransformationStrategy transformationStrategy)
         {
@@ -103,8 +103,8 @@ namespace MCDA.Model
 
             foreach (IToolParameter currentToolParameter2 in toolParameterContainer.ToolParameter)
             {
-                double localRange2 = localRangeList.Where(x => x.Item1 == currentToolParameter2).FirstOrDefault().Item2;
-                double globalRange2 = globalRangeList.Where(x => x.Item1 == currentToolParameter2).FirstOrDefault().Item2;
+                double localRange2 = localRangeList.Where(x => x.Item1 == currentToolParameter2).First().Item2;
+                double globalRange2 = globalRangeList.Where(x => x.Item1 == currentToolParameter2).First().Item2;
 
                 if (globalRange2 == 0)
                 {
@@ -140,11 +140,11 @@ namespace MCDA.Model
 
         public void Calculate()
         {
-             globalRange = GlobalRange(_toolParameterContainer);
-             localRange = LocalRange(_clusterIDs, _toolParameterContainer);
+             _globalRange = GlobalRange(_toolParameterContainer);
+             _localRange = LocalRange(_clusterIDs, _toolParameterContainer);
 
-             scaledValues = Scale(_toolParameterContainer, localRange);
-             weights = LocalWeights(_toolParameterContainer, localRange, globalRange);
+             _scaledValues = Scale(_toolParameterContainer, _localRange);
+             _weights = LocalWeights(_toolParameterContainer, _localRange, _globalRange);
         }
 
         public bool IsResultNull()
@@ -153,8 +153,8 @@ namespace MCDA.Model
 
             foreach (IToolParameter currentToolParameter in _toolParameterContainer.ToolParameter)
             {
-                double? scaledValue = scaledValues.Where(x => x.Item1 == currentToolParameter).FirstOrDefault().Item2;
-                double? weight = weights.Where(x => x.Item1 == currentToolParameter).FirstOrDefault().Item2;
+                double? scaledValue = _scaledValues.Where(x => x.Item1 == currentToolParameter).FirstOrDefault().Item2;
+                double? weight = _weights.Where(x => x.Item1 == currentToolParameter).FirstOrDefault().Item2;
 
                 if (!scaledValue.HasValue || !weight.HasValue)
                     return true;
@@ -185,10 +185,10 @@ namespace MCDA.Model
 
             foreach (IToolParameter currentToolParameter in _toolParameterContainer.ToolParameter)
             {
-                double? scaledValue = scaledValues.Where(x => x.Item1 == currentToolParameter).FirstOrDefault().Item2;
-                double? weight = weights.Where(x => x.Item1 == currentToolParameter).FirstOrDefault().Item2;
+                double? scaledValue = _scaledValues.Where(x => x.Item1 == currentToolParameter).FirstOrDefault().Item2;
+                double? weight = _weights.Where(x => x.Item1 == currentToolParameter).FirstOrDefault().Item2;
 
-                row[index] = localRange.Where(x => x.Item1 == currentToolParameter).FirstOrDefault().Item2;
+                row[index] = _localRange.Where(x => x.Item1 == currentToolParameter).FirstOrDefault().Item2;
 
                 if (scaledValue.HasValue)
                     row[index + 1] = scaledValue;

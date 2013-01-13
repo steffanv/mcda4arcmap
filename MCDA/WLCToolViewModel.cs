@@ -63,9 +63,16 @@ namespace MCDA.ViewModel
 
            _toolParameter = new BindingList<IToolParameter>(_wlcTool.ToolParameterContainer.ToolParameter);
 
-           _wlcTool.Run();
 
-           _wlcResultDataTable = _wlcTool.Data;
+           if (_mcdaExtension.SelectedLayer.Fields.Count(f => f.IsSelected) >= 1){
+               HasCriteriaSelected = true;
+
+                 _wlcTool.Run();
+
+                _wlcResultDataTable = _wlcTool.Data;
+           }
+           else
+               HasCriteriaSelected = false;
 
            RegisterToolParameterEvents();
 
@@ -91,15 +98,22 @@ namespace MCDA.ViewModel
 
            _toolParameter = new BindingList<IToolParameter>(_wlcTool.ToolParameterContainer.ToolParameter);
 
-           _wlcTool.Run();
-
-           _wlcResultDataTable = _wlcTool.Data;
+         
 
            if (_mcdaExtension.SelectedLayer != null)
            {
-
                _mcdaExtension.SelectedLayer.Fields.ForEach(x => x.UnRegisterPropertyHandler(f => f.IsSelected, FieldPropertyChanged));
                _mcdaExtension.SelectedLayer.Fields.ForEach(x => x.RegisterPropertyHandler(f => f.IsSelected, FieldPropertyChanged));
+
+               if (_mcdaExtension.SelectedLayer.Fields.Count(f => f.IsSelected) >= 1){
+                   HasCriteriaSelected = true;
+
+                   _wlcTool.Run();
+
+                   _wlcResultDataTable = _wlcTool.Data;
+               }
+               else
+                   HasCriteriaSelected = false;
            }
 
            RegisterToolParameterEvents();
@@ -298,7 +312,14 @@ namespace MCDA.ViewModel
 
            helper.Owner = parentHandle;
 
-           _standardizationView.ShowDialog();
+           _standardizationView.Closing += StandardizationViewClosing;
+          
+           _standardizationView.ShowDialog();        
+       }
+
+       void StandardizationViewClosing(object sender, CancelEventArgs e)
+       {
+           _standardizationViewModel.SelectedTransformationStrategy = _wlcTool.TransformationStrategy;
        }
 
        protected override void DoApplyStandardizationCommand()
@@ -312,6 +333,8 @@ namespace MCDA.ViewModel
        protected override void DoCancelStandardizationCommand()
        {
            _standardizationViewModel.SelectedTransformationStrategy = _wlcTool.TransformationStrategy;
+
+           _standardizationView.Closing -= StandardizationViewClosing;
            _standardizationView.Close();
        }
 
@@ -320,6 +343,7 @@ namespace MCDA.ViewModel
            if (_wlcTool.TransformationStrategy != _standardizationViewModel.SelectedTransformationStrategy)
                DoApplyStandardizationCommand();
 
+           _standardizationView.Closing -= StandardizationViewClosing;
            _standardizationView.Close();
        }
 

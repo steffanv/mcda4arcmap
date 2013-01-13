@@ -26,7 +26,7 @@ namespace MCDA
             InitializeComponent();
 
             DataContext = new StandardizationSelectionViewModel();
-        }
 
+        }     
     }
 }

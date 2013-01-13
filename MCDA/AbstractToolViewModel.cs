@@ -57,16 +57,17 @@ namespace MCDA.ViewModel
         protected ICommand _distributionCommand;
         protected ICommand _closingCommand;
 
+        protected bool HasCriteriaSelected = false;
+
         public ICommand LockCommand
         {
             get
             {
-
                 if (_lockCommand == null)
                 {
                     _lockCommand = new RelayCommand(
                         p => this.DoLockCommand(),
-                        p => true
+                        p => HasCriteriaSelected
                         );
                 }
 
@@ -80,10 +81,9 @@ namespace MCDA.ViewModel
             {
                 if (_standardizationSelectionCommand == null)
                 {
-
                     _standardizationSelectionCommand = new RelayCommand(
                         param => this.DoStandardizationSelectionCommand(),
-                        param => true
+                        param => HasCriteriaSelected
                     );
                 }
                 return _standardizationSelectionCommand;
@@ -99,7 +99,7 @@ namespace MCDA.ViewModel
 
                     _sendToInMemoryWorkspaceCommand = new RelayCommand(
                         param => this.DoSendToInMemoryWorkspaceCommand(),
-                        param => true
+                        param => HasCriteriaSelected
                     );
                 }
                 return _sendToInMemoryWorkspaceCommand;
@@ -110,12 +110,11 @@ namespace MCDA.ViewModel
         {
             get
             {
-
-                if (_exportAsCSVCommand == null)
+               if (_exportAsCSVCommand == null)
                 {
                     _exportAsCSVCommand = new RelayCommand(
                         p => this.DoExportAsCSVCommand(),
-                        p => true
+                        p => HasCriteriaSelected
                         );
                 }
 
@@ -127,12 +126,11 @@ namespace MCDA.ViewModel
         {
             get
             {
-
                 if (_distributionCommand == null)
                 {
                     _distributionCommand = new RelayCommand(
                         p => this.DoDistributionCommand(),
-                        p => true
+                        p => HasCriteriaSelected
                         );
                 }
 

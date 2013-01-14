@@ -426,9 +426,10 @@ namespace MCDA.ViewModel
 
             helper.Owner = parentHandle;
 
-            _neighborhoodSelectionView.ShowDialog();
-
             _neighborhoodSelectionView.Closing += NeighborhoodSelectionViewClosing;
+
+            _neighborhoodSelectionView.ShowDialog();
+            
         }
 
         void NeighborhoodSelectionViewClosing(object sender, CancelEventArgs e)

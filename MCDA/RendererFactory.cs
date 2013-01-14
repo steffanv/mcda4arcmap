@@ -20,12 +20,26 @@ namespace MCDA.Model
         {
             ISimpleRenderer simpleRenderer = new SimpleRendererClass();
 
-            ISimpleFillSymbol pSimpleFillSymbol = new SimpleFillSymbolClass();
-            pSimpleFillSymbol.Style = esriSimpleFillStyle.esriSFSSolid;
-            pSimpleFillSymbol.Outline.Width = 0.4;
-            pSimpleFillSymbol.Color = ToColor(Color.FromRgb(64, 224, 208));
+            ISimpleFillSymbol simpleFillSymbol = new SimpleFillSymbolClass();
+            simpleFillSymbol.Style = esriSimpleFillStyle.esriSFSSolid;
+            simpleFillSymbol.Outline.Width = 0.4;
+            simpleFillSymbol.Color = ToColor(Color.FromRgb(84, 204, 208));
 
-            simpleRenderer.Symbol = pSimpleFillSymbol as ISymbol;
+            simpleRenderer.Symbol = simpleFillSymbol as ISymbol;
+
+            return (IFeatureRenderer)simpleRenderer;
+        }
+
+        public static IFeatureRenderer NewAllMissingValuesRenderer()
+        {
+            ISimpleRenderer simpleRenderer = new SimpleRendererClass();
+
+            ISimpleFillSymbol noDataFillSymbol = new SimpleFillSymbolClass();
+            noDataFillSymbol.Style = esriSimpleFillStyle.esriSFSDiagonalCross;
+            noDataFillSymbol.Outline.Width = .4;
+            noDataFillSymbol.Color = ToColor(Color.FromRgb(84, 204, 208));
+
+            simpleRenderer.Symbol = noDataFillSymbol as ISymbol;
 
             return (IFeatureRenderer)simpleRenderer;
         }
@@ -51,31 +65,32 @@ namespace MCDA.Model
             
             IUniqueValueRenderer uniqueValueRenderer = new UniqueValueRendererClass();
 
-            ISimpleFillSymbol noDataSymbol = new SimpleFillSymbolClass();
-            noDataSymbol.Style = esriSimpleFillStyle.esriSFSDiagonalCross;
-            noDataSymbol.Outline.Width = .3;
-            noDataSymbol.Color = ToColor(Color.FromRgb(255, 255, 255));
-
-            //uniqueValueRenderer.UseDefaultSymbol = true;
-            uniqueValueRenderer.DefaultLabel = "No Data";
-            uniqueValueRenderer.DefaultSymbol = (ISymbol) noDataSymbol;
-
-            ISimpleFillSymbol pSimpleFillSymbol = new SimpleFillSymbolClass();
-            pSimpleFillSymbol.Style = esriSimpleFillStyle.esriSFSSolid;
-            pSimpleFillSymbol.Outline.Width = 0.4;
+            ISimpleFillSymbol simpleFillSymbol = new SimpleFillSymbolClass();
+            simpleFillSymbol.Style = esriSimpleFillStyle.esriSFSSolid;
+            simpleFillSymbol.Outline.Width = 0.4;
 
             string fieldName = biPolarRendererContainer.Field.Name;
 
             //These properties should be set prior to adding values.
             uniqueValueRenderer.FieldCount = 1;
             uniqueValueRenderer.set_Field(0, fieldName);
-            uniqueValueRenderer.DefaultSymbol = pSimpleFillSymbol as ISymbol;
-            uniqueValueRenderer.UseDefaultSymbol = true;
+            //uniqueValueRenderer.DefaultSymbol = simpleFillSymbol as ISymbol;
+            //uniqueValueRenderer.UseDefaultSymbol = true;
 
-            ISet<double> setOfFeatures = new HashSet<double>();
+            // add the no data fill
+            ISimpleFillSymbol noDataSymbol = new SimpleFillSymbolClass();
+            noDataSymbol.Style = esriSimpleFillStyle.esriSFSDiagonalCross;
+            noDataSymbol.Outline.Width = .4;
+            noDataSymbol.Color = ToColor(Color.FromRgb(84, 204, 208));
+
+            uniqueValueRenderer.DefaultLabel = "No Data";
+            uniqueValueRenderer.DefaultSymbol = (ISymbol)noDataSymbol;
+            uniqueValueRenderer.UseDefaultSymbol = true;
 
             int fieldIndex;
 
+            ISet<double> setOfFeatures = new HashSet<double>();
+            bool containsDBNullValue = false;
             using (ComReleaser comReleaser = new ComReleaser())
             {
                 IFeatureCursor featureCursor =  renderContainer.FeatureClass.Search(null, true);
@@ -85,18 +100,26 @@ namespace MCDA.Model
                 fieldIndex = featureCursor.Fields.FindField(fieldName);
 
                 IFeature currentFeature;
+                
                 while ((currentFeature = featureCursor.NextFeature()) != null)
                 {
                     object value = currentFeature.get_Value(fieldIndex);
 
                     if (Convert.IsDBNull(value))
+                    {
+                        containsDBNullValue = true;
                         continue;
+                    }
 
                     setOfFeatures.Add(Convert.ToDouble(value)); 
                 }
+            }
 
-                if (setOfFeatures.Count == 0)
-                    return NewSimpleRenderer();
+            if (containsDBNullValue && setOfFeatures.Count == 0 )
+                return NewAllMissingValuesRenderer();
+
+            if (setOfFeatures.Count == 0)
+               return NewSimpleRenderer();
 
             IEnumerable<double> orderedSet = setOfFeatures.OrderBy(d => d);
 
@@ -119,13 +142,18 @@ namespace MCDA.Model
                 uniqueValueRenderer.set_Symbol(classValue, (ISymbol)pClassSymbol);
              }
 
-            }
-
             //figure out how many colors belong to which side from the neutral color
             int size = uniqueValueRenderer.ValueCount;
 
             int left = (int) (size * (biPolarRendererContainer.NeutralColorPosition / 100));
             int right = size - left;
+
+            // for the case one or both are zero -> create color ramp crashes, the magic value seems to be 2
+            if(left < 2)
+                left = 2;
+
+            if(right < 2)
+                right = 2;
 
             IAlgorithmicColorRamp firstColorRamp = new AlgorithmicColorRampClass();
            
@@ -156,11 +184,9 @@ namespace MCDA.Model
 
             for (int j = 0; j <= uniqueValueRenderer.ValueCount - 1; j++)
             {
-                string xv = uniqueValueRenderer.get_Value(j);
+                string label = uniqueValueRenderer.get_Value(j);
 
-                //if (xv != String.Empty)
-                //{
-                ISimpleFillSymbol pSimpleFillColor = (ISimpleFillSymbol)uniqueValueRenderer.get_Symbol(xv);
+                ISimpleFillSymbol pSimpleFillColor = (ISimpleFillSymbol)uniqueValueRenderer.get_Symbol(label);
 
                     IColor color = firstEnumColors.Next();
 
@@ -173,9 +199,7 @@ namespace MCDA.Model
 
                     pSimpleFillColor.Color = color;
                     
-                    uniqueValueRenderer.set_Symbol(xv, (ISymbol) pSimpleFillColor);
-
-                //}
+                    uniqueValueRenderer.set_Symbol(label, (ISymbol) pSimpleFillColor);
             }
 
             //'** If you didn't use a predefined color ramp
@@ -187,12 +211,6 @@ namespace MCDA.Model
             uniqueValueRenderer.set_FieldType(0, isString);
             IGeoFeatureLayer geoFeatureLayer = renderContainer.FeatureLayer as IGeoFeatureLayer;
             geoFeatureLayer.Renderer = uniqueValueRenderer as IFeatureRenderer;
-
-            //This makes the layer properties symbology tab
-            //show the correct interface.
-            //IUID pUID = new UIDClass();
-            //pUID.Value = "{683C994E-A17B-11D1-8816-080009EC732A}";
-            //pGeoFeatureLayer.RendererPropertyPageClassID = pUID as UIDClass;
 
             return (IFeatureRenderer) uniqueValueRenderer;
         }

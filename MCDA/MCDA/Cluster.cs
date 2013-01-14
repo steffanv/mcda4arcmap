@@ -209,7 +209,7 @@ namespace MCDA.Model
             }
 
             if(result.HasValue)
-                row.SetField(row.ItemArray.Length - 1, Math.Round(result.Value, 6));
+                row.SetField(row.ItemArray.Length - 1, Math.Round(result.Value < 0 ? 0 : result.Value, 6));
             else
                 row.SetField(row.ItemArray.Length - 1, DBNull.Value);
 

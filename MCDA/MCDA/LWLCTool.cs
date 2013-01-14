@@ -107,28 +107,26 @@ namespace MCDA.Model
             object lockObject = new object();
 
             Parallel.ForEach(_dictionaryOfDistances.Keys, currentID =>
-            {
-                List<Tuple<int, double>> list = new List<Tuple<int, double>>();
-
-                _dictionaryOfDistances.TryGetValue(currentID, out list);
-
-                int maxElements = list.Count();
-                int tryKNearestNeighbors = _numberOfKNearestNeighborsForAutomatic;
-
-                Cluster c = new Cluster(currentID, list.OrderBy(t => t.Item2).Take(tryKNearestNeighbors).Select(t => t.Item1).ToList(), _dataTable, _toolParameterContainer, _tranformationStrategy);
-
-                // lets try another value - IsResultNull also calculates all required stuff for NewRow
-                while(c.IsResultNull() && tryKNearestNeighbors <= maxElements){
-
-                    tryKNearestNeighbors++;
-                    c = new Cluster(currentID, list.OrderBy(t => t.Item2).Take(tryKNearestNeighbors).Select(t => t.Item1).ToList(), _dataTable, _toolParameterContainer, _tranformationStrategy);
-                }
-
-                lock (lockObject)
                 {
-                    _resultDataTable.Rows.Add((c.FillRowWithResults(_resultDataTable.NewRow())));
-                }
-            });
+                    List<Tuple<int, double>> list = new List<Tuple<int,double>>(_dictionaryOfDistances[currentID]);
+
+                    int maxElements = list.Count();
+                    int tryKNearestNeighbors = _numberOfKNearestNeighborsForAutomatic;
+
+                    Cluster c = new Cluster(currentID, list.OrderBy(t => t.Item2).Take(tryKNearestNeighbors).Select(t => t.Item1).ToList(), _dataTable, _toolParameterContainer, _tranformationStrategy);
+
+                    // lets try another value - IsResultNull also calculates all required stuff for NewRow
+                    while (c.IsResultNull() && tryKNearestNeighbors <= maxElements)
+                    {
+                        tryKNearestNeighbors++;
+                        c = new Cluster(currentID, list.OrderBy(t => t.Item2).Take(tryKNearestNeighbors).Select(t => t.Item1).ToList(), _dataTable, _toolParameterContainer, _tranformationStrategy);
+                    }
+
+                    lock (lockObject)
+                    {
+                        _resultDataTable.Rows.Add((c.FillRowWithResults(_resultDataTable.NewRow())));
+                    }
+                });
         }
 
         private void BuildRookContiguityTable()
@@ -136,21 +134,19 @@ namespace MCDA.Model
             object lockObject = new object();
 
             Parallel.ForEach(_dictionaryOfRookContiguity.Keys, currentID =>
-            {
-                List<int> list = new List<int>();
-
-                _dictionaryOfRookContiguity.TryGetValue(currentID, out list);
-
-                Cluster c = new Cluster(currentID, list, _dataTable, _toolParameterContainer,_tranformationStrategy);
-
-                c.Calculate();
-
-                lock (lockObject)
                 {
-                    _resultDataTable.Rows.Add((c.FillRowWithResults(_resultDataTable.NewRow())));
-                }
+                    List<int> list = new List<int>(_dictionaryOfRookContiguity[currentID]);
 
-            });
+                    Cluster c = new Cluster(currentID, list, _dataTable, _toolParameterContainer, _tranformationStrategy);
+
+                    c.Calculate();
+
+                    lock (lockObject)
+                    {
+                        _resultDataTable.Rows.Add((c.FillRowWithResults(_resultDataTable.NewRow())));
+                    }
+
+                });
         }
 
         private void BuildQueenContiguityTable()
@@ -158,22 +154,19 @@ namespace MCDA.Model
             object lockObject = new object();
 
             Parallel.ForEach(_dictionaryOfQueenContiguity.Keys, currentID =>
-            {
-
-                List<int> list = new List<int>();
-
-                _dictionaryOfQueenContiguity.TryGetValue(currentID, out list);
- 
-                Cluster c = new Cluster(currentID, list, _dataTable, _toolParameterContainer, _tranformationStrategy);
-
-                c.Calculate();
-
-                lock (lockObject)
                 {
-                    _resultDataTable.Rows.Add((c.FillRowWithResults(_resultDataTable.NewRow())));
-                }
+                    List<int> list = new List<int>(_dictionaryOfQueenContiguity[currentID]);
 
-            });
+                    Cluster c = new Cluster(currentID, list, _dataTable, _toolParameterContainer, _tranformationStrategy);
+
+                    c.Calculate();
+
+                    lock (lockObject)
+                    {
+                        _resultDataTable.Rows.Add((c.FillRowWithResults(_resultDataTable.NewRow())));
+                    }
+
+                });
         }
 
         private void BuildKNearestNeighborTable()
@@ -181,20 +174,22 @@ namespace MCDA.Model
             object lockObject = new object();
 
             Parallel.ForEach(_dictionaryOfDistances.Keys, currentID =>
-            {
-                List<Tuple<int, double>> list = new List<Tuple<int, double>>();
-
-                _dictionaryOfDistances.TryGetValue(currentID, out list);
-               
-                Cluster c = new Cluster(currentID, list.OrderBy(t => t.Item2).Take(_numberOfKNearestNeighbors).Select(t => t.Item1).ToList(), _dataTable, _toolParameterContainer, _tranformationStrategy);
-
-                c.Calculate();
-
-                lock (lockObject)
                 {
-                    _resultDataTable.Rows.Add((c.FillRowWithResults(_resultDataTable.NewRow())));
-                }
-            });
+                    List<Tuple<int, double>> list = new List<Tuple<int,double>>(_dictionaryOfDistances[currentID]);
+
+                    Cluster c = new Cluster(currentID,
+                                            list.OrderBy(t => t.Item2)
+                                                .Take(_numberOfKNearestNeighbors)
+                                                .Select(t => t.Item1)
+                                                .ToList(), _dataTable, _toolParameterContainer, _tranformationStrategy);
+
+                    c.Calculate();
+
+                    lock (lockObject)
+                    {
+                        _resultDataTable.Rows.Add((c.FillRowWithResults(_resultDataTable.NewRow())));
+                    }
+                });
         }
 
         private void BuildThresholdTable()
@@ -202,20 +197,18 @@ namespace MCDA.Model
             object lockObject = new object();
 
             Parallel.ForEach(_dictionaryOfDistances.Keys, currentID =>
-            {
-                List<Tuple<int, double>> list = new List<Tuple<int, double>>();
-
-                _dictionaryOfDistances.TryGetValue(currentID, out list);
-
-                Cluster c = new Cluster(currentID, list.Where(t => t.Item2 <= _threshold).Select(t => t.Item1).ToList(), _dataTable, _toolParameterContainer, _tranformationStrategy);
-
-                c.Calculate();
-
-                lock (lockObject)
                 {
-                    _resultDataTable.Rows.Add((c.FillRowWithResults(_resultDataTable.NewRow())));
-                }
-            });
+                    List<Tuple<int, double>> list = new List<Tuple<int,double>>(_dictionaryOfDistances[currentID]);
+
+                    Cluster c = new Cluster(currentID, list.Where(t => t.Item2 <= _threshold).Select(t => t.Item1).ToList(), _dataTable, _toolParameterContainer, _tranformationStrategy);
+
+                    c.Calculate();
+
+                    lock (lockObject)
+                    {
+                        _resultDataTable.Rows.Add((c.FillRowWithResults(_resultDataTable.NewRow())));
+                    }
+                });
         } 
 
         private IDictionary<int, List<Tuple<int, double>>> BuildDictionaryOfDistancesByCentroid()
@@ -318,7 +311,7 @@ namespace MCDA.Model
                     IEnumIDs enumIDs = selectionSet.IDs;
 
                     int ID = enumIDs.Next();
-                    // thats ridiculous - someone at ESRI does not unterstand the iterator pattern...
+                    
                     while(ID != -1)
                     {
                         if (ID != currentFeature.OID)
@@ -471,9 +464,14 @@ namespace MCDA.Model
                                                               esriGeometryDimension.esriGeometry1Dimension);
 
                             // we have one or more polylines in common => add
-                            if (polylineCollection.GeometryCount >= 1)
+                            if (polylineCollection.GeometryCount >= 1){
                                 neighborIDs.Add(ID);
 
+                                //we can move on, no need to check for 2 dim intersect
+                                ID = enumIDs.Next();
+
+                                continue;
+                            }
 
                             IGeometryCollection polygonCollection =
                                 (IGeometryCollection)

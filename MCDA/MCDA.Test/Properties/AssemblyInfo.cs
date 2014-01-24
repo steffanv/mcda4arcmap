@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("MCDA")]
-[assembly: AssemblyDescription("Tool for MCDA")]
+[assembly: AssemblyTitle("MCDA.Test")]
+[assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Ryerson University")]
-[assembly: AssemblyProduct("MCDA")]
-[assembly: AssemblyCopyright("Copyright © Ryerson University 2012")]
+[assembly: AssemblyCompany("")]
+[assembly: AssemblyProduct("MCDA.Test")]
+[assembly: AssemblyCopyright("Copyright ©  2014")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("f098ac0f-6cae-4e1b-81d0-d67452d3cf57")]
+[assembly: Guid("473d3a46-48fe-496b-8ee9-74ef462d72cf")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -34,5 +34,3 @@ using System.Runtime.InteropServices;
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
-
-[assembly: InternalsVisibleTo("MCDA.Test")]

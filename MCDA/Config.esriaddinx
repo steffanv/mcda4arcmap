@@ -2,15 +2,15 @@
   <Name>MCDA Add-in</Name>
   <AddInID>{f098ac0f-6cae-4e1b-81d0-d67452d3cf57}</AddInID>
   <Description>Add-in for MCDA analysis</Description>
-  <Version>1.0</Version>
+  <Version>1.1</Version>
   <Image>Images\MCDA Add-in.png</Image>
   <Author>Steffan Voss</Author>
   <Company>-</Company>
-  <Date>01/10/2013</Date>
+  <Date>01/10/2014</Date>
   <Targets>
-    <Target name="Desktop" version="10.1" />
+    <Target name="Desktop" version="10.2" />
   </Targets>
-  <AddIn language="CLR4.0" library="MCDA.dll" namespace="MCDA">
+  <AddIn language="CLR4.5" library="MCDA.dll" namespace="MCDA">
     <ArcMap>
       <Commands>
         <Button id="Ryerson_University_MCDA_AddDataBtn" class="AddDataBtn" message="" caption="Add data" tip="Manage Critieria." category="MCDA Controls" image="Images\AddData.png" />
@@ -26,7 +26,7 @@
       </Extensions>
       <DockableWindows>
         <DockableWindow id="Ryerson_University_MCDA_AddDataView" class="AddDataView+AddinImpl" caption="Data Manager" image="Images\AddDataWindow.png">
-          <InitialPlacement height="500" width="300" state="pinned" position="float" />
+          <InitialPlacement height="500" width="300" state="unpinned" position="group"  />
         </DockableWindow>
         <!--<DockableWindow id="Ryerson_University_MCDA_OWAToolView" class="OWAToolView+AddinImpl" caption="OWA Tool" image="Images\OWAToolView.png">
           <InitialPlacement height="500" width="400" state="pinned" position="float" />
@@ -35,10 +35,10 @@
           <InitialPlacement height="300" width="500" state="pinned" position="group" />
         </DockableWindow>-->
         <DockableWindow id="Ryerson_University_MCDA_ConfigView" class="ConfigView+AddinImpl" caption="Configuration" image="Images\ConfigView.png">
-          <InitialPlacement height="300" width="300" state="pinned" position="float" />
+          <InitialPlacement height="300" width="300" state="unpinned" position="group" />
         </DockableWindow>
         <DockableWindow id="Ryerson_University_MCDA_VisualizationView" class="VisualizationView+AddinImpl" caption="Visualization" image="Images\VisualizationView.png">
-          <InitialPlacement height="300" width="500" state="pinned" position="float" />
+          <InitialPlacement height="300" width="500" state="unpinned" position="group" />
         </DockableWindow>
       </DockableWindows>
       <Toolbars>

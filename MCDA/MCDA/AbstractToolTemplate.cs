@@ -6,7 +6,7 @@ using System.Data;
 
 namespace MCDA.Model
 {
-   public abstract class AbstractToolTemplate : ITool
+   internal abstract class AbstractToolTemplate : ITool
     {  
         protected abstract void PerformAlgorithm();
         protected abstract void PerformScaling();
@@ -21,6 +21,6 @@ namespace MCDA.Model
         public abstract string DefaultResultColumnName {get; set;}
         public abstract DataTable Data{ get; }
         public abstract ToolParameterContainer ToolParameterContainer {get; set;}
-        public abstract TransformationStrategy TransformationStrategy { get; set; }
+        public abstract StandardizationStrategy TransformationStrategy { get; set; }
     }
 }

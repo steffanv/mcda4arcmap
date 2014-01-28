@@ -6,7 +6,7 @@ using System.Data;
 
 namespace MCDA.Model
 {
-    public interface ITransformationStrategy
+    public interface IStandardizationStrategy
     {
         void Transform(DataColumn column, bool benefitCriterion = true);
 

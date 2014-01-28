@@ -8,7 +8,7 @@ using System.Linq.Expressions;
 
 namespace MCDA.Model
 {
-    static class Export
+    internal static class Export
     {
         public static void ToCSV<T>(DataTable table, IList<T> toolParameter, string path, params Tuple<string,object>[] param) where T : IToolParameter
         {

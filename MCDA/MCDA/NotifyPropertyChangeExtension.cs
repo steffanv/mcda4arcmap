@@ -10,7 +10,7 @@ namespace MCDA.Extensions
     /// <summary>
     /// From http://www.wpftutorial.net/INotifyPropertyChanged.html and http://stackoverflow.com/questions/12274514/why-does-my-property-returns-not-the-value-i-set
     /// </summary>
-    public static class NotifyPropertyChangeExtension
+    internal static class NotifyPropertyChangeExtension
     {
         public static bool ChangeAndNotify<T>(this PropertyChangedEventHandler handler,
         ref T field, T value, Expression<Func<T>> memberExpression)
@@ -43,8 +43,7 @@ namespace MCDA.Extensions
                     handler(sender, new PropertyChangedEventArgs(body.Member.Name));
                 }
             }
-
-           
+   
             return true;
         }
 

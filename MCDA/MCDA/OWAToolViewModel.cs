@@ -13,7 +13,7 @@ using System.Linq.Expressions;
 
 namespace MCDA.ViewModel
 {
-    class OWAToolViewModel : AbstractToolViewModel, INotifyPropertyChanged
+    internal sealed class OWAToolViewModel : AbstractToolViewModel, INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 

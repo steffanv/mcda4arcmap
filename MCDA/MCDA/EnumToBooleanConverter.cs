@@ -7,7 +7,7 @@ using System.Windows.Data;
 namespace MCDA.Model
 {
     //from http://stackoverflow.com/questions/397556/how-to-bind-radiobuttons-to-an-enum
-    public class EnumToBooleanConverter : IValueConverter
+    internal sealed class EnumToBooleanConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {

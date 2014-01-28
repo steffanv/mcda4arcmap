@@ -14,7 +14,7 @@ using ESRI.ArcGIS.ADF;
 
 namespace MCDA.Model
 {
-    public static class RendererFactory
+    internal static class RendererFactory
     {
         public static IFeatureRenderer NewSimpleRenderer()
         {

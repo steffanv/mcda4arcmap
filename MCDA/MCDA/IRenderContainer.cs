@@ -8,7 +8,7 @@ using ESRI.ArcGIS.Geodatabase;
 
 namespace MCDA.Model
 {
-    public interface IRenderContainer
+    internal interface IRenderContainer
     {
         Renderer Renderer { get; set; }
 

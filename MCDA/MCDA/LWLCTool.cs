@@ -17,11 +17,11 @@ using System.Threading;
 
 namespace MCDA.Model
 {
-   public sealed class LWLCTool : AbstractToolTemplate
+   internal sealed class LWLCTool : AbstractToolTemplate
     {
        private string _defaultResultColumnName = "LWLC Result";
        private ToolParameterContainer _toolParameterContainer;
-       private TransformationStrategy _tranformationStrategy;
+       private StandardizationStrategy _tranformationStrategy;
        private IFeatureClass _featureClass;
        private DataTable _dataTable, _resultDataTable;
 
@@ -595,7 +595,7 @@ namespace MCDA.Model
             set {  _toolParameterContainer = value; }
         }
 
-        public override TransformationStrategy TransformationStrategy
+        public override StandardizationStrategy TransformationStrategy
         {
             get { return _tranformationStrategy; }
             set {  _tranformationStrategy = value; }

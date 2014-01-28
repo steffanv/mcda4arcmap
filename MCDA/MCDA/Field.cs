@@ -9,7 +9,7 @@ using ESRI.ArcGIS.ADF;
 
 namespace MCDA.Model
 {
-    public class Field : INotifyPropertyChanged
+    internal sealed class Field : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 

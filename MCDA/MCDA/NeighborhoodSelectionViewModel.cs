@@ -10,7 +10,7 @@ namespace MCDA.ViewModel
 {
     public enum NeighborhoodOptions { KNearestNeighbors, Rook, Queen, Threshold, Automatic }
 
-    class NeighborhoodSelectionViewModel : INotifyPropertyChanged
+    internal sealed class NeighborhoodSelectionViewModel : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 

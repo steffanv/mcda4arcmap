@@ -12,7 +12,7 @@ namespace MCDA.Model
     /// <summary>
     /// A container for a tool and its 
     /// </summary>
-    public class MCDAWorkspaceContainer : INotifyPropertyChanged, IRenderContainer
+    internal sealed class MCDAWorkspaceContainer : INotifyPropertyChanged, IRenderContainer
     {
         public event PropertyChangedEventHandler PropertyChanged;
 

@@ -14,7 +14,7 @@ using Microsoft.Win32;
 
 namespace MCDA.ViewModel
 {
-    class LWLCToolViewModel : AbstractToolViewModel, INotifyPropertyChanged
+    internal sealed class LWLCToolViewModel : AbstractToolViewModel, INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 

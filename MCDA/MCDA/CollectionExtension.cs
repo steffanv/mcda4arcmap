@@ -5,7 +5,7 @@ using System.Text;
 
 namespace MCDA.Extensions
 {
-    public static class CollectionExtension
+    internal static class CollectionExtension
     {
 
         public static void ForEach<T>(this IEnumerable<T> source, Action<T> action)

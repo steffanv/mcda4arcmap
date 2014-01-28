@@ -9,7 +9,7 @@ using System.Threading;
 
 namespace MCDA.Model
 {
-    public class Layer : INotifyPropertyChanged
+    internal sealed class Layer : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 

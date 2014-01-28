@@ -8,7 +8,7 @@ using ESRI.ArcGIS.Carto;
 
 namespace MCDA.Model
 {
-    class Classification
+    internal sealed class Classification
     {
         public static double[] Classify(IClassify method, IFeatureClass featureClass, IField field, int numberOfClasses)
         {

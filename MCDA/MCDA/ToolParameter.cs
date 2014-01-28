@@ -8,7 +8,7 @@ using System.ComponentModel;
 namespace MCDA.Model
 {
 
-   public class ToolParameter : AbstractToolParameter
+   internal sealed class ToolParameter : AbstractToolParameter
    {
         
         private static IToolParameter _lastWeightChangedToolParameter;

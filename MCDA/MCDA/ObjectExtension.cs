@@ -8,7 +8,7 @@ using System.IO;
 
 namespace MCDA.Extensions
 {
-    public static class ObjectExtension
+    internal static class ObjectExtension
     {
         //http://stackoverflow.com/questions/78536/cloning-objects-in-c-sharp
 

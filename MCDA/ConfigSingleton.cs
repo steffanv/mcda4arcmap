@@ -5,9 +5,9 @@ using System.Text;
 
 namespace MCDA.Model
 {
-    public enum RenderOption { AfterSliderDrag, AnimationLike, Realtime}
+    internal enum RenderOption { AfterSliderDrag, AnimationLike, Realtime}
 
-    class ConfigSingleton
+    internal sealed class ConfigSingleton
     {
         private static ConfigSingleton _instance;
 

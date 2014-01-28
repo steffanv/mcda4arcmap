@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace MCDA.Model
 {
-    public sealed class OWATool : AbstractToolTemplate
+    internal sealed class OWATool : AbstractToolTemplate
     {
         private DataTable _workingDataTable, _backupDataTable;
         private ToolParameterContainer _toolParameterContainer;
-        private TransformationStrategy _transformationStrategy;
+        private StandardizationStrategy _transformationStrategy;
         private double _alpha;
 
         private string _owaResultColumnName = "OWAResult";
@@ -24,7 +24,7 @@ namespace MCDA.Model
 
             _toolParameterContainer = toolParameterContainer;
 
-            _transformationStrategy = Model.TransformationStrategy.MaximumScoreTransformationStrategy;
+            _transformationStrategy = Model.StandardizationStrategy.MaximumScoreStandardizationStrategy;
 
             _alpha = 1;
         }
@@ -46,7 +46,7 @@ namespace MCDA.Model
             set { _toolParameterContainer = value; }
         }
 
-        public override TransformationStrategy TransformationStrategy
+        public override StandardizationStrategy TransformationStrategy
         {
             get { return _transformationStrategy; }
             set { _transformationStrategy = value; }
@@ -65,7 +65,7 @@ namespace MCDA.Model
             foreach (IToolParameter currentToolParameter in _toolParameterContainer.ToolParameter)
             {
 
-                TransformationStrategyFactory.GetStrategy(_transformationStrategy).Transform(_workingDataTable.Columns[currentToolParameter.ColumnName], currentToolParameter.IsBenefitCriterion);
+                StandardizationStrategyFactory.GetStrategy(_transformationStrategy).Transform(_workingDataTable.Columns[currentToolParameter.ColumnName], currentToolParameter.IsBenefitCriterion);
             }
         }
 

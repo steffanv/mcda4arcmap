@@ -6,7 +6,7 @@ using System.Windows.Data;
 
 namespace MCDA.Model
 {
-    public class NullToFalseConverter : IValueConverter
+    internal sealed class NullToFalseConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {

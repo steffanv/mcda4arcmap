@@ -8,7 +8,7 @@ using System.Reflection;
 
 namespace MCDA
 {
-    public static class PropertyChangedExtension
+    internal static class PropertyChangedExtension
     {
         public static void RegisterPropertyHandler<T, TProperty>(this T obj, Expression<Func<T, TProperty>> propertyExpression, PropertyChangedEventHandler handlerDelegate)
             where T : INotifyPropertyChanged

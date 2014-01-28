@@ -7,7 +7,7 @@ using System.Data;
 
 namespace MCDA.Model
 {
-    class MaximumScoreTransformationStrategy : ITransformationStrategy
+    internal sealed class MaximumScoreStandardizationStrategy : IStandardizationStrategy
     {
         public double? Transform(IList<double> data, double actualValue, bool benefitCriterion = false)
         {
@@ -24,6 +24,7 @@ namespace MCDA.Model
 
         public void Transform(DataColumn column, bool benefitCriterion = true)
         {
+            // check other types and empty column
             double maxValue = (double)column.Table.Compute("max(" + column.ColumnName + ")", String.Empty);
 
             int columnIndex = column.Ordinal;

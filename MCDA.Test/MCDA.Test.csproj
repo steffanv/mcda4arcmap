@@ -41,6 +41,8 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data.Linq" />
     <Reference Include="System.XML" />
   </ItemGroup>
   <Choose>
@@ -56,6 +58,8 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="ScoreRangeStandardizationTest.cs" />
+    <Compile Include="MaximumScoreStandardizationTest.cs" />
     <Compile Include="WLCToolTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

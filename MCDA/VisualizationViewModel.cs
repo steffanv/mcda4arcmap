@@ -16,7 +16,7 @@ using System.Threading;
 
 namespace MCDA.ViewModel
 {
-    class VisualizationViewModel : INotifyPropertyChanged
+    internal sealed class VisualizationViewModel : INotifyPropertyChanged
 	{
         public event PropertyChangedEventHandler PropertyChanged;
 

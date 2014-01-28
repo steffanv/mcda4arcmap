@@ -7,7 +7,7 @@ using System.Windows.Input;
 
 namespace MCDA.ViewModel
 {
-    abstract class AbstractToolViewModel
+    internal abstract class AbstractToolViewModel
     {
         public AbstractToolViewModel()
         {

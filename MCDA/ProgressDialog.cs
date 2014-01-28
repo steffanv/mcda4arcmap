@@ -5,7 +5,7 @@ using System.Text;
 
 namespace MCDA.ViewModel
 {
-    static class ProgressDialog
+    internal static class ProgressDialog
     {
         public static void ShowProgressDialog(string message, Delegate action, params object[] args)
         {          

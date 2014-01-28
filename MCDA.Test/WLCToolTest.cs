@@ -18,6 +18,7 @@ namespace MCDA.Test
             DataTable = new DataTable();
             ToolParameterContainer = new Model.ToolParameterContainer(Enumerable.Empty<Model.IToolParameter>().ToList());
         }
+
         [TestMethod]
         public void TestMethod1()
         {

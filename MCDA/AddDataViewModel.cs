@@ -12,7 +12,7 @@ namespace MCDA.ViewModel
     /// <summary>
     /// 
     /// </summary>
-   public class AddDataViewModel : INotifyPropertyChanged
+   internal sealed class AddDataViewModel : INotifyPropertyChanged
     {
        public event PropertyChangedEventHandler PropertyChanged;
 

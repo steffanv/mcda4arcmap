@@ -5,7 +5,6 @@ namespace MCDA.Model
 {
     public interface IToolParameter : IDeepClonable<IToolParameter>, INotifyPropertyChanged
     {
-
         IToolParameter LastWeightChangedToolParameter { get; set; }
 
         string ColumnName { get; set; }

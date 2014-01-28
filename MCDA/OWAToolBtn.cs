@@ -9,7 +9,7 @@ using System.Windows.Interop;
 
 namespace MCDA
 {
-    public class OWAToolBtn : ESRI.ArcGIS.Desktop.AddIns.Button
+    internal sealed class OWAToolBtn : ESRI.ArcGIS.Desktop.AddIns.Button
     {
         public OWAToolBtn()
         {

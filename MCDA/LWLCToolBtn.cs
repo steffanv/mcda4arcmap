@@ -7,7 +7,7 @@ using System.Windows.Interop;
 
 namespace MCDA
 {
-    public class LWLCToolBtn : ESRI.ArcGIS.Desktop.AddIns.Button
+    internal sealed class LWLCToolBtn : ESRI.ArcGIS.Desktop.AddIns.Button
     {
         public LWLCToolBtn()
         {

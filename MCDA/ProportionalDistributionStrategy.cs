@@ -6,7 +6,7 @@ using MCDA.Extensions;
 
 namespace MCDA.Model
 {
-    class ProportionalDistributionStrategy : IWeightDistributionStrategy
+    internal sealed class ProportionalDistributionStrategy : IWeightDistributionStrategy
     {
         public void Distribute<T>(IList<T> listOfToolParameter) where T : class, IToolParameter
         {

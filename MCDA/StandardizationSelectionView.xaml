@@ -25,8 +25,8 @@
         <Grid.Resources>
              <local:EnumToBooleanConverter x:Key="enumToBooleanConverter" />
         </Grid.Resources>
-            <RadioButton Grid.Row="0" GroupName="1" IsChecked="{Binding Path=SelectedTransformationStrategy, Converter={StaticResource enumToBooleanConverter}, ConverterParameter={x:Static local:TransformationStrategy.MaximumScoreTransformationStrategy}}">Maximum Score Procedure</RadioButton>
-            <RadioButton Grid.Row="1" GroupName="1" IsChecked="{Binding Path=SelectedTransformationStrategy, Converter={StaticResource enumToBooleanConverter}, ConverterParameter={x:Static local:TransformationStrategy.ScoreRangeTransformationStrategy}}">Score Range Procedure</RadioButton>
+            <RadioButton Grid.Row="0" GroupName="1" IsChecked="{Binding Path=SelectedTransformationStrategy, Converter={StaticResource enumToBooleanConverter}, ConverterParameter={x:Static local:StandardizationStrategy.MaximumScoreStandardizationStrategy}}">Maximum Score Procedure</RadioButton>
+            <RadioButton Grid.Row="1" GroupName="1" IsChecked="{Binding Path=SelectedTransformationStrategy, Converter={StaticResource enumToBooleanConverter}, ConverterParameter={x:Static local:StandardizationStrategy.ScoreRangeStandardizationStrategy}}">Score Range Procedure</RadioButton>
     </Grid>
     <Grid Grid.Row="3" VerticalAlignment="Bottom">
         <Grid.ColumnDefinitions>

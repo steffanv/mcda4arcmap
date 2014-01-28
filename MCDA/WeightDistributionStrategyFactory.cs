@@ -5,7 +5,7 @@ using System.Text;
 
 namespace MCDA.Model
 {
-    public static class WeightDistributionStrategyFactory
+    internal static class WeightDistributionStrategyFactory
     {
 
         public static IWeightDistributionStrategy NewProportionalDistributionStrategy()

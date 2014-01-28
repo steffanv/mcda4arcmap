@@ -6,7 +6,7 @@ using System.Data;
 
 namespace MCDA.Model
 {
-    class ScoreRangeTransformationStrategy : ITransformationStrategy
+    internal sealed class ScoreRangeStandardizationStrategy : IStandardizationStrategy
     {
         public double? Transform(IList<double> data, double actualValue, bool benefitCriterion = false)
         {

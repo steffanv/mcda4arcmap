@@ -165,7 +165,7 @@
     <Compile Include="NeighborhoodSelectionViewModel.cs" />
     <Compile Include="ProgressDialog.cs" />
     <Compile Include="RenderContainer.cs" />
-    <Compile Include="RendererContainer.cs" />
+    <Compile Include="ClassBreaksRendererContainer.cs" />
     <Compile Include="Classification.cs" />
     <Compile Include="CollectionExtension.cs" />
     <Compile Include="Config.Designer.cs">
@@ -189,7 +189,7 @@
     <Compile Include="ITool.cs" />
     <Compile Include="IToolParameter.cs" />
     <Compile Include="AbstractToolTemplate.cs" />
-    <Compile Include="ITransformationStrategy.cs" />
+    <Compile Include="IStandardizationStrategy.cs" />
     <Compile Include="IWeightDistributeStrategy.cs" />
     <Compile Include="Layer.cs" />
     <Compile Include="MCDAWorkspaceContainer.cs" />
@@ -203,12 +203,12 @@
     </Compile>
     <Compile Include="OWAToolViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="MaximumScoreTransformationStrategy.cs" />
+    <Compile Include="MaximumScoreStandardizationStrategy.cs" />
     <Compile Include="PropertyChangedExtension.cs" />
     <Compile Include="ProportionalDistributionStrategy.cs" />
     <Compile Include="RelayCommand.cs" />
     <Compile Include="RendererFactory.cs" />
-    <Compile Include="ScoreRangeTransformationStrategy.cs" />
+    <Compile Include="ScoreRangeStandardizationStrategy.cs" />
     <Compile Include="StandardizationSelectionView.xaml.cs">
       <DependentUpon>StandardizationSelectionView.xaml</DependentUpon>
     </Compile>
@@ -221,7 +221,7 @@
     </Compile>
     <Compile Include="VisualizationViewModel.cs" />
     <Compile Include="ToolParameter.cs" />
-    <Compile Include="TransformationStrategyFactory.cs" />
+    <Compile Include="StandardizationStrategyFactory.cs" />
     <Compile Include="WeightDistributionStrategyFactory.cs" />
     <Compile Include="ToolParameterContainer.cs" />
     <Compile Include="WLCTool.cs" />

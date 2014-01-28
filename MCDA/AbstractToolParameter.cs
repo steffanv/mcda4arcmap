@@ -3,7 +3,7 @@ using MCDA.Extensions;
 
 namespace MCDA.Model
 {
-   public abstract class AbstractToolParameter :  IToolParameter
+   internal abstract class AbstractToolParameter :  IToolParameter
     {
         public event PropertyChangedEventHandler PropertyChanged;
 

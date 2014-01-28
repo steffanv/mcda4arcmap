@@ -10,7 +10,7 @@ using ESRI.ArcGIS.Geodatabase;
 
 namespace MCDA.Model
 {
-    public class ClassBreaksRendererContainer : INotifyPropertyChanged
+    internal sealed class ClassBreaksRendererContainer : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -64,7 +64,7 @@ namespace MCDA.Model
 
     }
 
-    public class BiPolarRendererContainer : INotifyPropertyChanged
+    internal sealed class BiPolarRendererContainer : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 

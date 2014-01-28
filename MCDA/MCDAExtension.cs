@@ -25,7 +25,7 @@ namespace MCDA
     /// <summary>
     /// The s
     /// </summary>
-    public class MCDAExtension : ESRI.ArcGIS.Desktop.AddIns.Extension, INotifyPropertyChanged
+    internal sealed class MCDAExtension : ESRI.ArcGIS.Desktop.AddIns.Extension, INotifyPropertyChanged
     {
         /// <summary>
         /// 

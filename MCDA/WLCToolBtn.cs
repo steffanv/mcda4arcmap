@@ -9,7 +9,7 @@ using System.Windows.Interop;
 
 namespace MCDA
 {
-    public class WLCToolBtn : ESRI.ArcGIS.Desktop.AddIns.Button
+    internal sealed class WLCToolBtn : ESRI.ArcGIS.Desktop.AddIns.Button
     {
         public WLCToolBtn()
         {

@@ -9,7 +9,7 @@ using ESRI.ArcGIS.Geodatabase;
 
 namespace MCDA.Model
 {
-    class RenderContainer : IRenderContainer, INotifyPropertyChanged
+    internal sealed class RenderContainer : IRenderContainer, INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 

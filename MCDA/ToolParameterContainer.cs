@@ -8,7 +8,7 @@ using MCDA.Model;
 
 namespace MCDA.Model
 {  
-    public class ToolParameterContainer : INotifyPropertyChanged
+    internal sealed class ToolParameterContainer : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 

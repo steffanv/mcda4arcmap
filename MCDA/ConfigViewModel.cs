@@ -6,7 +6,7 @@ using MCDA.Model;
 
 namespace MCDA.ViewModel
 {
-    public class ConfigViewModel
+    internal sealed class ConfigViewModel
     {
         public RenderOption RenderOptions
         {

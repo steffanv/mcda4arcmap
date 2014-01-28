@@ -8,7 +8,7 @@ using ESRI.ArcGIS.esriSystem;
 
 namespace MCDA
 {
-    public class ConfigBtn : ESRI.ArcGIS.Desktop.AddIns.Button
+    internal sealed class ConfigBtn : ESRI.ArcGIS.Desktop.AddIns.Button
     {
         public ConfigBtn()
         {

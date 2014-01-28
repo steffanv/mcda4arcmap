@@ -6,7 +6,7 @@ using System.Data;
 
 namespace MCDA.Model
 {
-    public static class ToolFactory
+    internal static class ToolFactory
     {
 
         public static WLCTool NewWLCTool()

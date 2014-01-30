@@ -149,6 +149,7 @@
     </Compile>
     <Compile Include="AlphaSelectionViewModel.cs" />
     <Compile Include="Cluster.cs" />
+    <Compile Include="DataColumnExtension.cs" />
     <Compile Include="FlipControl.xaml.cs">
       <DependentUpon>FlipControl.xaml</DependentUpon>
     </Compile>

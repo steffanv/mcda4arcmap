@@ -60,6 +60,7 @@
   <ItemGroup>
     <Compile Include="ScoreRangeStandardizationTest.cs" />
     <Compile Include="MaximumScoreStandardizationTest.cs" />
+    <Compile Include="TestUtil.cs" />
     <Compile Include="WLCToolTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

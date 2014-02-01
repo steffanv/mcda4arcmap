@@ -13,8 +13,7 @@ using System.ComponentModel;
 namespace MCDA
 {
     internal sealed class ConfigBtn : ESRI.ArcGIS.Desktop.AddIns.Button
-    {
-       
+    {  
         protected override void OnClick()
         {
             var parentHandle = new IntPtr(ArcMap.Application.hWnd);
@@ -25,15 +24,7 @@ namespace MCDA
 
             helper.Owner = parentHandle;
 
-            configView.Closing += ConfigViewClosing;
-
             configView.ShowDialog();
-        }
-
-        void ConfigViewClosing(object sender, CancelEventArgs e)
-        {
-            //TODO nothing....so far
-           //ConfigSingleton.Instance.SelectedRenderoption = ConfigViewModel.SelectedRenderOption;
         }
     }
 }

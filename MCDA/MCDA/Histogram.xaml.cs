@@ -108,7 +108,7 @@ namespace MCDA.CustomControls
             {
                 if(Double.IsNaN(_data[i]))
                     continue;
-
+                //hier kracht es auch noch -> index
                 int index = (int) Math.Round(_data[i] * (size / maxDataValue),0);
                 values[index] += _freq[i];
             }

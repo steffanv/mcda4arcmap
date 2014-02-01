@@ -37,9 +37,9 @@
         <!--<DockableWindow id="Ryerson_University_MCDA_ConfigView" class="ConfigView+AddinImpl" caption="Configuration" image="Images\ConfigView.png">
           <InitialPlacement height="300" width="300" state="unpinned" position="group" />
         </DockableWindow>-->
-        <DockableWindow id="Ryerson_University_MCDA_VisualizationView" class="VisualizationView+AddinImpl" caption="Visualization" image="Images\VisualizationView.png">
+        <!--<DockableWindow id="Ryerson_University_MCDA_VisualizationView" class="VisualizationView+AddinImpl" caption="Visualization" image="Images\VisualizationView.png">
           <InitialPlacement height="300" width="500" state="unpinned" position="group" />
-        </DockableWindow>
+        </DockableWindow>-->
       </DockableWindows>
       <Toolbars>
         <Toolbar id="Ryerson_University_MCDA_MCDA_Toolbar" caption="MCDA" showInitially="true">

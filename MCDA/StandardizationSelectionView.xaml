@@ -15,8 +15,17 @@
                     <Grid.Resources>
                         <local:EnumToBooleanConverter x:Key="enumToBooleanConverter" />
                     </Grid.Resources>
-                    <RadioButton IsChecked="{Binding SelectedTransformationStrategy, ConverterParameter={x:Static local:StandardizationStrategy.MaximumScoreStandardizationStrategy}, Converter={StaticResource enumToBooleanConverter}}"  Content="Maximum Score Standardization" Margin="10,10,-10,99"/>
-                    <RadioButton IsChecked="{Binding SelectedTransformationStrategy, ConverterParameter={x:Static local:StandardizationStrategy.ScoreRangeStandardizationStrategy}, Converter={StaticResource enumToBooleanConverter}}"  Content="Score Range Standardization" Margin="10,35,-10,74"/>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="10" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="10" />
+                        <RowDefinition Height="20" />
+                        <RowDefinition Height="20" />
+                    </Grid.RowDefinitions>
+                    <RadioButton Grid.Row="1" Grid.Column="1" IsChecked="{Binding SelectedTransformationStrategy, ConverterParameter={x:Static local:StandardizationStrategy.MaximumScoreStandardizationStrategy}, Converter={StaticResource enumToBooleanConverter}}"  Content="Maximum Score Standardization" />
+                    <RadioButton Grid.Row="2" Grid.Column="1" IsChecked="{Binding SelectedTransformationStrategy, ConverterParameter={x:Static local:StandardizationStrategy.ScoreRangeStandardizationStrategy}, Converter={StaticResource enumToBooleanConverter}}"  Content="Score Range Standardization" />
                 </Grid>
             </TabItem>
         </TabControl>

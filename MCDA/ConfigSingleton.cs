@@ -11,7 +11,7 @@ namespace MCDA.Model
     {
         private static ConfigSingleton _instance;
 
-        private RenderOption _selectedRenderOption;
+        private RenderOption _selectedRenderOption = RenderOption.AfterSliderDrag;
 
         private ConfigSingleton() { }
 

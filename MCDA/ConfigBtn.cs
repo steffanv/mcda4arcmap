@@ -4,28 +4,36 @@ using System.Text;
 using System.IO;
 using ESRI.ArcGIS.Framework;
 using ESRI.ArcGIS.esriSystem;
+using MCDA.ViewModel;
+using System.Windows.Interop;
+using MCDA.Model;
+using System.ComponentModel;
 
 
 namespace MCDA
 {
     internal sealed class ConfigBtn : ESRI.ArcGIS.Desktop.AddIns.Button
     {
-        public ConfigBtn()
-        {
-        }
-
+       
         protected override void OnClick()
         {
-            UID dockWinID = new UIDClass();
-            dockWinID.Value = ThisAddIn.IDs.ConfigView;
+            var parentHandle = new IntPtr(ArcMap.Application.hWnd);
 
-            IDockableWindow w = ArcMap.DockableWindowManager.GetDockableWindow(dockWinID);
+            ConfigView configView = new ConfigView();
 
-            w.Show(true);
+            var helper = new WindowInteropHelper(configView);
+
+            helper.Owner = parentHandle;
+
+            configView.Closing += ConfigViewClosing;
+
+            configView.ShowDialog();
         }
 
-        protected override void OnUpdate()
+        void ConfigViewClosing(object sender, CancelEventArgs e)
         {
+            //TODO nothing....so far
+           //ConfigSingleton.Instance.SelectedRenderoption = ConfigViewModel.SelectedRenderOption;
         }
     }
 }

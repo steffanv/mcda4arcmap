@@ -1,34 +1,40 @@
-﻿<UserControl x:Class="MCDA.ConfigView"
+﻿<Window x:Class="MCDA.ConfigView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="clr-namespace:MCDA.Model"
-    Height="300" Width="300">
-    <Grid>
-        <TabControl Name="tabControl1" Grid.Column="0" Grid.Row="1">
-            <TabItem Header="Visualization" Name="renderingTabItem">
+          Title="Configuration"
+        WindowStyle="ToolWindow"
+        ShowInTaskbar="False"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner"
+    Height="240" Width="330">
+    <Grid Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
+        <TabControl Grid.Column="0" Grid.Row="1" VerticalAlignment="Stretch" Margin="5,5,5,40">
+            <TabItem Header="Visualization" Name="renderingTabItem" VerticalAlignment="Bottom">
                 <GroupBox Header="Rendering Options">
-                <Grid>
-                    <Grid.Resources>
+                    <Grid>
+                        <Grid.Resources>
                             <local:EnumToBooleanConverter x:Key="enumToBooleanConverter" />
-                    </Grid.Resources>
+                        </Grid.Resources>
                         <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
-                        <RadioButton Grid.Row="0" GroupName="1" IsChecked="{Binding Path=RenderOptions, Converter={StaticResource enumToBooleanConverter}, ConverterParameter={x:Static local:RenderOption.AfterSliderDrag}}">After Slider Drag</RadioButton>
-                        <RadioButton Grid.Row="1" GroupName="1" IsChecked="{Binding Path=RenderOptions, Converter={StaticResource enumToBooleanConverter}, ConverterParameter={x:Static local:RenderOption.AnimationLike}}">Animation Like</RadioButton>
-                        <RadioButton Grid.Row="2" GroupName="1" IsChecked="{Binding Path=RenderOptions, Converter={StaticResource enumToBooleanConverter}, ConverterParameter={x:Static local:RenderOption.Realtime}}">Realtime</RadioButton>
-                        <TextBox Grid.Row="0" Grid.Column="1" TextWrapping="Wrap" IsReadOnly="True" BorderThickness="0">Refreshes the view after dragging the slider (fast). </TextBox>
-                        <TextBox Grid.Row="1" Grid.Column="1" TextWrapping="Wrap" IsReadOnly="True" BorderThickness="0">Refreshs the view after dragging the slider for a limited amount of ticks (medium). </TextBox>
-                        <TextBox Grid.Row="2" Grid.Column="1" TextWrapping="Wrap" IsReadOnly="True" BorderThickness="0">Refreshes the view for every slider tick (slow). </TextBox>
+                            <ColumnDefinition Width="10" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="10" />
+                            <RowDefinition Height="20" />
+                            <RowDefinition Height="20" />
+                            <RowDefinition Height="20" />
+                        </Grid.RowDefinitions>
+                        <RadioButton Grid.Row="1" Grid.Column="1" IsChecked="{Binding Path=SelectedRenderOption, Converter={StaticResource enumToBooleanConverter}, ConverterParameter={x:Static local:RenderOption.AfterSliderDrag}}"  ToolTip="Refreshes the view after dragging the slider (fast)" >After Slider Drag</RadioButton>
+                        <RadioButton Grid.Row="2" Grid.Column="2" IsChecked="{Binding Path=SelectedRenderOption, Converter={StaticResource enumToBooleanConverter}, ConverterParameter={x:Static local:RenderOption.AnimationLike}}"  ToolTip="Refreshs the view after dragging the slider for a limited amount of ticks (medium)" >Animation Like</RadioButton>
+                        <RadioButton Grid.Row="3" Grid.Column="3" IsChecked="{Binding Path=SelectedRenderOption, Converter={StaticResource enumToBooleanConverter}, ConverterParameter={x:Static local:RenderOption.Realtime}}" ToolTip="Refreshes the view for every slider tick (slow)." >Realtime</RadioButton>
                     </Grid>
                 </GroupBox>
-            </TabItem>         
+            </TabItem>
         </TabControl>
+        <Button Content="Cancel"  Width="75"  HorizontalAlignment="Left" VerticalAlignment="Top" Command="{Binding Path=CancelCommand}" Margin="164,182,0,0" />
+        <Button Content="Apply"  Width="75"  HorizontalAlignment="Left" VerticalAlignment="Top" Command="{Binding Path=ApplyCommand}" Margin="244,182,0,0"  />
+        <Button Content="OK" Width="75" HorizontalAlignment="Left"  VerticalAlignment="Top"  Command="{Binding Path=OkayCommand}" Margin="84,182,0,0"/>
     </Grid>
-</UserControl>
+</Window>

@@ -4,29 +4,24 @@ using System.Text;
 using System.IO;
 using ESRI.ArcGIS.esriSystem;
 using ESRI.ArcGIS.Framework;
+using System.Windows.Interop;
 
 
 namespace MCDA
 {
-    public class VisualizationBtn : ESRI.ArcGIS.Desktop.AddIns.Button
-    {
-        public VisualizationBtn()
-        {
-        }
-
+    internal sealed class VisualizationBtn : ESRI.ArcGIS.Desktop.AddIns.Button
+    { 
         protected override void OnClick()
         {
+            var parentHandle = new IntPtr(ArcMap.Application.hWnd);
 
-            UID dockWinID = new UIDClass();
-            dockWinID.Value = ThisAddIn.IDs.VisualizationView;
+            VisualizationView visualizationView = new VisualizationView();
 
-            IDockableWindow w = ArcMap.DockableWindowManager.GetDockableWindow(dockWinID);
+            var helper = new WindowInteropHelper(visualizationView);
 
-            w.Show(true);
-        }
+            helper.Owner = parentHandle;
 
-        protected override void OnUpdate()
-        {
+            visualizationView.Show();
         }
     }
 }

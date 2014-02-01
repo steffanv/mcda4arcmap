@@ -250,6 +250,8 @@ namespace MCDA.ViewModel
 
                     _completeResultList.Add(temp); 
                 }
+
+                _completeResultList.OrderBy(rC => rC.FeatureLayerName).ThenBy(rC => rC.FieldName);
             }
         }
 
@@ -356,6 +358,7 @@ namespace MCDA.ViewModel
         {
             if (_isBiPolarRendererApplyCommandExecuted)
             {
+                //TODO hier hat es gekracht nachdem ich das wlc tool geschlossen habe und apply machen wollte (NPE)
                 _selectedResult.RenderContainer.BiPolarRendererContainer = GetBiPolarContainer();
                 _selectedResult.RenderContainer.Renderer = Renderer.BiPolarRenderer;
 

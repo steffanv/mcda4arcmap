@@ -1,15 +1,19 @@
-﻿
-<UserControl x:Class="MCDA.VisualizationView"
+﻿<Window x:Class="MCDA.VisualizationView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"  
     xmlns:local="clr-namespace:MCDA.Model"
     xmlns:customControl="clr-namespace:MCDA.CustomControls"
     xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
-    Height="300" Width="500">
-    <UserControl.Resources>
+         Title="Visualization"
+        WindowStyle="ToolWindow"
+        ShowInTaskbar="False"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner"     
+    Height="400" Width="500">
+    <Window.Resources>
         <local:NullToFalseConverter x:Key="nullToFalseConverter" />
-    </UserControl.Resources>
-    <Grid>
+    </Window.Resources>
+    <Grid Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="Auto"/>
@@ -18,6 +22,7 @@
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="40"/>
         </Grid.RowDefinitions>
         <customControl:FlipControl x:Name="fc" Grid.Column="0" Grid.Row="0" HorizontalContentAlignment="Stretch" >
             <customControl:FlipControl.Front>
@@ -66,37 +71,33 @@
             </customControl:FlipControl.Back>
         </customControl:FlipControl>
         <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ResizeBehavior="PreviousAndNext" />
-        <TabControl   Name="visualizationMethodsTabControl"  Grid.Column="2" Grid.ColumnSpan="2" Grid.Row="0">
-            <TabItem Header="Class-Breaks Renderer" Name="classBreaksRenderer">
+        <TabControl   Name="visualizationMethodsTabControl"  Grid.Column="2" Grid.ColumnSpan="2" Grid.Row="0" Grid.RowSpan="2" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
+            <TabItem Header="Class-Breaks" Name="classBreaksRenderer" >
                 <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
-                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="40"/>
                     </Grid.RowDefinitions>
-                    <TabControl   Name="tabControl1"   Grid.ColumnSpan="2" Grid.Row="2">
+                    <TabControl   Name="tabControl1" >
                         <TabItem Header="Color Ramp" Name="colorRamp">
                             <Grid>
                                 <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="10"/>
                                     <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="10"/>
                                 </Grid.ColumnDefinitions>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="50"/>
                                 </Grid.RowDefinitions>
-                                <GroupBox Header="Negativ Color" Grid.Column="0" Grid.Row="0" Height="50">
+                                <GroupBox Header="Start Color" Grid.Column="1" Grid.Row="0" Height="50">
                                     <DockPanel LastChildFill="True" Name="dockPanel1"  />
                                 </GroupBox>
-                                <GroupBox Header="Positiv Color" Grid.Column="0" Grid.Row="1" Height="50">
+                                <GroupBox Header="End Color" Grid.Column="2" Grid.Row="0" Height="50">
                                     <DockPanel LastChildFill="True" Name="dockPanel2"  />
                                 </GroupBox>
-                                <GroupBox Header="Linear Gradient" Grid.Column="0" Grid.Row="2">
+                                <GroupBox Header="Linear Gradient" Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="2">
                                     <Rectangle Name="colorRampRectangle"  VerticalAlignment="Stretch" HorizontalAlignment="Stretch" />
                                 </GroupBox>
                             </Grid>
@@ -104,59 +105,73 @@
                         <TabItem Header="Classification" Name="classification">
                             <Grid>
                                 <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="10"/>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="10"/>
                                 </Grid.ColumnDefinitions>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="*"/>
                                 </Grid.RowDefinitions>
-                                <Label  Content="Classification Method" Grid.Column="0" Grid.Row="0" />
-                                <Label  Content="Classes" Grid.Column="1" Grid.Row="0" />
-                                <ComboBox ItemsSource="{Binding Path=ListOfClassificationMethod, Mode=OneWay}" DisplayMemberPath="MethodName" SelectedValue="{Binding Path=SelectedClassificationMethod, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding SelectedValue, ElementName=attributeComboBox, Converter={StaticResource nullToFalseConverter}}" Name="classificationComboBox" Grid.Column="0" Grid.Row="1"/>
-                                <ComboBox ItemsSource="{Binding Path=NumberOfClasses, Mode=OneWay}" SelectedValue="{Binding Path=SelectedNumberOfClasses, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding SelectedValue, ElementName=attributeComboBox, Converter={StaticResource nullToFalseConverter}}" Name="classesComboBox" Grid.Column="1" Grid.Row="1"/>
-                                <GroupBox Header="Histogram" Grid.Row="2" Grid.ColumnSpan="2">
+                                <Label  Content="Classification Method" Grid.Column="1" Grid.Row="0" />
+                                <Label  Content="Classes" Grid.Column="2" Grid.Row="0" />
+                                <ComboBox HorizontalAlignment="Right" Width="50" ItemsSource="{Binding Path=ListOfClassificationMethod, Mode=OneWay}" DisplayMemberPath="MethodName" SelectedValue="{Binding Path=SelectedClassificationMethod, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding SelectedValue, ElementName=attributeComboBox, Converter={StaticResource nullToFalseConverter}}" Name="classificationComboBox" Grid.Column="1" Grid.Row="1"/>
+                                <ComboBox HorizontalAlignment="Right" Width="50" ItemsSource="{Binding Path=NumberOfClasses, Mode=OneWay}" SelectedValue="{Binding Path=SelectedNumberOfClasses, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding SelectedValue, ElementName=attributeComboBox, Converter={StaticResource nullToFalseConverter}}" Name="classesComboBox" Grid.Column="2" Grid.Row="1"/>
+                                <GroupBox Header="Histogram" Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2">
                                     <customControl:Histogram x:Name="historgram"/>
                                 </GroupBox>
                             </Grid>
                         </TabItem>
                     </TabControl>
-                    <Button Content="Remove" Grid.Column="1" Grid.Row="3" Width="50" Height="23" HorizontalAlignment="Center" Command="{Binding Path=RemoveClassBreaksRendererCommand}" />
-                    <Button Content="Apply" Grid.Column="1" Grid.Row="3" Width="50" Height="23" HorizontalAlignment="Right" Command="{Binding Path=ApplyClassBreaksRendererCommand}" />
+                    <Button Content="Remove"  Width="75"  HorizontalAlignment="Left" VerticalAlignment="Top" Command="{Binding Path=RemoveClassBreaksRendererCommand}" Margin="165,12,0,0" Grid.Row="1" />
+                    <Button Content="Apply" Width="75" HorizontalAlignment="Left" VerticalAlignment="Top" Command="{Binding Path=ApplyClassBreaksRendererCommand}" Margin="245,12,0,0" Grid.Row="1" />
                 </Grid>
             </TabItem>
-            <TabItem Header="Bi-Polar Renderer" Name="uniqueValueRenderer">
+            <TabItem Header="Bi-Polar" Name="uniqueValueRenderer">
                 <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="40"/>
                     </Grid.RowDefinitions>
-                    <GroupBox Header="Negativ Color" Grid.ColumnSpan="2" Grid.Row="0" Height="50">
-                        <DockPanel LastChildFill="True" Name="biPolarNegativColorDockPanel"  />
-                    </GroupBox>
-                    <GroupBox Header="Positiv Color" Grid.ColumnSpan="2" Grid.Row="1" Height="50">
-                        <DockPanel LastChildFill="True" Name="biPolarPositivColorDockPanel"  />
-                    </GroupBox>
-                    <GroupBox Header="Neutral Color" Grid.ColumnSpan="2" Grid.Row="2" Height="50">
-                        <DockPanel LastChildFill="True" Name="biPolarNeutralColorDockPanel"  />
-                    </GroupBox>
-                    <GroupBox Header="Color Scale" Grid.ColumnSpan="2" Grid.Row="3">
-                        <Rectangle Name="biPolarColorScaleRectangle"  VerticalAlignment="Stretch" HorizontalAlignment="Stretch" />
-                    </GroupBox>
-                    <Slider Name="biPolarColorSlider" Grid.ColumnSpan="2" Grid.Row="4" Height="30"  Value="{Binding Path=BiPolarColorSliderValue, Mode=TwoWay}" Thumb.DragCompleted="biPolarColorSlider_DragCompleted" Orientation="Horizontal" Minimum="1" Maximum="99" />
-                    <Button Content="Remove" Grid.Column="1" Grid.Row="5" Width="50" Height="23" HorizontalAlignment="Center" Command="{Binding Path=RemoveBiPolarRendererCommand}" />
-                    <Button Content="Apply" Grid.Column="1" Grid.Row="5" Width="50" Height="23" HorizontalAlignment="Right" Command="{Binding Path=ApplyBiPolarRendererCommand}" />
+                    <Border BorderBrush="LightGray" BorderThickness="1">
+                        <Grid Grid.Row="0" Background="White" >
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="10"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="10"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="50"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="40" />
+                            </Grid.RowDefinitions>
+                            <GroupBox Header="Start Color" Grid.Column="1" Grid.Row="0" Height="50">
+                                <DockPanel LastChildFill="True" Name="biPolarNegativColorDockPanel"  />
+                            </GroupBox>
+                            <GroupBox Header="End Color" Grid.Column="2" Grid.Row="0" Height="50">
+                                <DockPanel LastChildFill="True" Name="biPolarPositivColorDockPanel"  />
+                            </GroupBox>
+                            <GroupBox Header="Neutral Color" Grid.Column="1" Grid.Row="2" Height="50">
+                                <DockPanel LastChildFill="True" Name="biPolarNeutralColorDockPanel"  />
+                            </GroupBox>
+                            <GroupBox Header="Linear Gradient" Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="3">
+                                <Rectangle Name="biPolarColorScaleRectangle"  VerticalAlignment="Stretch" HorizontalAlignment="Stretch" />
+                            </GroupBox>
+                            <Slider Name="biPolarColorSlider" Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="4" Height="30"  Value="{Binding Path=BiPolarColorSliderValue, Mode=TwoWay}" Thumb.DragCompleted="biPolarColorSlider_DragCompleted" Orientation="Horizontal" Minimum="1" Maximum="99" />
+                        </Grid>
+                    </Border>
+                    <Button Content="Apply"  Width="75" HorizontalAlignment="Left" VerticalAlignment="Top" Command="{Binding ApplyBiPolarRendererCommand}" Margin="245,12,0,0" Grid.Row="1" />
+                    <Button Content="Remove" Width="75" HorizontalAlignment="Left" VerticalAlignment="Top" Command="{Binding RemoveBiPolarRendererCommand}" Margin="165,12,0,0" Grid.Row="1"  />
                 </Grid>
             </TabItem>
-        </TabControl>     
+        </TabControl>
+        <Button Content="Switch" HorizontalAlignment="Left" Margin="83,10,0,0" VerticalAlignment="Top" Width="75" Grid.Row="1" Click="SwitchButtonClick"/>
     </Grid>
-</UserControl>
+</Window>

@@ -11,7 +11,12 @@
     <Grid Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
         <TabControl Grid.Column="0" Grid.Row="1" VerticalAlignment="Stretch" Margin="5,5,5,40">
             <TabItem Header="Visualization" Name="renderingTabItem" VerticalAlignment="Bottom">
-                <GroupBox Header="Rendering Options">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <GroupBox Header="Rendering Options" Grid.Row="0">
                     <Grid>
                         <Grid.Resources>
                             <local:EnumToBooleanConverter x:Key="enumToBooleanConverter" />
@@ -31,6 +36,7 @@
                         <RadioButton Grid.Row="3" Grid.Column="3" IsChecked="{Binding Path=SelectedRenderOption, Converter={StaticResource enumToBooleanConverter}, ConverterParameter={x:Static local:RenderOption.Realtime}}" ToolTip="Refreshes the view for every slider tick (slow)." >Realtime</RadioButton>
                     </Grid>
                 </GroupBox>
+                </Grid>
             </TabItem>
         </TabControl>
         <Button Content="Cancel"  Width="75"  HorizontalAlignment="Left" VerticalAlignment="Top" Command="{Binding Path=CancelCommand}" Margin="164,182,0,0" />

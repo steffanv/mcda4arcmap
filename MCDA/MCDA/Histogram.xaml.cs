@@ -53,6 +53,7 @@ namespace MCDA.CustomControls
 
         private void DrawBreaks()
         {
+            //TODO braks can contains no elements -> no MAX possible
             if (_breaks == null)
                 return;
 

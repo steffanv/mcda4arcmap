@@ -5,7 +5,7 @@
   <Version>1.1</Version>
   <Image>Images\MCDA Add-in.png</Image>
   <Author>Steffan Voss</Author>
-  <Company>-</Company>
+  <Company>Steffan Voss</Company>
   <Date>01/10/2014</Date>
   <Targets>
     <Target name="Desktop" version="10.2" />
@@ -34,9 +34,9 @@
         <!--<DockableWindow id="Ryerson_University_MCDA_WLCToolView" class="WLCToolView+AddinImpl" caption="WLC Tool" image="Images\WLCToolView.png">
           <InitialPlacement height="300" width="500" state="pinned" position="group" />
         </DockableWindow>-->
-        <DockableWindow id="Ryerson_University_MCDA_ConfigView" class="ConfigView+AddinImpl" caption="Configuration" image="Images\ConfigView.png">
+        <!--<DockableWindow id="Ryerson_University_MCDA_ConfigView" class="ConfigView+AddinImpl" caption="Configuration" image="Images\ConfigView.png">
           <InitialPlacement height="300" width="300" state="unpinned" position="group" />
-        </DockableWindow>
+        </DockableWindow>-->
         <DockableWindow id="Ryerson_University_MCDA_VisualizationView" class="VisualizationView+AddinImpl" caption="Visualization" image="Images\VisualizationView.png">
           <InitialPlacement height="300" width="500" state="unpinned" position="group" />
         </DockableWindow>

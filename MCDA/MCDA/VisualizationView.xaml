@@ -125,8 +125,8 @@
                             </Grid>
                         </TabItem>
                     </TabControl>
-                    <Button Content="Remove"  Width="75"  HorizontalAlignment="Left" VerticalAlignment="Top" Command="{Binding Path=RemoveClassBreaksRendererCommand}" Margin="165,12,0,0" Grid.Row="1" />
-                    <Button Content="Apply" Width="75" HorizontalAlignment="Left" VerticalAlignment="Top" Command="{Binding Path=ApplyClassBreaksRendererCommand}" Margin="245,12,0,0" Grid.Row="1" />
+                    <Button Content="Remove"  Width="75"  HorizontalAlignment="Left" VerticalAlignment="Top" Command="{Binding Path=RemoveClassBreaksRendererCommand}" Margin="165,12,0,0" Grid.Row="1" ToolTip="Remove the renderer from the layer." />
+                    <Button Content="Apply" Width="75" HorizontalAlignment="Left" VerticalAlignment="Top" Command="{Binding Path=ApplyClassBreaksRendererCommand}" Margin="245,12,0,0" Grid.Row="1" ToolTip="Apply the renderer to the layer." />
                 </Grid>
             </TabItem>
             <TabItem Header="Bi-Polar" Name="uniqueValueRenderer">
@@ -167,11 +167,11 @@
                             <Slider Name="biPolarColorSlider" Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="4" Height="30"  Value="{Binding Path=BiPolarColorSliderValue, Mode=TwoWay}" Thumb.DragCompleted="biPolarColorSlider_DragCompleted" Orientation="Horizontal" Minimum="1" Maximum="99" />
                         </Grid>
                     </Border>
-                    <Button Content="Apply"  Width="75" HorizontalAlignment="Left" VerticalAlignment="Top" Command="{Binding ApplyBiPolarRendererCommand}" Margin="245,12,0,0" Grid.Row="1" />
-                    <Button Content="Remove" Width="75" HorizontalAlignment="Left" VerticalAlignment="Top" Command="{Binding RemoveBiPolarRendererCommand}" Margin="165,12,0,0" Grid.Row="1"  />
+                    <Button Content="Apply"  Width="75" HorizontalAlignment="Left" VerticalAlignment="Top" Command="{Binding ApplyBiPolarRendererCommand}" Margin="245,12,0,0" Grid.Row="1" ToolTip="Apply the renderer to the layer." />
+                    <Button Content="Remove" Width="75" HorizontalAlignment="Left" VerticalAlignment="Top" Command="{Binding RemoveBiPolarRendererCommand}" Margin="165,12,0,0" Grid.Row="1" ToolTip="Remove the renderer from the layer."  />
                 </Grid>
             </TabItem>
         </TabControl>
-        <Button Content="Switch" HorizontalAlignment="Left" Margin="83,10,0,0" VerticalAlignment="Top" Width="75" Grid.Row="1" Click="SwitchButtonClick"/>
+        <Button Content="Switch" HorizontalAlignment="Left" Margin="83,10,0,0" VerticalAlignment="Top" Width="75" Grid.Row="1" Click="SwitchButtonClick" ToolTip="Switch between all layers and MCDA4ArcMap maintained layers."/>
     </Grid>
 </Window>

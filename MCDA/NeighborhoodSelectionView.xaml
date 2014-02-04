@@ -35,8 +35,8 @@
                                 <RowDefinition Height="20" />
                                 <RowDefinition Height="20" />
                             </Grid.RowDefinitions>
-                            <RadioButton Grid.Row="1" Grid.Column="1" GroupName="NeighborhoodOption" IsChecked="{Binding Path=NeighborhoodOption, Converter={StaticResource enumToBooleanConverter}, ConverterParameter={x:Static viewModel:NeighborhoodOptions.Rook}}" Content="Rook Contiguity" />
-                            <RadioButton Grid.Row="2" Grid.Column="2" GroupName="NeighborhoodOption" IsChecked="{Binding Path=NeighborhoodOption, Converter={StaticResource enumToBooleanConverter}, ConverterParameter={x:Static viewModel:NeighborhoodOptions.Queen}}" Content="Queen Contiguity" />
+                            <RadioButton Grid.Row="1" Grid.Column="1" GroupName="NeighborhoodOption" IsChecked="{Binding Path=NeighborhoodOption, Converter={StaticResource enumToBooleanConverter}, ConverterParameter={x:Static viewModel:NeighborhoodOptions.Rook}}" Content="Rook Contiguity" ToolTip="Include polygons that share a border of some length." />
+                            <RadioButton Grid.Row="2" Grid.Column="2" GroupName="NeighborhoodOption" IsChecked="{Binding Path=NeighborhoodOption, Converter={StaticResource enumToBooleanConverter}, ConverterParameter={x:Static viewModel:NeighborhoodOptions.Queen}}" Content="Queen Contiguity" ToolTip="Include polygons that share even a point lenght border." />
                         </Grid>
                     </GroupBox>
                     <GroupBox Header="Distance" Grid.Row="1">
@@ -54,10 +54,10 @@
                                 <RowDefinition Height="20" />
                                 <RowDefinition Height="25" />
                             </Grid.RowDefinitions>
-                            <RadioButton Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" GroupName="NeighborhoodOption" Content="Threshold Distance (Unit from Projection)"  IsChecked="{Binding Path=NeighborhoodOption, Converter={StaticResource enumToBooleanConverter}, ConverterParameter={x:Static viewModel:NeighborhoodOptions.Threshold}}" />
+                            <RadioButton Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" GroupName="NeighborhoodOption" Content="Threshold Distance (Unit from Projection)"  IsChecked="{Binding Path=NeighborhoodOption, Converter={StaticResource enumToBooleanConverter}, ConverterParameter={x:Static viewModel:NeighborhoodOptions.Threshold}}" ToolTip="Include polygons in a certain distance." />
                             <Slider Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Name="weightSlider"  Value="{Binding Path=Threshold, Mode=TwoWay}"  HorizontalContentAlignment="Stretch" Minimum="0" Maximum="1000" TickFrequency="0.01" />
                             <TextBox Grid.Row="3" Grid.Column="3" Name="weightSliderTextblock" Width="50" Text="{Binding ElementName=weightSlider, Path=Value, StringFormat={}{0:0.###} }" />
-                            <RadioButton Grid.Row="4" Grid.Column="1" GroupName="NeighborhoodOption" IsChecked="{Binding Path=NeighborhoodOption, Converter={StaticResource enumToBooleanConverter}, ConverterParameter={x:Static viewModel:NeighborhoodOptions.KNearestNeighbors}}">K Nearest Neighbors</RadioButton>
+                            <RadioButton Grid.Row="4" Grid.Column="1" GroupName="NeighborhoodOption" IsChecked="{Binding Path=NeighborhoodOption, Converter={StaticResource enumToBooleanConverter}, ConverterParameter={x:Static viewModel:NeighborhoodOptions.KNearestNeighbors}}" ToolTip="Include the k neareast neighboors.">K Nearest Neighbors</RadioButton>
                             <ComboBox Grid.Row="5" Grid.Column="2" Height="23" HorizontalAlignment="Center"  Name="comboBox1"  Width="50" ItemsSource="{Binding Path=NumberOfKNearestNeighbors, Mode=OneWay}" SelectedValue="{Binding Path=SelectedNumberOfKNearestNeighbors, Mode=TwoWay}" />
                         </Grid>
                     </GroupBox>
@@ -73,7 +73,7 @@
                                 <RowDefinition Height="20" />
                                 <RowDefinition Height="25" />
                             </Grid.RowDefinitions>
-                            <RadioButton Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" GroupName="NeighborhoodOption" IsChecked="{Binding Path=NeighborhoodOption, Converter={StaticResource enumToBooleanConverter}, ConverterParameter={x:Static viewModel:NeighborhoodOptions.Automatic}}" Content="Automatic (Extends neighborhood)"  />
+                            <RadioButton Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" GroupName="NeighborhoodOption" IsChecked="{Binding Path=NeighborhoodOption, Converter={StaticResource enumToBooleanConverter}, ConverterParameter={x:Static viewModel:NeighborhoodOptions.Automatic}}" Content="Automatic (Extends neighborhood)" ToolTip="Add neighboor polygons until LWLC can be calculated."  />
                             <ComboBox Grid.Row="2" Grid.Column="2" Height="23" HorizontalAlignment="Center"  Name="comboBox2"  Width="50" ItemsSource="{Binding Path=NumberOfKNearestNeighbors, Mode=OneWay}" SelectedValue="{Binding Path=SelectedNumberOfKNearestNeighborsForAutomatic, Mode=TwoWay}" />
                         </Grid>
                     </GroupBox>

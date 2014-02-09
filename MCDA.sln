@@ -2,12 +2,19 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Express 2012 for Windows Desktop
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MCDA", "MCDA\MCDA.csproj", "{6B4C0EC2-4865-4C29-8BBC-8A73FF9DCBA9}"
+	ProjectSection(ProjectDependencies) = postProject
+		{AC95B4DB-0463-4E2D-82D9-4535F7CFBEC1} = {AC95B4DB-0463-4E2D-82D9-4535F7CFBEC1}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MCDA.Test", "MCDA.Test\MCDA.Test.csproj", "{18F1EB09-2E54-4B41-B54A-ADA5407F2F88}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HistogramControl", "..\..\..\Visual Studio 2013\Projects\HistogramControl\HistogramControl\HistogramControl.csproj", "{AC95B4DB-0463-4E2D-82D9-4535F7CFBEC1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HistogramTestProject", "..\..\..\Visual Studio 2013\Projects\HistogramControl\HistogramTestProject\HistogramTestProject.csproj", "{3AE27CB5-AF7B-43CE-8A7F-BBE0D9BED681}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 3
+		SccNumberOfProjects = 5
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs36
 		SccLocalPath0 = .
@@ -17,6 +24,12 @@ Global
 		SccProjectUniqueName2 = MCDA.Test\\MCDA.Test.csproj
 		SccProjectName2 = MCDA.Test
 		SccLocalPath2 = MCDA.Test
+		SccProjectUniqueName3 = ..\\..\\..\\Visual\u0020Studio\u00202013\\Projects\\HistogramControl\\HistogramControl\\HistogramControl.csproj
+		SccProjectName3 = ../../histogram/HistogramControl/HistogramControl
+		SccLocalPath3 = ..\\..\\..\\Visual\u0020Studio\u00202013\\Projects\\HistogramControl\\HistogramControl
+		SccProjectUniqueName4 = ..\\..\\..\\Visual\u0020Studio\u00202013\\Projects\\HistogramControl\\HistogramTestProject\\HistogramTestProject.csproj
+		SccProjectName4 = ../../histogram/HistogramControl/HistogramTestProject
+		SccLocalPath4 = ..\\..\\..\\Visual\u0020Studio\u00202013\\Projects\\HistogramControl\\HistogramTestProject
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -47,6 +60,26 @@ Global
 		{18F1EB09-2E54-4B41-B54A-ADA5407F2F88}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{18F1EB09-2E54-4B41-B54A-ADA5407F2F88}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{18F1EB09-2E54-4B41-B54A-ADA5407F2F88}.Release|x86.ActiveCfg = Release|Any CPU
+		{AC95B4DB-0463-4E2D-82D9-4535F7CFBEC1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AC95B4DB-0463-4E2D-82D9-4535F7CFBEC1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AC95B4DB-0463-4E2D-82D9-4535F7CFBEC1}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{AC95B4DB-0463-4E2D-82D9-4535F7CFBEC1}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{AC95B4DB-0463-4E2D-82D9-4535F7CFBEC1}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{AC95B4DB-0463-4E2D-82D9-4535F7CFBEC1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AC95B4DB-0463-4E2D-82D9-4535F7CFBEC1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AC95B4DB-0463-4E2D-82D9-4535F7CFBEC1}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{AC95B4DB-0463-4E2D-82D9-4535F7CFBEC1}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{AC95B4DB-0463-4E2D-82D9-4535F7CFBEC1}.Release|x86.ActiveCfg = Release|Any CPU
+		{3AE27CB5-AF7B-43CE-8A7F-BBE0D9BED681}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3AE27CB5-AF7B-43CE-8A7F-BBE0D9BED681}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3AE27CB5-AF7B-43CE-8A7F-BBE0D9BED681}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{3AE27CB5-AF7B-43CE-8A7F-BBE0D9BED681}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{3AE27CB5-AF7B-43CE-8A7F-BBE0D9BED681}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{3AE27CB5-AF7B-43CE-8A7F-BBE0D9BED681}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3AE27CB5-AF7B-43CE-8A7F-BBE0D9BED681}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3AE27CB5-AF7B-43CE-8A7F-BBE0D9BED681}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{3AE27CB5-AF7B-43CE-8A7F-BBE0D9BED681}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{3AE27CB5-AF7B-43CE-8A7F-BBE0D9BED681}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -143,7 +143,6 @@
     <Compile Include="AbstractToolParameter.cs" />
     <Compile Include="AbstractToolViewModel.cs" />
     <Compile Include="AddDataViewModel.cs" />
-    <Compile Include="AHPToolBtn.cs" />
     <Compile Include="AlphaSelectionView.xaml.cs">
       <DependentUpon>AlphaSelectionView.xaml</DependentUpon>
     </Compile>
@@ -183,9 +182,6 @@
     <Compile Include="Export.cs" />
     <Compile Include="Field.cs" />
     <Compile Include="FieldTypeOID.cs" />
-    <Compile Include="Histogram.xaml.cs">
-      <DependentUpon>Histogram.xaml</DependentUpon>
-    </Compile>
     <Compile Include="IDeepCloneable.cs" />
     <Compile Include="ITool.cs" />
     <Compile Include="IToolParameter.cs" />
@@ -277,10 +273,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="FlipControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Histogram.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -389,6 +381,13 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\Visual Studio 2013\Projects\HistogramControl\HistogramControl\HistogramControl.csproj">
+      <Project>{ac95b4db-0463-4e2d-82d9-4535f7cfbec1}</Project>
+      <Name>HistogramControl</Name>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <StartAction>Program</StartAction>

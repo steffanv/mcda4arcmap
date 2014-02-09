@@ -14,7 +14,6 @@
     <ArcMap>
       <Commands>
         <Button id="Ryerson_University_MCDA_AddDataBtn" class="AddDataBtn" message="" caption="Add data" tip="Manage Critieria." category="MCDA Controls" image="Images\AddData.png" />
-        <!--<Button id="Ryerson_University_MCDA_AHPToolBtn" class="AHPToolBtn" message="" caption="AHP Tool" tip="Add-in command tooltip." category="Add-In Controls" image="Images\AHPTool.png" />-->
         <Button id="Ryerson_University_MCDA_OWAToolBtn" class="OWAToolBtn" message="" caption="OWA Tool" tip="Ordered Weighted Averaging Tool." category="Add-In Controls" image="Images\OWATool.png" />
         <Button id="Ryerson_University_MCDA_WLCToolBtn" class="WLCToolBtn" message="" caption="WLC Tool" tip="Weighted Linear Combination Tool." category="Add-In Controls" image="Images\WLCTool.png" />
         <Button id="Ryerson_University_MCDA_LWLCToolBtn" class="LWLCToolBtn" message="" caption="LWLC Tool" tip="Local Weighted Linear Combination Tool" category="Add-In Controls" image="Images\LWLCTool.png" />
@@ -57,7 +56,6 @@
             <Button refID="Ryerson_University_MCDA_WLCToolBtn" />
             <Button refID="Ryerson_University_MCDA_OWAToolBtn" />
             <Button refID="Ryerson_University_MCDA_LWLCToolBtn" />
-            <!--<Button refID="Ryerson_University_MCDA_AHPToolBtn" />-->
           </Items>
         </Menu>
       </Menus>

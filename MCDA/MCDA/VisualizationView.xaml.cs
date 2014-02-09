@@ -17,6 +17,7 @@ using Xceed.Wpf.Toolkit;
 using MCDA.ViewModel;
 using MCDA.Model;
 using System.Collections.ObjectModel;
+using HistogramControl;
 
 namespace MCDA
 {
@@ -29,13 +30,19 @@ namespace MCDA
         private ColorPicker _positivColorPickerForBiPolarRenderer = new ColorPicker();
         private ColorPicker _neutralColorPickerForBipolarRenderer = new ColorPicker();
 
+        private long [] _histogramData;
+
+        HistogramControl.HistogramControl _histogramControl = new HistogramControl.HistogramControl();
+
         private VisualizationViewModel _viewModel;
 
         public VisualizationView()
         {
             InitializeComponent();
 
-            InitialiazeColorPicker(); 
+            InitialiazeColorPicker();
+
+            InitializeHistogramControl();
 
             DataContext = new VisualizationViewModel();
 
@@ -47,7 +54,13 @@ namespace MCDA
             _viewModel.RegisterPropertyHandler(p => p.SelectedResult, ViewModelPropertyChanged);
            
         }
-  
+
+        public long[] HistogramData
+        {
+            get { return _histogramData; }
+            set { _histogramData = value; }
+        }
+
         void ViewModelPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             //we use this so far only for the histogram
@@ -56,18 +69,29 @@ namespace MCDA
 
             double[] data;
             int[] freq;
-
+           
             Classification.Histogram(_viewModel.SelectedResult.RenderContainer.FeatureClass, _viewModel.SelectedResult.Field, out data, out freq);
 
-            historgram.Data = data;
-            historgram.Frequency = freq;
-
-            historgram.DrawHistogram();
+            _histogramControl.Data = Array.ConvertAll<int, long>(Classification.NormalizeHistogramData(data, freq), Convert.ToInt64);
 
             double[] classes = Classification.Classify(_viewModel.SelectedClassificationMethod, _viewModel.SelectedResult.RenderContainer.FeatureClass, _viewModel.SelectedResult.Field, _viewModel.SelectedNumberOfClasses);
 
-            historgram.Breaks = classes;
+            _histogramControl.Breaks = Array.ConvertAll<int, long>(Classification.NormalizeBreaks(classes), Convert.ToInt64);   
+
         }
+
+        private void InitializeHistogramControl()
+        {
+            histogramGroupBoxDockPanel.Children.Add(_histogramControl);
+
+            Binding _histogramControlDataBinding = new Binding("HistogramData");
+            _histogramControl.SetBinding(HistogramControl.HistogramControl.DataProperty, _histogramControlDataBinding);
+
+            Binding _histogramControlBreaksBinding = new Binding("HistogramBreaksData");
+            _histogramControl.SetBinding(HistogramControl.HistogramControl.BreaksProperty, _histogramControlBreaksBinding);
+        }
+
+        #region Color Picker init
 
         private void InitialiazeColorPicker()
         {
@@ -131,6 +155,8 @@ namespace MCDA
             biPolarColorSlider.ValueChanged += new RoutedPropertyChangedEventHandler<double>(BiPolarColorSliderValueChanged);
         }
 
+        #endregion
+
         private void RedefineBiPolarLinearGradient()
         {
             LinearGradientBrush biPolarColorScaleRectagleBrush = new LinearGradientBrush(_negativColorPickerForBiPolarRenderer.SelectedColor, _positivColorPickerForBiPolarRenderer.SelectedColor, 0d);
@@ -161,17 +187,7 @@ namespace MCDA
             viewmodel.BiPolarRendererValuesChanged();
         }
 
-        private void ListView_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-            fc.Flip();
-        }
-
-        private void ListView_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
-        {
-            fc.Flip();
-        }
-
-        private void SwitchButtonClick(object sender, RoutedEventArgs e)
+        private void SwitchList(object sender, EventArgs e)
         {
             fc.Flip();
         }

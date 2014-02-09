@@ -8,7 +8,7 @@ using ESRI.ArcGIS.Carto;
 
 namespace MCDA.Model
 {
-    internal sealed class Classification
+    internal static class Classification
     {
         public static double[] Classify(IClassify method, IFeatureClass featureClass, IField field, int numberOfClasses)
         {
@@ -42,22 +42,52 @@ namespace MCDA.Model
             freq = dataFrequency as int[];
         }
 
-        //http://trompelecode.com/2012/04/how-to-create-an-image-histogram-using-csharp-and-wpf/
-        public static int[] SmoothHistogram(int[] originalValues) 
-        { 
-            int[] smoothedValues = new int[originalValues.Length]; 
-            double[] mask = new double[] { 0.25, 0.5, 0.25 };
+        public static int[] NormalizeHistogramData(double[] data, int[] freq)
+        {
+            if (data == null || freq == null || data.Length <= 0 || freq.Length <= 0)
+                return new int [0];
 
-            for (int bin = 1; bin < originalValues.Length - 1; bin++) {
- 
-                double smoothedValue = 0; 
-                for (int i = 0; i < mask.Length; i++)
-                { 
-                    smoothedValue += originalValues[bin - 1 + i] * mask[i]; 
-                } 
-                smoothedValues[bin] = (int)smoothedValue;
+            int[] normalizedValues = new int[100];
+
+            double max = data.Max();
+            double min = data.Min();
+
+            if (max - min == 0)
+                return new int[0];
+
+            double divisor = max - min;
+
+            for(int i = 0; i < data.Length; i++){
+
+                int position = (int) Math.Round(((data[i] - min) / divisor)*99, 0);
+                normalizedValues[position] += freq[i];
             }
 
-            return smoothedValues; }
+            return normalizedValues;
+        }
+
+        public static int[] NormalizeBreaks(double[] breaks)
+        {
+            if (breaks == null || breaks.Length <= 0)
+                return new int[0];
+
+            int[] normalizedValues = new int[breaks.Length];
+
+            double max = breaks.Max();
+            double min = breaks.Min();
+
+            if (max - min == 0)
+                return new int[0];
+
+            double divisor = max - min;
+
+            for (int i = 0; i < breaks.Length; i++)
+            {
+                normalizedValues[i] = (int)Math.Round(((breaks[i] - min) / divisor) * 99, 0);
+            }
+
+            return normalizedValues;
+        }
+       
     }
 }

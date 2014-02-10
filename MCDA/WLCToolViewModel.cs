@@ -292,7 +292,7 @@ namespace MCDA.ViewModel
            }
 
            if (!_isSendToInMemoryWorkspaceCommand)
-               //_mcdaExtension.RemoveLink(_wlcTool);
+               //mcdaExtension.RemoveLink(_wlcTool);
                DoLockCommand();
 
            PropertyChanged.Notify(() => IsSendToInMemoryWorkspaceCommand);

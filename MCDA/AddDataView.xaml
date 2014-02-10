@@ -14,7 +14,7 @@
                     <ListView Name="layerListView" ItemsSource="{Binding Path=Layer}" HorizontalContentAlignment="Stretch" DataContext="{Binding}">
                         <ListView.View>
                             <GridView>
-                                <GridViewColumn  Header="Active"  Width="Auto">
+                                <GridViewColumn  Header="Selected"  Width="Auto">
                                     <GridViewColumn.CellTemplate>
                                         <DataTemplate>
                                             <RadioButton Name="isSelectedRadioButton" IsChecked="{Binding Path=IsSelected, Mode=TwoWay}" />
@@ -41,24 +41,34 @@
                     <ListView Name="criteriaListView"  ItemsSource="{Binding Path=Fields}" HorizontalContentAlignment="Stretch" DataContext="{Binding}">
                         <ListView.View>
                             <GridView>
-                                <GridViewColumn  Header="Active"  Width="Auto">
+                                <GridViewColumn  Header="Selected"  Width="Auto">
                                     <GridViewColumn.CellTemplate>
                                         <DataTemplate>
-                                            <CheckBox Name="criteriaCheckBox" IsChecked="{Binding Path=IsSelected, Mode=TwoWay}"/>
+                                            <CheckBox Name="criteriaCheckBox" IsChecked="{Binding Path=IsSelected, Mode=TwoWay}" IsEnabled="{Binding Path=IsSuitableForMCDA, Mode=OneWay}" />
                                         </DataTemplate>
                                     </GridViewColumn.CellTemplate>
                                 </GridViewColumn>
-                                <GridViewColumn  Header="Criteria"  Width="150">
+                                <GridViewColumn  Header="Criteria"  Width="130">
                                     <GridViewColumn.CellTemplate>
                                         <DataTemplate>
-                                            <Label Name="criteriaLabel"  Content="{Binding Path=FieldName, Mode=OneWay}" />
+                                            <Label Name="criteriaLabel"  Content="{Binding Path=FieldName, Mode=OneWay}" >
+                                                <Label.Style>
+                                                    <Style TargetType="Label">
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsSuitableForMCDA}" Value="false">
+                                                                <Setter Property="ToolTip" Value="{Binding Path=NotSuitableForMCDAReason, Mode=OneWay}" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Label.Style>
+                                            </Label>
                                         </DataTemplate>
                                     </GridViewColumn.CellTemplate>
                                 </GridViewColumn>
-                                <GridViewColumn  Header="Owner"  Width="150">
+                                <GridViewColumn  Header="Remark"  Width="150">
                                     <GridViewColumn.CellTemplate>
                                         <DataTemplate>
-                                            <Label Name="criteriaLabel"  Content="{Binding Path=Layer.LayerName, Mode=OneWay}" />
+                                            <Label Name="remarkLabel"  Content="{Binding Path=NotSuitableForMCDAReason, Mode=OneWay}" />
                                         </DataTemplate>
                                     </GridViewColumn.CellTemplate>
                                 </GridViewColumn>

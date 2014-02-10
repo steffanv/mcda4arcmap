@@ -239,7 +239,7 @@
     <AddInContent Include="Images\MCDA Add-in.png" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AddDataBtn.cs" />
+    <Compile Include="AddDataButton.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MCDAExtension.cs" />

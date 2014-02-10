@@ -13,7 +13,7 @@
   <AddIn language="CLR4.5" library="MCDA.dll" namespace="MCDA">
     <ArcMap>
       <Commands>
-        <Button id="Ryerson_University_MCDA_AddDataBtn" class="AddDataBtn" message="" caption="Add data" tip="Manage Critieria." category="MCDA Controls" image="Images\AddData.png" />
+        <Button id="Ryerson_University_MCDA_AddDataBtn" class="AddDataButton" message="" caption="Add data" tip="Manage Critieria." category="MCDA Controls" image="Images\AddData.png" />
         <Button id="Ryerson_University_MCDA_OWAToolBtn" class="OWAToolBtn" message="" caption="OWA Tool" tip="Ordered Weighted Averaging Tool." category="Add-In Controls" image="Images\OWATool.png" />
         <Button id="Ryerson_University_MCDA_WLCToolBtn" class="WLCToolBtn" message="" caption="WLC Tool" tip="Weighted Linear Combination Tool." category="Add-In Controls" image="Images\WLCTool.png" />
         <Button id="Ryerson_University_MCDA_LWLCToolBtn" class="LWLCToolBtn" message="" caption="LWLC Tool" tip="Local Weighted Linear Combination Tool" category="Add-In Controls" image="Images\LWLCTool.png" />

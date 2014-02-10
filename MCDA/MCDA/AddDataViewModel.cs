@@ -9,62 +9,41 @@ using MCDA.Model;
 
 namespace MCDA.ViewModel
 {
-    /// <summary>
-    /// 
-    /// </summary>
-   internal sealed class AddDataViewModel : INotifyPropertyChanged
+    internal sealed class AddDataViewModel : INotifyPropertyChanged
     {
-       public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler PropertyChanged;
 
-       private BindingList<Layer> _layer;
-       private BindingList<Field> _fields = new BindingList<Field>();
+        private MCDAExtension mcdaExtension;
 
-       private MCDAExtension _mcdaExtension;
-
-        public AddDataViewModel() 
+        public AddDataViewModel()
         {
-            _mcdaExtension = MCDAExtension.GetExtension();
+            mcdaExtension = MCDAExtension.GetExtension();
 
-            _layer = new BindingList<Layer>(_mcdaExtension.AvailableFeatureLayer);
-
-            _mcdaExtension.RegisterPropertyHandler(x => x.AvailableLayer, MCDAExtensionPropertyChanged);
+            mcdaExtension.RegisterPropertyHandler(x => x.AvailableLayer, MCDAExtensionPropertyChanged);
 
             //call because the extension could already have a selected feature and thus fields
-            MCDAExtensionPropertyChanged(this,null);
-  
+            MCDAExtensionPropertyChanged(this, null);
         }
 
-        void MCDAExtensionPropertyChanged(object sender, PropertyChangedEventArgs e)
-        {         
-            _layer = new BindingList<Layer>(_mcdaExtension.AvailableFeatureLayer);
+        public BindingList<Layer> Layer { get; set; }
+       
+        public BindingList<Field> Fields { get; set; }
+     
 
-            Layer feature = _layer.Where(l => l.IsSelected).FirstOrDefault();
+        private void MCDAExtensionPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            Layer = new BindingList<Layer>(mcdaExtension.AvailableFeatureLayer.OrderBy(l => l.LayerName).ToList());
+
+            Layer feature = Layer.Where(l => l.IsSelected).FirstOrDefault();
 
             if (feature != null)
-            {
-                List<Field> field = feature.Fields.Where(f => f.IsNumber && f.HasDifferentNumericValues()).ToList();
-
-                _fields = new BindingList<Field>(field);
-            }
+                Fields = new BindingList<Field>(feature.Fields.OrderByDescending(f => f.IsSuitableForMCDA).ThenBy(f => f.FieldName).ToList());
             else
-            {
-                _fields = new BindingList<Field>();
-            }
+                Fields = new BindingList<Field>();
 
             PropertyChanged.Notify(() => Layer);
             PropertyChanged.Notify(() => Fields);
         }
 
-        public BindingList<Layer> Layer
-        {
-            get { return _layer; }
-            set { _layer = value; }
-        }
-
-        public BindingList<Field> Fields
-        {
-            get { return _fields; }
-            set { _fields = value; }
-        }
     }
 }

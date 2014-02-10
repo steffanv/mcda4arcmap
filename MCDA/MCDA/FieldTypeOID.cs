@@ -8,7 +8,7 @@ namespace MCDA.Model
     /// <summary>
     /// Use this class as custom type for data table column used for oids. 
     /// </summary>
-   internal sealed class FieldTypeOID : IComparable
+   internal sealed class FieldTypeOID : IComparable<FieldTypeOID>
     {
         public int OID { get; set; }
 
@@ -17,11 +17,9 @@ namespace MCDA.Model
             return OID.ToString();
         }
 
-        public int CompareTo(object obj)
+        public int CompareTo(FieldTypeOID fieldTypeOID)
         {
-            int arg = ((FieldTypeOID)obj).OID;
-
-            return arg.CompareTo(OID);
+            return fieldTypeOID.OID.CompareTo(OID);
         }
     }
 }

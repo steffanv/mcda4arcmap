@@ -303,7 +303,7 @@ namespace MCDA.ViewModel
 
             if (!_isSendToInMemoryWorkspaceCommand)
             {
-                //_mcdaExtension.RemoveLink(_owaTool);
+                //mcdaExtension.RemoveLink(_owaTool);
                 DoLockCommand();
             }
 

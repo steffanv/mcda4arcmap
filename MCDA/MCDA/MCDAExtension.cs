@@ -22,14 +22,10 @@ using MCDA.ViewModel;
 
 namespace MCDA
 {
-    /// <summary>
-    /// The s
-    /// </summary>
+
     internal sealed class MCDAExtension : ESRI.ArcGIS.Desktop.AddIns.Extension, INotifyPropertyChanged
     {
-        /// <summary>
-        /// 
-        /// </summary>
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         private static MCDAExtension _extension;
@@ -39,7 +35,7 @@ namespace MCDA
 
         private IActiveViewEvents_Event _activeViewEvents;
 
-        private IDictionary<AbstractToolTemplate,MCDAWorkspaceContainer> _dictionaryOfLinks= new Dictionary<AbstractToolTemplate,MCDAWorkspaceContainer>();
+        private IDictionary<AbstractToolTemplate, MCDAWorkspaceContainer> _dictionaryOfLinks = new Dictionary<AbstractToolTemplate, MCDAWorkspaceContainer>();
 
         private IWorkspace _shadowWorkspace;
 
@@ -75,7 +71,7 @@ namespace MCDA
         {
             //unregister for all member to avoid unessary multiple call
             _listOfAvailableLayer.ForEach(l => l.PropertyChanged -= new PropertyChangedEventHandler(AvailalbeLayerListMemberPropertyChanged));
-            _listOfAvailableLayer.ForEach(l => l.PropertyChanged +=new PropertyChangedEventHandler(AvailalbeLayerListMemberPropertyChanged));
+            _listOfAvailableLayer.ForEach(l => l.PropertyChanged += new PropertyChangedEventHandler(AvailalbeLayerListMemberPropertyChanged));
         }
 
         /// <summary>
@@ -125,65 +121,65 @@ namespace MCDA
 
             _activeViewEvents = map as IActiveViewEvents_Event;
 
-            _activeViewEvents.ItemAdded += new IActiveViewEvents_ItemAddedEventHandler(ArcMap_ItemAdded);
-            _activeViewEvents.ItemDeleted += new IActiveViewEvents_ItemDeletedEventHandler(ArcMap_ItemDeleted);
+            _activeViewEvents.ItemAdded += new IActiveViewEvents_ItemAddedEventHandler(ArcMapItemAdded);
+            _activeViewEvents.ItemDeleted += new IActiveViewEvents_ItemDeletedEventHandler(ArcMapItemDeleted);
 
-            ArcMap.Events.NewDocument += new ESRI.ArcGIS.ArcMapUI.IDocumentEvents_NewDocumentEventHandler(Events_NewDocument);
-            //ArcMap.Events.BeforeCloseDocument += new ESRI.ArcGIS.ArcMapUI.IDocumentEvents_BeforeCloseDocumentEventHandler(Events_BeforeCloseDocument); 
-            ArcMap.Events.OpenDocument += new ESRI.ArcGIS.ArcMapUI.IDocumentEvents_OpenDocumentEventHandler(Events_OpenDocument);
-  
+            ArcMap.Events.NewDocument += new ESRI.ArcGIS.ArcMapUI.IDocumentEvents_NewDocumentEventHandler(EventsNewDocument);
+            //ArcMap.Events.BeforeCloseDocument += new ESRI.ArcGIS.ArcMapUI.IDocumentEvents_BeforeCloseDocumentEventHandler(EventsBeforeCloseDocument); 
+            ArcMap.Events.OpenDocument += new ESRI.ArcGIS.ArcMapUI.IDocumentEvents_OpenDocumentEventHandler(EventsOpenDocument);
+
         }
         #endregion
 
         #region events
-        bool Events_BeforeCloseDocument()
+        bool EventsBeforeCloseDocument()
         {
-                // Return true to stop document from closing
-                ESRI.ArcGIS.Framework.IMessageDialog msgBox = new ESRI.ArcGIS.Framework.MessageDialogClass();
-                return msgBox.DoModal("BeforeCloseDocument Event", "Abort closing?", "Yes", "No", ArcMap.Application.hWnd);
-           
+            // Return true to stop document from closing
+            ESRI.ArcGIS.Framework.IMessageDialog msgBox = new ESRI.ArcGIS.Framework.MessageDialogClass();
+            return msgBox.DoModal("BeforeCloseDocument Event", "Abort closing?", "Yes", "No", ArcMap.Application.hWnd);
+
         }
-        void Events_NewDocument()
+        void EventsNewDocument()
         {
-            _activeViewEvents.ItemAdded -= new IActiveViewEvents_ItemAddedEventHandler(ArcMap_ItemAdded);
-            _activeViewEvents.ItemDeleted -= new IActiveViewEvents_ItemDeletedEventHandler(ArcMap_ItemDeleted);
+            _activeViewEvents.ItemAdded -= new IActiveViewEvents_ItemAddedEventHandler(ArcMapItemAdded);
+            _activeViewEvents.ItemDeleted -= new IActiveViewEvents_ItemDeletedEventHandler(ArcMapItemDeleted);
 
             IMap map = ArcMap.Document.ActiveView.FocusMap;
 
             _activeViewEvents = map as IActiveViewEvents_Event;
 
-            _activeViewEvents.ItemAdded += new IActiveViewEvents_ItemAddedEventHandler(ArcMap_ItemAdded);
-            _activeViewEvents.ItemDeleted += new IActiveViewEvents_ItemDeletedEventHandler(ArcMap_ItemDeleted);
+            _activeViewEvents.ItemAdded += new IActiveViewEvents_ItemAddedEventHandler(ArcMapItemAdded);
+            _activeViewEvents.ItemDeleted += new IActiveViewEvents_ItemDeletedEventHandler(ArcMapItemDeleted);
 
             AvailableLayer = new List<Model.Layer>();
 
         }
 
-        void Events_OpenDocument()
+        void EventsOpenDocument()
         {
-            _activeViewEvents.ItemAdded -= new IActiveViewEvents_ItemAddedEventHandler(ArcMap_ItemAdded);
-            _activeViewEvents.ItemDeleted -= new IActiveViewEvents_ItemDeletedEventHandler(ArcMap_ItemDeleted);
+            _activeViewEvents.ItemAdded -= new IActiveViewEvents_ItemAddedEventHandler(ArcMapItemAdded);
+            _activeViewEvents.ItemDeleted -= new IActiveViewEvents_ItemDeletedEventHandler(ArcMapItemDeleted);
 
             IMap map = ArcMap.Document.ActiveView.FocusMap;
 
             _activeViewEvents = map as IActiveViewEvents_Event;
 
-            _activeViewEvents.ItemAdded += new IActiveViewEvents_ItemAddedEventHandler(ArcMap_ItemAdded);
-            _activeViewEvents.ItemDeleted += new IActiveViewEvents_ItemDeletedEventHandler(ArcMap_ItemDeleted);
+            _activeViewEvents.ItemAdded += new IActiveViewEvents_ItemAddedEventHandler(ArcMapItemAdded);
+            _activeViewEvents.ItemDeleted += new IActiveViewEvents_ItemDeletedEventHandler(ArcMapItemDeleted);
 
             AvailableLayer = new List<Model.Layer>();
         }
 
-        void ArcMap_ItemDeleted(object Item)
+        void ArcMapItemDeleted(object Item)
         {
-           
+
             RefreshAvailableLayerListAfterAddOrDelete(ArcMap.Document.ActiveView);
 
             PropertyChanged.Notify(() => AvailableLayer);
 
         }
 
-        private void ArcMap_ItemAdded(object item)
+        private void ArcMapItemAdded(object item)
         {
             RefreshAvailableLayerListAfterAddOrDelete(ArcMap.Document.ActiveView);
 
@@ -194,8 +190,8 @@ namespace MCDA
         public ToolParameterContainer GetToolParameterBasedOnSelectedFields()
         {
             IList<IToolParameter> toolParameter = new List<IToolParameter>();
-            
-            AvailableLayer.Where(l => l.IsSelected).ForEach(l => l.Fields.Where(f => f.IsSelected && f.IsNumber).ForEach(f => toolParameter.Add(new ToolParameter(f.FieldName))));
+
+            AvailableLayer.Where(l => l.IsSelected).ForEach(l => l.Fields.Where(f => f.IsSelected && f.IsNumeric).ForEach(f => toolParameter.Add(new ToolParameter(f.FieldName))));
 
             return new ToolParameterContainer(toolParameter);
         }
@@ -231,39 +227,39 @@ namespace MCDA
 
             int extension = 0;
 
-            while(SelectedLayer.Fields.Any(f => f.FieldName.Equals(preferredName)))
+            while (SelectedLayer.Fields.Any(f => f.FieldName.Equals(preferredName)))
             {
                 //remove what we tried before
                 if (extension > 0)
                     preferredName = preferredName.Remove(preferredName.Length - (extension).ToString().Length);
 
                 extension++;
-                preferredName += extension;          
+                preferredName += extension;
             }
 
-            return preferredName;         
+            return preferredName;
         }
 
         public IList<Model.Field> GetFieldsFromSelectedLayerWhichAreNumeric(IList<Model.Layer> layer)
         {
             IList<Model.Field> fieldList = new List<Model.Field>();
 
-            layer.Where(l => l.IsSelected).ForEach(l => l.Fields.Where(f => f.IsNumber).ForEach(f => fieldList.Add(f)));
+            layer.Where(l => l.IsSelected).ForEach(l => l.Fields.Where(f => f.IsNumeric).ForEach(f => fieldList.Add(f)));
 
             return fieldList;
         }
 
         public DataTable GetDataTableForParameterSet<T>(IList<T> toolParameter) where T : IToolParameter
         {
-           IList<Model.Field> listOfFields = GetListOfFieldsFromToolParameter(toolParameter);
+            IList<Model.Field> listOfFields = GetListOfFieldsFromToolParameter(toolParameter);
 
-           DataTable dataTable = new DataTable();
+            DataTable dataTable = new DataTable();
 
-           //add columns
-           foreach (Model.Field currentField in listOfFields)
-           {
-               dataTable.Columns.Add(currentField.FieldName, typeof(double));
-           }
+            //add columns
+            foreach (Model.Field currentField in listOfFields)
+            {
+                dataTable.Columns.Add(currentField.FieldName, typeof(double));
+            }
 
             //add the oid column
             Model.Field oidField = GetOIDFieldFromSelectedFeature();
@@ -281,7 +277,7 @@ namespace MCDA
                 // it is important to take care of the order of the columns! later we depend if we add data
                 listOfFields.Insert(0, oidField);
 
-                if(oidField.FieldName.Equals("FID"))
+                if (oidField.FieldName.Equals("FID"))
                     isOIDFieldNameFID = true;
 
                 //make the oid column the first column
@@ -291,52 +287,52 @@ namespace MCDA
             }
 
             //get data for rows and store it in a list of list like a table
-           IList<IList<double>> tableData = new List<IList<double>>();
+            IList<IList<double>> tableData = new List<IList<double>>();
 
-           bool isOIDFieldStartsByZero = false;
+            bool isOIDFieldStartsByZero = false;
 
-           int expectedNumbersOfRow = 0;
-           foreach (Model.Field currentField in listOfFields)
-           {
-               IList<double> column = GetValuesOfField(currentField);
-               tableData.Add(column);
+            int expectedNumbersOfRow = 0;
+            foreach (Model.Field currentField in listOfFields)
+            {
+                IList<double> column = GetValuesOfField(currentField);
+                tableData.Add(column);
 
-               //each column has the data of all rows in the column
-               expectedNumbersOfRow = column.Count;
+                //each column has the data of all rows in the column
+                expectedNumbersOfRow = column.Count;
 
-               if (currentField.IsOID && column.Contains(0d))
-                   isOIDFieldStartsByZero = true;                  
-           }
-           
-           // add rows
-           // the table data list has the same order as the datatable columns!
-           for (int i = 0; i < expectedNumbersOfRow; i++)
-           {
-               DataRow row = dataTable.NewRow();
+                if (currentField.IsOID && column.Contains(0d))
+                    isOIDFieldStartsByZero = true;
+            }
 
-               for (int y = 0; y < tableData.Count; y++)
-               {
-                   //we have the oid column
-                   if (y == dataTableOIDOrdinal)
-                   {
-                       //if the column is FID we have to change the ids 0...x to 1...x+1 because this change will be made after the featureclass is copied into the in memory workspace
-                       if (isOIDFieldNameFID && isOIDFieldStartsByZero)
-                       {
-                           row[y] = new FieldTypeOID() { OID = (int)tableData[y][i]+1 };
-                           continue;
-                       }
+            // add rows
+            // the table data list has the same order as the datatable columns!
+            for (int i = 0; i < expectedNumbersOfRow; i++)
+            {
+                DataRow row = dataTable.NewRow();
 
-                       row[y] = new FieldTypeOID() { OID = (int) tableData[y][i] };
-                         continue;
-                   }
+                for (int y = 0; y < tableData.Count; y++)
+                {
+                    //we have the oid column
+                    if (y == dataTableOIDOrdinal)
+                    {
+                        //if the column is FID we have to change the ids 0...x to 1...x+1 because this change will be made after the featureclass is copied into the in memory workspace
+                        if (isOIDFieldNameFID && isOIDFieldStartsByZero)
+                        {
+                            row[y] = new FieldTypeOID() { OID = (int)tableData[y][i] + 1 };
+                            continue;
+                        }
 
-                   row[y] = tableData[y][i];
-               }
+                        row[y] = new FieldTypeOID() { OID = (int)tableData[y][i] };
+                        continue;
+                    }
 
-               dataTable.Rows.Add(row);
-           }
+                    row[y] = tableData[y][i];
+                }
 
-           return dataTable;
+                dataTable.Rows.Add(row);
+            }
+
+            return dataTable;
         }
 
         public IList<MCDAWorkspaceContainer> GetAllMCDAWorkspaceContainerFromShadowWorkspace()
@@ -373,7 +369,7 @@ namespace MCDA
         public IList<IField> GetListOfFieldsFromFeatureClass(IFeatureClass featureClass)
         {
             IList<IField> fieldsList = new List<IField>();
-            
+
             IFields fields = featureClass.Fields;
 
             for (int i = 0; i <= fields.FieldCount - 1; i++)
@@ -387,13 +383,13 @@ namespace MCDA
 
         #region private ArcObjects stuff
 
-        private IList<Model.Layer>  GetListOfLayerFromActiveView(ESRI.ArcGIS.Carto.IActiveView activeView)
+        private IList<Model.Layer> GetListOfLayerFromActiveView(ESRI.ArcGIS.Carto.IActiveView activeView)
         {
 
             IList<Model.Layer> layerList = new List<Model.Layer>();
 
             ESRI.ArcGIS.Carto.IMap map = activeView.FocusMap;
-           
+
             // Get the number of layers
             int numberOfLayers = map.LayerCount;
 
@@ -403,7 +399,7 @@ namespace MCDA
 
                 layerList.Add(new Model.Layer(map.get_Layer(i)));
             }
-            
+
             return layerList;
         }
 
@@ -444,10 +440,10 @@ namespace MCDA
             }
 
             //remove
-            for(int i = _listOfAvailableLayer.Count -1; i >= 0; i--)
+            for (int i = _listOfAvailableLayer.Count - 1; i >= 0; i--)
             {
                 if (!newLayerList.Any(l => l == _listOfAvailableLayer[i].ESRILayer))
-                    _listOfAvailableLayer.RemoveAt(i);   
+                    _listOfAvailableLayer.RemoveAt(i);
             }
 
             //add
@@ -456,7 +452,7 @@ namespace MCDA
                 //think about this lambda foreach "bug"
                 ILayer freshReference = currentNewLayer;
                 //is the new layer part in the mcda layer list?
-                if(!_listOfAvailableLayer.Any(l => l.ESRILayer == freshReference))
+                if (!_listOfAvailableLayer.Any(l => l.ESRILayer == freshReference))
                     _listOfAvailableLayer.Add(new Model.Layer(currentNewLayer));
             }
 
@@ -523,11 +519,11 @@ namespace MCDA
         public void DisplayLink(AbstractToolTemplate tool)
         {
             MCDAWorkspaceContainer mcdaWorkspaceContainer;
-           
+
             if (!_dictionaryOfLinks.TryGetValue(tool, out mcdaWorkspaceContainer))
                 return;
 
-           ArcMap.Document.ActiveView.FocusMap.AddLayer(mcdaWorkspaceContainer.FeatureLayer);
+            ArcMap.Document.ActiveView.FocusMap.AddLayer(mcdaWorkspaceContainer.FeatureLayer);
         }
 
         public void RemoveLink(AbstractToolTemplate tool)
@@ -654,16 +650,17 @@ namespace MCDA
             {
                 IGeoFeatureLayer geoFeatureLayer = renderContainer.FeatureLayer as IGeoFeatureLayer;
 
-                switch(renderContainer.Renderer){
+                switch (renderContainer.Renderer)
+                {
 
-                    case Renderer.ClassBreaksRenderer: geoFeatureLayer.Renderer = RendererFactory.NewClassBreaksRenderer( renderContainer);
+                    case Renderer.ClassBreaksRenderer: geoFeatureLayer.Renderer = RendererFactory.NewClassBreaksRenderer(renderContainer);
                         break;
                     case Renderer.BiPolarRenderer: geoFeatureLayer.Renderer = RendererFactory.NewUniqueValueRenderer(renderContainer);
                         break;
                     case Renderer.None: geoFeatureLayer.Renderer = RendererFactory.NewSimpleRenderer();
                         break;
                 }
-                
+
                 PartialRefresh(renderContainer);
             }
         }
@@ -673,76 +670,13 @@ namespace MCDA
         /// </summary>
         /// <param name="renderContainer"></param>
         private void PartialRefresh(IRenderContainer renderContainer)
-        {  
+        {
             IActiveView av = (IActiveView)ArcMap.Document.FocusMap;
 
             av.ContentsChanged();
             ArcMap.Document.UpdateContents();
 
             av.PartialRefresh(esriViewDrawPhase.esriViewGeography, renderContainer.FeatureLayer, null);
- 
-        }
-
-        #region workspace editing
-        /*
-        private bool StartEditing(ESRI.ArcGIS.Geodatabase.IWorkspace workspaceToEdit)
-        {
-            //Get a reference to the editor.
-            UID uid = new UIDClass();
-            uid.Value = "esriEditor.Editor";
-            IEditor _editor = ArcMap.Application.FindExtensionByCLSID(uid) as IEditor;
-
-            //Check to see if a workspace is already being edited.
-            if (_editor.EditState == esriEditState.esriStateNotEditing)
-            {
-                _editor.StartEditing(workspaceToEdit);
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        private void StopEditing(ESRI.ArcGIS.Geodatabase.IWorkspace workspaceToEdit)
-        {
-            _editor.StopEditing(true);
-        }
-        */
-        #endregion
-
-        #region persistence
-        protected override void OnSave(Stream outStrm)
-        { 
-            var bf = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
-
-            //persist only the unique layer names of selected layer
-            _listOfSelectedUniqueLayerNamesForPersistence = _listOfAvailableLayer.Where(l => l.IsSelected).Select(l => l.UniqueLayerName).ToList();
-             
-            bf.Serialize(outStrm, _listOfSelectedUniqueLayerNamesForPersistence);
-        }
-
-        protected override void OnLoad(Stream inStrm)
-        {
-            var bf = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
-
-            //bf.AssemblyFormat = System.Runtime.Serialization.Formatters.FormatterAssemblyStyle.Simple;
-
-            bf.Binder = new MCDADeserializationBinder();
-
-            _listOfSelectedUniqueLayerNamesForPersistence = null;
-            _listOfSelectedUniqueLayerNamesForPersistence = bf.Deserialize(inStrm) as List<string>;
-        }
-
-    }
-
-    sealed class MCDADeserializationBinder : SerializationBinder
-    {
-        public override Type BindToType(string assemblyName, string typeName)
-        {
-            return Type.GetType(typeName + "," + Assembly.GetExecutingAssembly().FullName);
         }
     }
-     #endregion  
-
 }

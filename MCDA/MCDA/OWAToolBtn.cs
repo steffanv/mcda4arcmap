@@ -21,9 +21,9 @@ namespace MCDA
             //UID dockWinID = new UIDClass();
             //dockWinID.Value = ThisAddIn.IDs.OWAToolView;
 
-            //IDockableWindow w = ArcMap.DockableWindowManager.GetDockableWindow(dockWinID);
+            //IDockableWindow dockableWindow = ArcMap.DockableWindowManager.GetDockableWindow(dockWinID);
 
-            //w.Show(true);
+            //dockableWindow.Show(true);
 
             var parentHandle = new IntPtr(ArcMap.Application.hWnd);
 

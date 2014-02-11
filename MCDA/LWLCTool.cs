@@ -337,7 +337,8 @@ namespace MCDA.Model
                         List<int> values;
                         neighborDictionary.TryGetValue(currentKey, out values);
 
-                        values.ModifyEach(v => v + 1);
+                        values = values.Select(v => v + 1).ToList();
+
                         newNeighborDictionary.Add(currentKey + 1, values);
                     }
 
@@ -500,7 +501,8 @@ namespace MCDA.Model
                 {
                     List<int> values = neighborDictionary[currentKey];
 
-                    values.ModifyEach(v => v + 1);
+                    values = values.Select(v => v + 1).ToList();
+
                     newNeighborDictionary.Add(currentKey + 1, values);
                 }
 

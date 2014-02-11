@@ -95,11 +95,18 @@ namespace MCDA.ViewModel
 
         private void RegisterToolParameterEvents()
         {
-            _toolParameter.ForEach(t => t.UnRegisterPropertyHandler(b => b.IsBenefitCriterion, BenefitCriterionChanged));
-            _toolParameter.ForEach(t => t.UnRegisterPropertyHandler(w => w.Weight, WeightChanged));
+            foreach (var currentToolParameter in _toolParameter)
+            {
+                currentToolParameter.UnRegisterPropertyHandler(b => b.IsBenefitCriterion, BenefitCriterionChanged);
+                currentToolParameter.UnRegisterPropertyHandler(w => w.Weight, WeightChanged);
+            }
 
-            _toolParameter.ForEach(t => t.RegisterPropertyHandler(b => b.IsBenefitCriterion, BenefitCriterionChanged));
-            _toolParameter.ForEach(t => t.RegisterPropertyHandler(w => w.Weight, WeightChanged));
+            foreach(var currentToolParameter in _toolParameter){
+
+                currentToolParameter.RegisterPropertyHandler(b => b.IsBenefitCriterion, BenefitCriterionChanged);
+                currentToolParameter.RegisterPropertyHandler(w => w.Weight, WeightChanged);
+            }
+
         }
 
         private void MCDAExtensionPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -111,12 +118,18 @@ namespace MCDA.ViewModel
 
             _toolParameter = new BindingList<IToolParameter>(_owaTool.ToolParameterContainer.ToolParameter);
 
-            
-
             if (_mcdaExtension.SelectedLayer != null)
             {
-                _mcdaExtension.SelectedLayer.Fields.ForEach(x => x.UnRegisterPropertyHandler(f => f.IsSelected, FieldPropertyChanged));
-                _mcdaExtension.SelectedLayer.Fields.ForEach(x => x.RegisterPropertyHandler(f => f.IsSelected, FieldPropertyChanged));
+          
+                foreach (var currentField in _mcdaExtension.SelectedLayer.Fields)
+                {
+                    currentField.UnRegisterPropertyHandler(f => f.IsSelected, FieldPropertyChanged);
+                }
+
+                foreach (var currentField in _mcdaExtension.SelectedLayer.Fields)
+                {
+                    currentField.RegisterPropertyHandler(f => f.IsSelected, FieldPropertyChanged);
+                }
 
                 if (_mcdaExtension.SelectedLayer.Fields.Count(f => f.IsSelected) >= 1){
                     HasCriteriaSelected = true;

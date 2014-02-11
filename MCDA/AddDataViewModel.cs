@@ -29,10 +29,9 @@ namespace MCDA.ViewModel
        
         public BindingList<Field> Fields { get; set; }
      
-
         private void MCDAExtensionPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            Layer = new BindingList<Layer>(mcdaExtension.AvailableFeatureLayer.OrderBy(l => l.LayerName).ToList());
+            Layer = new BindingList<Layer>(mcdaExtension.AllAvailableLayer.OrderByDescending(l => l.IsSuitableForMCDA).ThenBy(l => l.LayerName).ToList());
 
             Layer feature = Layer.Where(l => l.IsSelected).FirstOrDefault();
 

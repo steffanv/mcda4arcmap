@@ -60,6 +60,11 @@ namespace MCDA
             get { return AvailableLayer.Where(l => l.IsFeatureLayer && l.HasAreaAndTopologicalOperator()).ToList().OrderBy(f => f.LayerName).ToList(); }
         }
 
+        public IList<Model.Layer> AllAvailableLayer
+        {
+            get { return AvailableLayer.OrderBy(f => f.LayerName).ToList(); }
+        }
+
         public IDictionary<AbstractToolTemplate, MCDAWorkspaceContainer> LinkDictionary
         {
             get { return _dictionaryOfLinks; }
@@ -70,8 +75,15 @@ namespace MCDA
         private void RegisterListenerForEveryMemberOfListOfAvailableLayer()
         {
             //unregister for all member to avoid unessary multiple call
-            _listOfAvailableLayer.ForEach(l => l.PropertyChanged -= new PropertyChangedEventHandler(AvailalbeLayerListMemberPropertyChanged));
-            _listOfAvailableLayer.ForEach(l => l.PropertyChanged += new PropertyChangedEventHandler(AvailalbeLayerListMemberPropertyChanged));
+            foreach (var currentAvailableLayer in _listOfAvailableLayer)
+            {
+                currentAvailableLayer.PropertyChanged -= new PropertyChangedEventHandler(AvailalbeLayerListMemberPropertyChanged);
+            }
+
+            foreach (var currentAvailableLayer in _listOfAvailableLayer)
+            {
+                currentAvailableLayer.PropertyChanged += new PropertyChangedEventHandler(AvailalbeLayerListMemberPropertyChanged);
+            }
         }
 
         /// <summary>
@@ -82,7 +94,11 @@ namespace MCDA
         /// <param name="e"></param>
         private void AvailalbeLayerListMemberPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            _listOfAvailableLayer.Where(l => Layer.LastSelectedLayer != l).ForEach(l => l.IsSelected = false);
+
+            foreach(var currentAvailableLayer in _listOfAvailableLayer.Where(l => Layer.LastSelectedLayer != l))
+            {
+                currentAvailableLayer.IsSelected = false;
+            }
 
             PropertyChanged.Notify(() => AvailableLayer);
         }
@@ -191,7 +207,13 @@ namespace MCDA
         {
             IList<IToolParameter> toolParameter = new List<IToolParameter>();
 
-            AvailableLayer.Where(l => l.IsSelected).ForEach(l => l.Fields.Where(f => f.IsSelected && f.IsNumeric).ForEach(f => toolParameter.Add(new ToolParameter(f.FieldName))));
+            foreach (var currentAvailableLayer in AvailableLayer.Where(l => l.IsSelected))
+            {
+                foreach (var currentField in currentAvailableLayer.Fields.Where(f => f.IsSelected && f.IsNumeric))
+	            {
+		            toolParameter.Add(new ToolParameter(currentField.FieldName));
+	            }
+            }
 
             return new ToolParameterContainer(toolParameter);
         }
@@ -244,7 +266,13 @@ namespace MCDA
         {
             IList<Model.Field> fieldList = new List<Model.Field>();
 
-            layer.Where(l => l.IsSelected).ForEach(l => l.Fields.Where(f => f.IsNumeric).ForEach(f => fieldList.Add(f)));
+            foreach(var currentLayer in layer.Where(l => l.IsSelected)){
+
+                foreach(var currentField in currentLayer.Fields.Where(f => f.IsNumeric)){
+
+                    fieldList.Add(currentField);
+                }
+            }
 
             return fieldList;
         }
@@ -409,7 +437,13 @@ namespace MCDA
 
             foreach (IToolParameter currentToolParameter in toolParameter)
             {
-                AvailableLayer.Where(l => l.IsSelected).ForEach(l => l.Fields.Where(f => f.FieldName.Equals(currentToolParameter.ColumnName)).ForEach(f => listOfFields.Add(f)));
+                foreach(var currentAvailableLayer in AvailableLayer.Where(l => l.IsSelected)){
+
+                    foreach(var currentField in currentAvailableLayer.Fields.Where(f => f.FieldName.Equals(currentToolParameter.ColumnName))){
+
+                        listOfFields.Add(currentField);
+                    }
+                } 
             }
 
             return listOfFields;

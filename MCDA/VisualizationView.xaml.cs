@@ -18,6 +18,7 @@ using MCDA.ViewModel;
 using MCDA.Model;
 using System.Collections.ObjectModel;
 using HistogramControl;
+using MCDA.Extensions;
 
 namespace MCDA
 {

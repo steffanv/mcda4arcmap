@@ -7,12 +7,8 @@ using System.Windows.Interop;
 
 namespace MCDA
 {
-    internal sealed class LWLCToolBtn : ESRI.ArcGIS.Desktop.AddIns.Button
+    internal sealed class LWLCToolButton : ESRI.ArcGIS.Desktop.AddIns.Button
     {
-        public LWLCToolBtn()
-        {
-        }
-
         protected override void OnClick()
         {
             var parentHandle = new IntPtr(ArcMap.Application.hWnd);
@@ -24,10 +20,6 @@ namespace MCDA
             helper.Owner = parentHandle;
 
             wpfWindow.Show();
-        }
-
-        protected override void OnUpdate()
-        {
         }
     }
 }

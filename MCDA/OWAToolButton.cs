@@ -9,22 +9,10 @@ using System.Windows.Interop;
 
 namespace MCDA
 {
-    internal sealed class OWAToolBtn : ESRI.ArcGIS.Desktop.AddIns.Button
+    internal sealed class OWAToolButton : ESRI.ArcGIS.Desktop.AddIns.Button
     {
-        public OWAToolBtn()
-        {
-        }
-
         protected override void OnClick()
         {
-
-            //UID dockWinID = new UIDClass();
-            //dockWinID.Value = ThisAddIn.IDs.OWAToolView;
-
-            //IDockableWindow dockableWindow = ArcMap.DockableWindowManager.GetDockableWindow(dockWinID);
-
-            //dockableWindow.Show(true);
-
             var parentHandle = new IntPtr(ArcMap.Application.hWnd);
 
             var wpfWindow = new OWAToolView();
@@ -36,8 +24,5 @@ namespace MCDA
             wpfWindow.Show();
         }
 
-        protected override void OnUpdate()
-        {
-        }
     }
 }

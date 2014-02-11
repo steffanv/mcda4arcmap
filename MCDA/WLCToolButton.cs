@@ -2,29 +2,28 @@
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
-using ESRI.ArcGIS.Framework;
 using ESRI.ArcGIS.esriSystem;
-using MCDA.ViewModel;
+using ESRI.ArcGIS.Framework;
 using System.Windows.Interop;
-using MCDA.Model;
-using System.ComponentModel;
 
 
 namespace MCDA
 {
-    internal sealed class ConfigBtn : ESRI.ArcGIS.Desktop.AddIns.Button
-    {  
+    internal sealed class WLCToolButton : ESRI.ArcGIS.Desktop.AddIns.Button
+    {
+        
         protected override void OnClick()
         {
             var parentHandle = new IntPtr(ArcMap.Application.hWnd);
 
-            ConfigView configView = new ConfigView();
+            var wpfWindow = new WLCToolView();
 
-            var helper = new WindowInteropHelper(configView);
+            var helper = new WindowInteropHelper(wpfWindow);
 
             helper.Owner = parentHandle;
 
-            configView.ShowDialog();
+            wpfWindow.Show();
         }
+
     }
 }

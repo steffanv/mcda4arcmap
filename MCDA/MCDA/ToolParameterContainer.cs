@@ -12,16 +12,20 @@ namespace MCDA.Model
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private IList<IToolParameter> _listOfParameter;
+        private IList<IToolParameter> listOfParameter;
         private IWeightDistributionStrategy _weightDistributionStrategy = WeightDistributionStrategyFactory.DefaultWeightDistributionStrategy();
 
         private static bool _isLocked = false;
 
         public ToolParameterContainer(IList<IToolParameter> listOfParameter )
         {
-            _listOfParameter = listOfParameter;
+            this.listOfParameter = listOfParameter;
 
-            _listOfParameter.ForEach(p => p.RegisterPropertyHandler(x => x.Weight, WeightPropertyChanged));
+            foreach (var currentParameter in this.listOfParameter)
+            {
+                currentParameter.RegisterPropertyHandler(x => x.Weight, WeightPropertyChanged);
+            }
+
         }
 
         void WeightPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -30,7 +34,7 @@ namespace MCDA.Model
             {
                 _isLocked = true;
 
-                _weightDistributionStrategy.Distribute(_listOfParameter);
+                _weightDistributionStrategy.Distribute(listOfParameter);
 
                 _isLocked = false;
 
@@ -46,11 +50,14 @@ namespace MCDA.Model
 
         public void DistributeEquallyToolParameterWeights()
         {
-            double weight = 100 / (double)_listOfParameter.Count;
+            double weight = 100 / (double)listOfParameter.Count;
 
             _isLocked = true;
 
-            _listOfParameter.ForEach(t => t.Weight = weight);
+            foreach (var currentParameter in listOfParameter)
+            {
+                currentParameter.Weight = weight;
+            }
 
             _isLocked = false;
 
@@ -59,12 +66,19 @@ namespace MCDA.Model
 
         public IList<IToolParameter> ToolParameter
         {
-            get { return _listOfParameter.Where(t => !t.IsOID).ToList(); }
+            get { return listOfParameter.Where(t => !t.IsOID).ToList(); }
             set {
 
-                _listOfParameter.ForEach(p => p.UnRegisterPropertyHandler(w => w.Weight, WeightPropertyChanged));
-                PropertyChanged.ChangeAndNotify(ref _listOfParameter, value, () => ToolParameter);
-                _listOfParameter.ForEach(p => p.RegisterPropertyHandler(w => w.Weight, WeightPropertyChanged));
+                foreach (var currentParameter in listOfParameter)
+                {
+                    currentParameter.UnRegisterPropertyHandler(w => w.Weight, WeightPropertyChanged);
+                }
+                PropertyChanged.ChangeAndNotify(ref listOfParameter, value, () => ToolParameter);
+
+                foreach (var currentParameter in listOfParameter)
+                {
+                    currentParameter.RegisterPropertyHandler(w => w.Weight, WeightPropertyChanged);
+                }
             }
         }
     }

@@ -9,27 +9,19 @@ using System.Windows.Interop;
 
 namespace MCDA
 {
-    internal sealed class WLCToolBtn : ESRI.ArcGIS.Desktop.AddIns.Button
-    {
-        public WLCToolBtn()
-        {
-        }
-
+    internal sealed class VisualizationButton : ESRI.ArcGIS.Desktop.AddIns.Button
+    { 
         protected override void OnClick()
         {
             var parentHandle = new IntPtr(ArcMap.Application.hWnd);
 
-            var wpfWindow = new WLCToolView();
+            VisualizationView visualizationView = new VisualizationView();
 
-            var helper = new WindowInteropHelper(wpfWindow);
+            var helper = new WindowInteropHelper(visualizationView);
 
             helper.Owner = parentHandle;
 
-            wpfWindow.Show();
-        }
-
-        protected override void OnUpdate()
-        {
+            visualizationView.Show();
         }
     }
 }

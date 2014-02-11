@@ -32,7 +32,11 @@ namespace MCDA.Model
             {
                 //assume values = 0 are only close to zero (0.01) otherwise we could never increase the value while distributing the weight
                 double hundredPercentValueOfWeights = listOfToolParameter.Where(t => t.IsLocked == false && t != lastWeightChangedToolParameter).Sum(t => t.Weight);
-                listOfToolParameter.Where(t => t.IsLocked == false && t != lastWeightChangedToolParameter && t.Weight == 0).ForEach(t => t.Weight = 0.01);
+
+                foreach(var currentToolParameter in listOfToolParameter.Where(t => t.IsLocked == false && t != lastWeightChangedToolParameter && t.Weight == 0))
+                {
+                    currentToolParameter.Weight = 0.01;
+                }
 
                 foreach (IToolParameter currentToolParameter in listOfToolParameter.Where(t => t.IsLocked == false && t != lastWeightChangedToolParameter).ToList())
                 {
@@ -46,9 +50,15 @@ namespace MCDA.Model
                 }
             }
 
-            listOfToolParameter.Where(t => t.Weight <= 0.01).ForEach(t => t.Weight = 0);
-
-            listOfToolParameter.Where(t => t.Weight > 100).ForEach(t => t.Weight = 100);
+            foreach (var currentToolParamter in listOfToolParameter.Where(t => t.Weight <= 0.01))
+            {
+                currentToolParamter.Weight = 0;
+            }
+           
+            foreach( var currentToolParameter in listOfToolParameter.Where(t => t.Weight > 100))
+            {
+                currentToolParameter.Weight = 100;
+            }
         }
     }
 }

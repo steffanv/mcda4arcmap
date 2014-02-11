@@ -50,11 +50,18 @@ namespace MCDA.Model
         {
             get
             {
+                if (!IsFeatureLayer)
+                    return "Layer is not a FeatureLayer.";
                 if (!HasAreaAndTopologicalOperator())
-                    return "Field is not numeric.";
+                    return "Geometry must be Polygon.";
                 else return string.Empty;
 
             }
+        }
+
+        public bool IsSuitableForMCDA
+        {
+            get { return IsFeatureLayer && HasAreaAndTopologicalOperator() ; }
         }
 
         public IFeatureClass FeatureClass
@@ -113,7 +120,6 @@ namespace MCDA.Model
         {
             switch (FeatureLayer.ShapeType)
             {
-
                 case ESRI.ArcGIS.Geometry.esriGeometryType.esriGeometryPolygon:
                     return true;
             }
@@ -128,8 +134,15 @@ namespace MCDA.Model
 
         public void RegisterListenerForEveryMemberOfFields()
         {
-            fields.ForEach(f => f.PropertyChanged -= new PropertyChangedEventHandler(FieldPropertyChanged));
-            fields.ForEach(f => f.PropertyChanged +=new PropertyChangedEventHandler(FieldPropertyChanged));
+            foreach (var currentField in fields)
+            {
+                currentField.PropertyChanged -= new PropertyChangedEventHandler(FieldPropertyChanged);
+            }
+
+            foreach (var currentField in fields)
+            {
+                currentField.PropertyChanged +=new PropertyChangedEventHandler(FieldPropertyChanged);
+            }
         }
 
         private void FieldPropertyChanged(object sender, PropertyChangedEventArgs e)

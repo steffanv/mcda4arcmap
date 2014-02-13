@@ -9,14 +9,24 @@ namespace MCDA.Model
     {
         public static IStandardizationStrategy GetStrategy(StandardizationStrategy transformationStrategy){
 
-            if(transformationStrategy == StandardizationStrategy.MaximumScoreStandardizationStrategy)
-                return new MaximumScoreStandardizationStrategy();
-            if(transformationStrategy == StandardizationStrategy.ScoreRangeStandardizationStrategy)
-                return new ScoreRangeStandardizationStrategy();
-            if(transformationStrategy == StandardizationStrategy.DefaultStandardizationStrategy)
-                return new MaximumScoreStandardizationStrategy();
-
-            return new MaximumScoreStandardizationStrategy();
+            switch (transformationStrategy)
+	        {
+		    case StandardizationStrategy.MaximumScoreStandardizationStrategy:
+                    return new MaximumScoreStandardizationStrategy();
+                
+            case StandardizationStrategy.ScoreRangeStandardizationStrategy:
+                    return new ScoreRangeStandardizationStrategy();
+                
+            case StandardizationStrategy.IdentityStandardizationStrategy:
+                    return new IdentityStandardizationStrategy();
+                
+            case StandardizationStrategy.DefaultStandardizationStrategy:
+                    return new MaximumScoreStandardizationStrategy();
+                
+            default:
+                    return new MaximumScoreStandardizationStrategy();
+                
+	        }
         }
     }
 
@@ -24,6 +34,7 @@ namespace MCDA.Model
 
         MaximumScoreStandardizationStrategy,
         ScoreRangeStandardizationStrategy,
+        IdentityStandardizationStrategy,
         DefaultStandardizationStrategy
 
     }

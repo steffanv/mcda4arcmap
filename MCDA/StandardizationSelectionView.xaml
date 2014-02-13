@@ -23,9 +23,11 @@
                         <RowDefinition Height="10" />
                         <RowDefinition Height="20" />
                         <RowDefinition Height="20" />
+                        <RowDefinition Height="20" />
                     </Grid.RowDefinitions>
-                    <RadioButton Grid.Row="1" Grid.Column="1" IsChecked="{Binding SelectedTransformationStrategy, ConverterParameter={x:Static local:StandardizationStrategy.MaximumScoreStandardizationStrategy}, Converter={StaticResource enumToBooleanConverter}}"  Content="Maximum Score Standardization" ToolTip="Produces values between 0 and 1, where cost criteria is anchored at 0 and benefit criteria at 1." />
-                    <RadioButton Grid.Row="2" Grid.Column="1" IsChecked="{Binding SelectedTransformationStrategy, ConverterParameter={x:Static local:StandardizationStrategy.ScoreRangeStandardizationStrategy}, Converter={StaticResource enumToBooleanConverter}}"  Content="Score Range Standardization" ToolTip="The lowest value will be zero and the highest 1. Does not preserve proportionality." />
+                    <RadioButton Grid.Row="1" Grid.Column="1" IsChecked="{Binding SelectedTransformationStrategy, ConverterParameter={x:Static local:StandardizationStrategy.IdentityStandardizationStrategy}, Converter={StaticResource enumToBooleanConverter}}"  Content="Identity Standardization" ToolTip="Does not perform any kind of standardization." />
+                    <RadioButton Grid.Row="2" Grid.Column="1" IsChecked="{Binding SelectedTransformationStrategy, ConverterParameter={x:Static local:StandardizationStrategy.MaximumScoreStandardizationStrategy}, Converter={StaticResource enumToBooleanConverter}}"  Content="Maximum Score Standardization" ToolTip="Produces values between 0 and 1, where cost criteria is anchored at 0 and benefit criteria at 1." />
+                    <RadioButton Grid.Row="3" Grid.Column="1" IsChecked="{Binding SelectedTransformationStrategy, ConverterParameter={x:Static local:StandardizationStrategy.ScoreRangeStandardizationStrategy}, Converter={StaticResource enumToBooleanConverter}}"  Content="Score Range Standardization" ToolTip="The lowest value will be zero and the highest 1. Does not preserve proportionality." />
                 </Grid>
             </TabItem>
         </TabControl>

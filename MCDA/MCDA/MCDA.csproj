@@ -152,6 +152,7 @@
     <Compile Include="FlipControl.xaml.cs">
       <DependentUpon>FlipControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="IdentityStandardizationStrategy.cs" />
     <Compile Include="IRenderContainer.cs" />
     <Compile Include="LWLCTool.cs" />
     <Compile Include="LWLCToolButton.cs" />

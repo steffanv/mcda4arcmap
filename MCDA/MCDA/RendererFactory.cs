@@ -224,6 +224,7 @@ namespace MCDA.Model
             IClassBreaksRenderer classBreaksRenderer = new ClassBreaksRendererClass();
             classBreaksRenderer.Field = classBreaksRendererContainer.Field.AliasName;
             classBreaksRenderer.BreakCount = classificationResult.Count();
+            //TODO hier knallt es auch, existiert das result nicht immer?
             classBreaksRenderer.MinimumBreak = classificationResult.Min();
 
             Color startColor = classBreaksRendererContainer.StartColor;

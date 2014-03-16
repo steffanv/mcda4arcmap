@@ -9,7 +9,7 @@ namespace MCDA.Model
     /// <summary>
     /// Represents a strategy to standardize a list of numerical values.
     /// </summary>
-    public interface IStandardizationStrategy
+    public interface INormalizationStrategy
     {
         /// <summary>
         /// Transforms a DataColumn in place.

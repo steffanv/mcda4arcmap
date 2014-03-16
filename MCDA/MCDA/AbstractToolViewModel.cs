@@ -11,11 +11,11 @@ namespace MCDA.ViewModel
     {
         public AbstractToolViewModel()
         {
-            _standardizationViewModel.CancelCommand = CancelStandardizationCommand;
-            _standardizationViewModel.ApplyCommand = ApplyStandardizationCommand;
-            _standardizationViewModel.OkayCommand = OkayStandardizationCommand;
+            _NormalizationViewModel.CancelCommand = CancelNormalizationCommand;
+            _NormalizationViewModel.ApplyCommand = ApplyNormalizationCommand;
+            _NormalizationViewModel.OkayCommand = OkayNormalizationCommand;
 
-            _standardizationView.DataContext = _standardizationViewModel;
+            _NormalizationView.DataContext = _NormalizationViewModel;
         }
 
         protected virtual void BeforeUpdate(){}
@@ -50,7 +50,7 @@ namespace MCDA.ViewModel
    
         }
 
-        protected ICommand _standardizationSelectionCommand;
+        protected ICommand _NormalizationSelectionCommand;
         protected ICommand _sendToInMemoryWorkspaceCommand;
         protected ICommand _lockCommand;
         protected ICommand _exportAsCSVCommand;
@@ -75,18 +75,18 @@ namespace MCDA.ViewModel
             }
         }
 
-        public ICommand StandardizationSelectionCommand
+        public ICommand NormalizationSelectionCommand
         {
             get
             {
-                if (_standardizationSelectionCommand == null)
+                if (_NormalizationSelectionCommand == null)
                 {
-                    _standardizationSelectionCommand = new RelayCommand(
-                        param => this.DoStandardizationSelectionCommand(),
+                    _NormalizationSelectionCommand = new RelayCommand(
+                        param => this.DoNormalizationSelectionCommand(),
                         param => HasCriteriaSelected
                     );
                 }
-                return _standardizationSelectionCommand;
+                return _NormalizationSelectionCommand;
             }
         }
 
@@ -156,67 +156,67 @@ namespace MCDA.ViewModel
         }
 
        protected abstract void DoLockCommand();
-       protected abstract void DoStandardizationSelectionCommand();
+       protected abstract void DoNormalizationSelectionCommand();
        protected abstract void DoSendToInMemoryWorkspaceCommand();
        protected abstract void DoExportAsCSVCommand();
        protected abstract void DoDistributionCommand();
        protected abstract void DoClosingCommand();
 
 
-       #region standardization
+       #region Normalization
 
-       protected StandardizationSelectionView _standardizationView = new StandardizationSelectionView();
-       protected StandardizationSelectionViewModel _standardizationViewModel = new StandardizationSelectionViewModel();
+       protected NormalizationSelectionView _NormalizationView = new NormalizationSelectionView();
+       protected NormalizationSelectionViewModel _NormalizationViewModel = new NormalizationSelectionViewModel();
 
-       private ICommand _applyStandardizationCommand;
-       private ICommand _okayStandardizationCommand;
-       private ICommand _cancelStandardizationCommand;
+       private ICommand _applyNormalizationCommand;
+       private ICommand _okayNormalizationCommand;
+       private ICommand _cancelNormalizationCommand;
 
-       private ICommand CancelStandardizationCommand
+       private ICommand CancelNormalizationCommand
        {
            get
            {
-               if (_cancelStandardizationCommand == null)
+               if (_cancelNormalizationCommand == null)
                {
-                   _cancelStandardizationCommand = new RelayCommand(
-                       p => this.DoCancelStandardizationCommand(),
+                   _cancelNormalizationCommand = new RelayCommand(
+                       p => this.DoCancelNormalizationCommand(),
                        p => true);
                }
-               return _cancelStandardizationCommand;
+               return _cancelNormalizationCommand;
            }
        }
 
-       private ICommand OkayStandardizationCommand
+       private ICommand OkayNormalizationCommand
        {
            get
            {
-               if (_okayStandardizationCommand == null)
+               if (_okayNormalizationCommand == null)
                {
-                   _okayStandardizationCommand = new RelayCommand(
-                       p => this.DoOkayStandardizationCommand(),
+                   _okayNormalizationCommand = new RelayCommand(
+                       p => this.DoOkayNormalizationCommand(),
                        p => true);
                }
-               return _okayStandardizationCommand;
+               return _okayNormalizationCommand;
            }
        }
 
-       private ICommand ApplyStandardizationCommand
+       private ICommand ApplyNormalizationCommand
        {
            get
            {
-               if (_applyStandardizationCommand == null)
+               if (_applyNormalizationCommand == null)
                {
-                   _applyStandardizationCommand = new RelayCommand(
-                       p => this.DoApplyStandardizationCommand(),
+                   _applyNormalizationCommand = new RelayCommand(
+                       p => this.DoApplyNormalizationCommand(),
                        p => true);
                }
-               return _applyStandardizationCommand;
+               return _applyNormalizationCommand;
            }
        }
 
-       protected abstract void DoApplyStandardizationCommand();
-       protected abstract void DoCancelStandardizationCommand();
-       protected abstract void DoOkayStandardizationCommand();
+       protected abstract void DoApplyNormalizationCommand();
+       protected abstract void DoCancelNormalizationCommand();
+       protected abstract void DoOkayNormalizationCommand();
 
        #endregion
     }

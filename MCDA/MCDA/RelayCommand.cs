@@ -6,71 +6,38 @@ using System.Windows.Input;
 
 namespace MCDA.Model
 {
-    ///From http://stackoverflow.com/questions/3531772/binding-button-click-to-a-method
-
-
-    /// <summary>
-    /// A command whose sole purpose is to 
-    /// relay its functionality to other
-    /// objects by invoking delegates. The
-    /// default return value for the CanExecute
-    /// method is 'true'.
-    /// </summary>
     internal class RelayCommand : ICommand
     {
-        #region Fields
-
-        readonly Action<object> _execute;
-        readonly Predicate<object> _canExecute;
-
-        #endregion // Fields
-
-        #region Constructors
-
-        /// <summary>
-        /// Creates a new command that can always execute.
-        /// </summary>
-        /// <param name="execute">The execution logic.</param>
-        public RelayCommand(Action<object> execute)
-            : this(execute, null)
-        {
-        }
-
-        /// <summary>
-        /// Creates a new command.
-        /// </summary>
-        /// <param name="execute">The execution logic.</param>
-        /// <param name="canExecute">The execution status logic.</param>
-        public RelayCommand(Action<object> execute, Predicate<object> canExecute)
-        {
-            if (execute == null)
-                throw new ArgumentNullException("execute");
-
-            _execute = execute;
-            _canExecute = canExecute;
-        }
-
-        #endregion // Constructors
-
-        #region ICommand Members
-
-        //[DebuggerStepThrough]
-        public bool CanExecute(object parameters)
-        {
-            return _canExecute == null ? true : _canExecute(parameters);
-        }
+        readonly Action<object> execute;
+        readonly Predicate<object> canExecute;
 
         public event EventHandler CanExecuteChanged
         {
             add { CommandManager.RequerySuggested += value; }
             remove { CommandManager.RequerySuggested -= value; }
         }
+      
+        public RelayCommand(Action<object> execute) : this(execute, null)
+        {
+        }
+
+        public RelayCommand(Action<object> execute, Predicate<object> canExecute)
+        {
+            if (execute == null)
+                throw new ArgumentNullException("execute");
+
+            this.execute = execute;
+            this.canExecute = canExecute;
+        }
+
+        public bool CanExecute(object parameter)
+        {
+            return canExecute == null ? true : canExecute(parameter);
+        }
 
         public void Execute(object parameters)
         {
-            _execute(parameters);
+            execute(parameters);
         }
-
-        #endregion // ICommand Members
     }
 }

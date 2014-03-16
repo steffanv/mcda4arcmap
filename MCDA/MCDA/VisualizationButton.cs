@@ -21,7 +21,7 @@ namespace MCDA
 
             helper.Owner = parentHandle;
 
-            visualizationView.Show();
+            visualizationView.ShowDialog();
         }
     }
 }

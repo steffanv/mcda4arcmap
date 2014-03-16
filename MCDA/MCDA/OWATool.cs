@@ -11,7 +11,7 @@ namespace MCDA.Model
     {
         private DataTable _workingDataTable, _backupDataTable;
         private ToolParameterContainer _toolParameterContainer;
-        private StandardizationStrategy _transformationStrategy;
+        private NormalizationStrategy _transformationStrategy;
         private double _alpha;
 
         private string _owaResultColumnName = "OWAResult";
@@ -24,7 +24,7 @@ namespace MCDA.Model
 
             _toolParameterContainer = toolParameterContainer;
 
-            _transformationStrategy = Model.StandardizationStrategy.MaximumScoreStandardizationStrategy;
+            _transformationStrategy = Model.NormalizationStrategy.MaximumScoreNormalizationStrategy;
 
             _alpha = 1;
         }
@@ -46,7 +46,7 @@ namespace MCDA.Model
             set { _toolParameterContainer = value; }
         }
 
-        public override StandardizationStrategy TransformationStrategy
+        public override NormalizationStrategy TransformationStrategy
         {
             get { return _transformationStrategy; }
             set { _transformationStrategy = value; }
@@ -65,7 +65,7 @@ namespace MCDA.Model
             foreach (IToolParameter currentToolParameter in _toolParameterContainer.ToolParameter)
             {
 
-                StandardizationStrategyFactory.GetStrategy(_transformationStrategy).Transform(_workingDataTable.Columns[currentToolParameter.ColumnName], currentToolParameter.IsBenefitCriterion);
+                NormalizationStrategyFactory.GetStrategy(_transformationStrategy).Transform(_workingDataTable.Columns[currentToolParameter.ColumnName], currentToolParameter.IsBenefitCriterion);
             }
         }
 

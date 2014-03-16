@@ -21,6 +21,6 @@ namespace MCDA.Model
         public abstract string DefaultResultColumnName {get; set;}
         public abstract DataTable Data{ get; }
         public abstract ToolParameterContainer ToolParameterContainer {get; set;}
-        public abstract StandardizationStrategy TransformationStrategy { get; set; }
+        public abstract NormalizationStrategy TransformationStrategy { get; set; }
     }
 }

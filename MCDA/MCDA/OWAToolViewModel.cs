@@ -323,48 +323,48 @@ namespace MCDA.ViewModel
             PropertyChanged.Notify(() => IsSendToInMemoryWorkspaceCommand);
         }
 
-        protected override void DoStandardizationSelectionCommand()
+        protected override void DoNormalizationSelectionCommand()
         {
             var parentHandle = new IntPtr(ArcMap.Application.hWnd);
 
-            _standardizationView = new StandardizationSelectionView();
+            _NormalizationView = new NormalizationSelectionView();
 
-            _standardizationView.DataContext = _standardizationViewModel;
+            _NormalizationView.DataContext = _NormalizationViewModel;
 
-            _standardizationViewModel.SelectedTransformationStrategy = _owaTool.TransformationStrategy;
+            _NormalizationViewModel.SelectedTransformationStrategy = _owaTool.TransformationStrategy;
 
-            var helper = new WindowInteropHelper(_standardizationView);
+            var helper = new WindowInteropHelper(_NormalizationView);
 
             helper.Owner = parentHandle;
 
-            _standardizationView.ShowDialog();
+            _NormalizationView.ShowDialog();
 
-            _standardizationView.Closed += delegate(object sender, EventArgs e)
+            _NormalizationView.Closed += delegate(object sender, EventArgs e)
            {
-               DoCancelStandardizationCommand();
+               DoCancelNormalizationCommand();
            };
         }
 
-        protected override void DoApplyStandardizationCommand()
+        protected override void DoApplyNormalizationCommand()
         {
-            _owaTool.TransformationStrategy = _standardizationViewModel.SelectedTransformationStrategy;
+            _owaTool.TransformationStrategy = _NormalizationViewModel.SelectedTransformationStrategy;
 
             _isUpdateAllowed = true;
             base.Update();
         }
 
-        protected override void DoCancelStandardizationCommand()
+        protected override void DoCancelNormalizationCommand()
         {
-            _standardizationViewModel.SelectedTransformationStrategy = _owaTool.TransformationStrategy;
-            _standardizationView.Close();
+            _NormalizationViewModel.SelectedTransformationStrategy = _owaTool.TransformationStrategy;
+            _NormalizationView.Close();
         }
 
-        protected override void DoOkayStandardizationCommand()
+        protected override void DoOkayNormalizationCommand()
         {
-            if (_owaTool.TransformationStrategy != _standardizationViewModel.SelectedTransformationStrategy)
-                DoApplyStandardizationCommand();
+            if (_owaTool.TransformationStrategy != _NormalizationViewModel.SelectedTransformationStrategy)
+                DoApplyNormalizationCommand();
 
-            _standardizationView.Close();
+            _NormalizationView.Close();
         }
 
         public ICommand AlphaSelectionCommand

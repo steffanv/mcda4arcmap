@@ -71,11 +71,11 @@ namespace MCDA
             double[] data;
             int[] freq;
            
-            Classification.Histogram(_viewModel.SelectedResult.RenderContainer.FeatureClass, _viewModel.SelectedResult.Field, out data, out freq);
+            Classification.Histogram(_viewModel.SelectedResult.FeatureClass, _viewModel.SelectedResult.Field, out data, out freq);
 
             _histogramControl.Data = Array.ConvertAll<int, long>(Classification.NormalizeHistogramData(data, freq), Convert.ToInt64);
 
-            double[] classes = Classification.Classify(_viewModel.SelectedClassificationMethod, _viewModel.SelectedResult.RenderContainer.FeatureClass, _viewModel.SelectedResult.Field, _viewModel.SelectedNumberOfClasses);
+            double[] classes = Classification.Classify(_viewModel.SelectedClassificationMethod, _viewModel.SelectedResult.FeatureClass, _viewModel.SelectedResult.Field, _viewModel.SelectedNumberOfClasses);
 
             _histogramControl.Breaks = Array.ConvertAll<int, long>(Classification.NormalizeBreaks(classes), Convert.ToInt64);   
 
@@ -99,10 +99,9 @@ namespace MCDA
             //create grey colors for the neutral color
             ObservableCollection<ColorItem> greyScaleColors = new ObservableCollection<ColorItem>();
 
-            for(byte i = 0; i < 254; i+=2){
-
+            for(byte i = 0; i < 254; i+=2)
                 greyScaleColors.Add(new ColorItem(Color.FromRgb(i,i,i),"Grey"));
-            }
+            
 
             _neutralColorPickerForBipolarRenderer.AvailableColors = greyScaleColors;
             _neutralColorPickerForBipolarRenderer.ShowAdvancedButton = false;

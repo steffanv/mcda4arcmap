@@ -32,7 +32,7 @@ namespace MCDA.ViewModel
             get
             {
                 if (_cancelCommand == null)
-                    _cancelCommand = new RelayCommand( p => this.DoCancelStandardizationCommand(), p => true);
+                    _cancelCommand = new RelayCommand( p => this.DoCancelNormalizationCommand(), p => true);
 
                 return _cancelCommand;
             }
@@ -71,7 +71,7 @@ namespace MCDA.ViewModel
             RequestClose(null, null);
         }
 
-        private void DoCancelStandardizationCommand()
+        private void DoCancelNormalizationCommand()
         {
             RequestClose(null, null);
         }

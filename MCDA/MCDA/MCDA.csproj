@@ -153,7 +153,7 @@
       <DependentUpon>FlipControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="IdentityStandardizationStrategy.cs" />
-    <Compile Include="IRenderContainer.cs" />
+    <Compile Include="IRendererContainer.cs" />
     <Compile Include="LWLCTool.cs" />
     <Compile Include="LWLCToolButton.cs" />
     <Compile Include="LWLCToolView.xaml.cs">
@@ -165,7 +165,7 @@
     </Compile>
     <Compile Include="NeighborhoodSelectionViewModel.cs" />
     <Compile Include="ProgressDialog.cs" />
-    <Compile Include="RenderContainer.cs" />
+    <Compile Include="RendererContainer.cs" />
     <Compile Include="ClassBreaksRendererContainer.cs" />
     <Compile Include="Classification.cs" />
     <Compile Include="Config.Designer.cs">
@@ -198,15 +198,15 @@
     </Compile>
     <Compile Include="OWAToolViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="MaximumScoreStandardizationStrategy.cs" />
+    <Compile Include="MaximumScoreNormalizationStrategy.cs" />
     <Compile Include="ProportionalDistributionStrategy.cs" />
     <Compile Include="RelayCommand.cs" />
     <Compile Include="RendererFactory.cs" />
-    <Compile Include="ScoreRangeStandardizationStrategy.cs" />
-    <Compile Include="StandardizationSelectionView.xaml.cs">
-      <DependentUpon>StandardizationSelectionView.xaml</DependentUpon>
+    <Compile Include="ScoreRangeNormalizationStrategy.cs" />
+    <Compile Include="NormalizationSelectionView.xaml.cs">
+      <DependentUpon>NormalizationSelectionView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="StandardizationSelectionViewModel.cs" />
+    <Compile Include="NormalizationSelectionViewModel.cs" />
     <Compile Include="ToolFactory.cs" />
     <Compile Include="Util.cs" />
     <Compile Include="VisualizationButton.cs" />
@@ -215,7 +215,7 @@
     </Compile>
     <Compile Include="VisualizationViewModel.cs" />
     <Compile Include="ToolParameter.cs" />
-    <Compile Include="StandardizationStrategyFactory.cs" />
+    <Compile Include="NormalizationStrategyFactory.cs" />
     <Compile Include="WeightDistributionStrategyFactory.cs" />
     <Compile Include="ToolParameterContainer.cs" />
     <Compile Include="WLCTool.cs" />
@@ -285,7 +285,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="StandardizationSelectionView.xaml">
+    <Page Include="NormalizationSelectionView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -334,7 +334,7 @@
     <AddInContent Include="Images\OWATool.png" />
     <AddInContent Include="Images\WLCTool.png" />
     <AddInContent Include="Images\WLCToolView.png" />
-    <Resource Include="Images\toolbargraphics\Standardization.png">
+    <Resource Include="Images\toolbargraphics\Normalization.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
     <AddInContent Include="Images\StandardizationSelection.png" />

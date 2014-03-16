@@ -19,13 +19,13 @@ namespace MCDA
     /// Designer class of the dockable window add-in. It contains WPF user interfaces that
     /// make up the dockable window.
     /// </summary>
-    public partial class StandardizationSelectionView : Window
+    public partial class NormalizationSelectionView : Window
     {
-        public StandardizationSelectionView()
+        public NormalizationSelectionView()
         {
             InitializeComponent();
 
-            DataContext = new StandardizationSelectionViewModel();
+            DataContext = new NormalizationSelectionViewModel();
 
         }     
     }

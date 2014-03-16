@@ -312,53 +312,53 @@ namespace MCDA.ViewModel
            PropertyChanged.Notify(() => IsSendToInMemoryWorkspaceCommand);
        }
 
-       protected override void DoStandardizationSelectionCommand()
+       protected override void DoNormalizationSelectionCommand()
        {
            var parentHandle = new IntPtr(ArcMap.Application.hWnd);
 
-           _standardizationView = new StandardizationSelectionView();
+           _NormalizationView = new NormalizationSelectionView();
 
-           _standardizationView.DataContext = _standardizationViewModel;
+           _NormalizationView.DataContext = _NormalizationViewModel;
 
-           _standardizationViewModel.SelectedTransformationStrategy = _wlcTool.TransformationStrategy;
+           _NormalizationViewModel.SelectedTransformationStrategy = _wlcTool.TransformationStrategy;
 
-           var helper = new WindowInteropHelper(_standardizationView);
+           var helper = new WindowInteropHelper(_NormalizationView);
 
            helper.Owner = parentHandle;
 
-           _standardizationView.Closing += StandardizationViewClosing;
+           _NormalizationView.Closing += NormalizationViewClosing;
           
-           _standardizationView.ShowDialog();        
+           _NormalizationView.ShowDialog();        
        }
 
-       void StandardizationViewClosing(object sender, CancelEventArgs e)
+       void NormalizationViewClosing(object sender, CancelEventArgs e)
        {
-           _standardizationViewModel.SelectedTransformationStrategy = _wlcTool.TransformationStrategy;
+           _NormalizationViewModel.SelectedTransformationStrategy = _wlcTool.TransformationStrategy;
        }
 
-       protected override void DoApplyStandardizationCommand()
+       protected override void DoApplyNormalizationCommand()
        {
-           _wlcTool.TransformationStrategy = _standardizationViewModel.SelectedTransformationStrategy;
+           _wlcTool.TransformationStrategy = _NormalizationViewModel.SelectedTransformationStrategy;
 
            _isUpdateAllowed = true;
            base.Update();
        }
 
-       protected override void DoCancelStandardizationCommand()
+       protected override void DoCancelNormalizationCommand()
        {
-           _standardizationViewModel.SelectedTransformationStrategy = _wlcTool.TransformationStrategy;
+           _NormalizationViewModel.SelectedTransformationStrategy = _wlcTool.TransformationStrategy;
 
-           _standardizationView.Closing -= StandardizationViewClosing;
-           _standardizationView.Close();
+           _NormalizationView.Closing -= NormalizationViewClosing;
+           _NormalizationView.Close();
        }
 
-       protected override void DoOkayStandardizationCommand()
+       protected override void DoOkayNormalizationCommand()
        {
-           if (_wlcTool.TransformationStrategy != _standardizationViewModel.SelectedTransformationStrategy)
-               DoApplyStandardizationCommand();
+           if (_wlcTool.TransformationStrategy != _NormalizationViewModel.SelectedTransformationStrategy)
+               DoApplyNormalizationCommand();
 
-           _standardizationView.Closing -= StandardizationViewClosing;
-           _standardizationView.Close();
+           _NormalizationView.Closing -= NormalizationViewClosing;
+           _NormalizationView.Close();
        }
 
        protected override void DoDistributionCommand()

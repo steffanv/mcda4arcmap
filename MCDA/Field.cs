@@ -18,6 +18,7 @@ namespace MCDA.Model
         private bool isNumber = false;
         private ESRI.ArcGIS.Geodatabase.IField field;
         private Layer layer;
+        private IRenderContainer renderContainer = new RenderContainer();
 
         public Field(ESRI.ArcGIS.Geodatabase.IField field, Layer layer)
         {
@@ -28,6 +29,12 @@ namespace MCDA.Model
                 isNumber = true;
             if (field.Type == ESRI.ArcGIS.Geodatabase.esriFieldType.esriFieldTypeOID)
                 isOID = true;
+        }
+
+        public IRenderContainer RenderContainer {
+
+            get { return renderContainer; }
+            set { PropertyChanged.ChangeAndNotify(ref renderContainer, value, () => RenderContainer); }     
         }
 
         /// <summary>
@@ -85,7 +92,7 @@ namespace MCDA.Model
         }
 
         /// <summary>
-        /// Determines if the values of the Field have at least one value that is distinct from all other values . A non numeric field returns always false.
+        /// Determines if the values of the Field have at least one value that is distinct from all other values. A non numeric field returns always false.
         /// </summary>
         /// <returns></returns>
         public bool HasDifferentNumericValues()

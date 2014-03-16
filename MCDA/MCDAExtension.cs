@@ -30,10 +30,10 @@ namespace MCDA
 
         private static MCDAExtension _extension;
 
-        private IList<Model.Layer> _listOfAvailableLayer = new List<Model.Layer>();
+        private IList<Model.Layer> listOfAvailableLayer = new List<Model.Layer>();
         private IList<String> _listOfSelectedUniqueLayerNamesForPersistence = new List<string>();
 
-        private IActiveViewEvents_Event _activeViewEvents;
+        private IActiveViewEvents_Event activeViewEvents;
 
         private IDictionary<AbstractToolTemplate, MCDAWorkspaceContainer> _dictionaryOfLinks = new Dictionary<AbstractToolTemplate, MCDAWorkspaceContainer>();
 
@@ -46,13 +46,13 @@ namespace MCDA
         /// </summary>
         public Layer SelectedLayer
         {
-            get { return _listOfAvailableLayer.FirstOrDefault(l => l.IsSelected); }
+            get { return listOfAvailableLayer.FirstOrDefault(l => l.IsSelected); }
         }
 
         public IList<Model.Layer> AvailableLayer
         {
-            get { return _listOfAvailableLayer.OrderBy(f => f.LayerName).ToList(); }
-            set { PropertyChanged.ChangeAndNotify(ref _listOfAvailableLayer, value, () => AvailableLayer); }
+            get { return listOfAvailableLayer.OrderBy(f => f.LayerName).ToList(); }
+            set { PropertyChanged.ChangeAndNotify(ref listOfAvailableLayer, value, () => AvailableLayer); }
         }
 
         public IList<Model.Layer> AvailableFeatureLayer
@@ -71,16 +71,16 @@ namespace MCDA
         }
         #endregion
 
-        #region eventhandling for _listOfAvailableLayer
+        #region eventhandling for listOfAvailableLayer
         private void RegisterListenerForEveryMemberOfListOfAvailableLayer()
         {
             //unregister for all member to avoid unessary multiple call
-            foreach (var currentAvailableLayer in _listOfAvailableLayer)
+            foreach (var currentAvailableLayer in listOfAvailableLayer)
             {
                 currentAvailableLayer.PropertyChanged -= new PropertyChangedEventHandler(AvailalbeLayerListMemberPropertyChanged);
             }
 
-            foreach (var currentAvailableLayer in _listOfAvailableLayer)
+            foreach (var currentAvailableLayer in listOfAvailableLayer)
             {
                 currentAvailableLayer.PropertyChanged += new PropertyChangedEventHandler(AvailalbeLayerListMemberPropertyChanged);
             }
@@ -95,7 +95,7 @@ namespace MCDA
         private void AvailalbeLayerListMemberPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
 
-            foreach(var currentAvailableLayer in _listOfAvailableLayer.Where(l => Layer.LastSelectedLayer != l))
+            foreach(var currentAvailableLayer in listOfAvailableLayer.Where(l => Layer.LastSelectedLayer != l))
             {
                 currentAvailableLayer.IsSelected = false;
             }
@@ -135,10 +135,10 @@ namespace MCDA
 
             IMap map = ArcMap.Document.ActiveView.FocusMap;
 
-            _activeViewEvents = map as IActiveViewEvents_Event;
+            activeViewEvents = map as IActiveViewEvents_Event;
 
-            _activeViewEvents.ItemAdded += new IActiveViewEvents_ItemAddedEventHandler(ArcMapItemAdded);
-            _activeViewEvents.ItemDeleted += new IActiveViewEvents_ItemDeletedEventHandler(ArcMapItemDeleted);
+            activeViewEvents.ItemAdded += new IActiveViewEvents_ItemAddedEventHandler(ArcMapItemAdded);
+            activeViewEvents.ItemDeleted += new IActiveViewEvents_ItemDeletedEventHandler(ArcMapItemDeleted);
 
             ArcMap.Events.NewDocument += new ESRI.ArcGIS.ArcMapUI.IDocumentEvents_NewDocumentEventHandler(EventsNewDocument);
             //ArcMap.Events.BeforeCloseDocument += new ESRI.ArcGIS.ArcMapUI.IDocumentEvents_BeforeCloseDocumentEventHandler(EventsBeforeCloseDocument); 
@@ -157,15 +157,15 @@ namespace MCDA
         }
         void EventsNewDocument()
         {
-            _activeViewEvents.ItemAdded -= new IActiveViewEvents_ItemAddedEventHandler(ArcMapItemAdded);
-            _activeViewEvents.ItemDeleted -= new IActiveViewEvents_ItemDeletedEventHandler(ArcMapItemDeleted);
+            activeViewEvents.ItemAdded -= new IActiveViewEvents_ItemAddedEventHandler(ArcMapItemAdded);
+            activeViewEvents.ItemDeleted -= new IActiveViewEvents_ItemDeletedEventHandler(ArcMapItemDeleted);
 
             IMap map = ArcMap.Document.ActiveView.FocusMap;
 
-            _activeViewEvents = map as IActiveViewEvents_Event;
+            activeViewEvents = map as IActiveViewEvents_Event;
 
-            _activeViewEvents.ItemAdded += new IActiveViewEvents_ItemAddedEventHandler(ArcMapItemAdded);
-            _activeViewEvents.ItemDeleted += new IActiveViewEvents_ItemDeletedEventHandler(ArcMapItemDeleted);
+            activeViewEvents.ItemAdded += new IActiveViewEvents_ItemAddedEventHandler(ArcMapItemAdded);
+            activeViewEvents.ItemDeleted += new IActiveViewEvents_ItemDeletedEventHandler(ArcMapItemDeleted);
 
             AvailableLayer = new List<Model.Layer>();
 
@@ -173,15 +173,15 @@ namespace MCDA
 
         void EventsOpenDocument()
         {
-            _activeViewEvents.ItemAdded -= new IActiveViewEvents_ItemAddedEventHandler(ArcMapItemAdded);
-            _activeViewEvents.ItemDeleted -= new IActiveViewEvents_ItemDeletedEventHandler(ArcMapItemDeleted);
+            activeViewEvents.ItemAdded -= new IActiveViewEvents_ItemAddedEventHandler(ArcMapItemAdded);
+            activeViewEvents.ItemDeleted -= new IActiveViewEvents_ItemDeletedEventHandler(ArcMapItemDeleted);
 
             IMap map = ArcMap.Document.ActiveView.FocusMap;
 
-            _activeViewEvents = map as IActiveViewEvents_Event;
+            activeViewEvents = map as IActiveViewEvents_Event;
 
-            _activeViewEvents.ItemAdded += new IActiveViewEvents_ItemAddedEventHandler(ArcMapItemAdded);
-            _activeViewEvents.ItemDeleted += new IActiveViewEvents_ItemDeletedEventHandler(ArcMapItemDeleted);
+            activeViewEvents.ItemAdded += new IActiveViewEvents_ItemAddedEventHandler(ArcMapItemAdded);
+            activeViewEvents.ItemDeleted += new IActiveViewEvents_ItemDeletedEventHandler(ArcMapItemDeleted);
 
             AvailableLayer = new List<Model.Layer>();
         }
@@ -226,7 +226,7 @@ namespace MCDA
         public Model.Field GetOIDFieldFromSelectedFeature()
         {
 
-            Model.Layer selectedFeature = _listOfAvailableLayer.FirstOrDefault(f => f.IsSelected);
+            Model.Layer selectedFeature = listOfAvailableLayer.FirstOrDefault(f => f.IsSelected);
 
             if (selectedFeature == null)
                 return null;
@@ -455,7 +455,7 @@ namespace MCDA
         /// <param name="activeView"></param>
         private void RefreshAvailableLayerListAfterAddOrDelete(ESRI.ArcGIS.Carto.IActiveView activeView)
         {
-            if (_listOfAvailableLayer == null)
+            if (listOfAvailableLayer.Any())
                 return;
 
             IList<Model.Layer> layerList = new List<Model.Layer>();
@@ -474,20 +474,18 @@ namespace MCDA
             }
 
             //remove
-            for (int i = _listOfAvailableLayer.Count - 1; i >= 0; i--)
+            for (int i = listOfAvailableLayer.Count - 1; i >= 0; i--)
             {
-                if (!newLayerList.Any(l => l == _listOfAvailableLayer[i].ESRILayer))
-                    _listOfAvailableLayer.RemoveAt(i);
+                if (!newLayerList.Any(l => l == listOfAvailableLayer[i].ESRILayer))
+                    listOfAvailableLayer.RemoveAt(i);
             }
 
             //add
             foreach (ILayer currentNewLayer in newLayerList)
             {
-                //think about this lambda foreach "bug"
-                ILayer freshReference = currentNewLayer;
                 //is the new layer part in the mcda layer list?
-                if (!_listOfAvailableLayer.Any(l => l.ESRILayer == freshReference))
-                    _listOfAvailableLayer.Add(new Model.Layer(currentNewLayer));
+                if (!listOfAvailableLayer.Any(l => l.ESRILayer == currentNewLayer))
+                    listOfAvailableLayer.Add(new Model.Layer(currentNewLayer));
             }
 
             //and do not forget to register the new layer
@@ -622,7 +620,6 @@ namespace MCDA
 
             IFeatureClass fc = mcdaWorkspaceContainer.FeatureClass;
 
-
             if (fc.FindField(tool.DefaultResultColumnName) < 0)
             {
 
@@ -637,9 +634,6 @@ namespace MCDA
 
             using (ComReleaser comReleaser = new ComReleaser())
             {
-                // StartEditing(_shadowWorkspace);
-                // _editor.StartOperation();
-
                 IFeatureCursor featureCursor = fc.Update(null, true);
 
                 comReleaser.ManageLifetime(featureCursor);
@@ -686,7 +680,6 @@ namespace MCDA
 
                 switch (renderContainer.Renderer)
                 {
-
                     case Renderer.ClassBreaksRenderer: geoFeatureLayer.Renderer = RendererFactory.NewClassBreaksRenderer(renderContainer);
                         break;
                     case Renderer.BiPolarRenderer: geoFeatureLayer.Renderer = RendererFactory.NewUniqueValueRenderer(renderContainer);

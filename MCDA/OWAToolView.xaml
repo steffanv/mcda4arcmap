@@ -57,7 +57,7 @@
                     </Button.Style>
                     <Image Source="Images\toolbargraphics\Distribution.png" ToolTip="Distribute the weights equally."/>
                 </Button>
-                <Button Command="{Binding Path=StandardizationSelectionCommand}" ToolTip="Choose another standardization strategy.">
+                <Button Command="{Binding Path=NormalizationSelectionCommand}" ToolTip="Choose another Normalization strategy.">
                     <Button.Style>
                         <Style TargetType="Button">
                             <Style.Triggers>
@@ -67,7 +67,7 @@
                             </Style.Triggers>
                         </Style>
                     </Button.Style>
-                    <Image Source="Images\toolbargraphics\Standardization.png" RenderOptions.BitmapScalingMode="HighQuality" ToolTip="Choose another standardization strategy." />
+                    <Image Source="Images\toolbargraphics\Normalization.png" RenderOptions.BitmapScalingMode="HighQuality" ToolTip="Choose another Normalization strategy." />
                 </Button>
                 <Button Command="{Binding Path=AlphaSelectionCommand}" ToolTip="Choose another alpha value.">
                     <Button.Style>

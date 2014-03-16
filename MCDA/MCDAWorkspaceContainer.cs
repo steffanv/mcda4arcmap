@@ -63,5 +63,16 @@ namespace MCDA.Model
             get { return _renderer; }
             set { PropertyChanged.ChangeAndNotify(ref _renderer, value, () => Renderer); }
         }
+
+
+        public string FieldName
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public string FeatureLayerName
+        {
+            get { throw new NotImplementedException(); }
+        }
     }
 }

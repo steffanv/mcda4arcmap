@@ -102,7 +102,6 @@ namespace MCDA.Model
 
         public IField Field
         {
-
             get { return _field; }
             set { PropertyChanged.ChangeAndNotify(ref _field, value, () => Field); }
         }

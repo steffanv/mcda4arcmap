@@ -7,45 +7,47 @@ using MCDA.Extensions;
 
 namespace MCDA.Model
 {
-    internal sealed class MaximumScoreStandardizationStrategy : IStandardizationStrategy
+    internal sealed class ScoreRangeNormalizationStrategy : INormalizationStrategy
     {
         public double? Transform(IEnumerable<double> data, double actualValue, bool benefitCriterion = false)
         {
-            double maxValue = data.Max();
+            double localRange = data.Max() - data.Min();
 
-            if (maxValue == 0)
+            if (localRange == 0)
                 return null;
 
             if (benefitCriterion)
-                return actualValue / maxValue;
+                return (actualValue - data.Min()) / localRange;
             else
-                return 1d - (actualValue / maxValue);
+                return (data.Max() - actualValue) / localRange;
         }
 
         public void Transform(DataColumn column, bool benefitCriterion = true)
         {
             if (!column.IsNumeric() || column.Table.Rows.Count <= 0)
                 return;
-          
+
             dynamic maxValue = column.Table.Compute("max(" + column.ColumnName + ")", String.Empty);
+            dynamic minValue = column.Table.Compute("min(" + column.ColumnName + ")", String.Empty);
 
-            if (maxValue == 0)
+            dynamic range = maxValue - minValue;
+            
+            if (range == 0)
                 return;
-
-            int columnIndex = column.Ordinal;  
+            
+            int columnIndex = column.Ordinal;
 
             foreach (DataRow currentDataRow in column.Table.Rows)
             {
                 if (benefitCriterion)
                 {
                     dynamic currentValue = currentDataRow.ItemArray[columnIndex];
-                    currentDataRow[columnIndex] = currentValue / maxValue;
+                    currentDataRow[columnIndex] = (currentValue - minValue) / range;
                 }
-
                 else
                 {
                     dynamic currentValue = currentDataRow.ItemArray[columnIndex];
-                    currentDataRow[columnIndex] = 1d - (currentValue / maxValue);
+                    currentDataRow[columnIndex] = (maxValue - currentValue) / range;
                 }
             }
         }

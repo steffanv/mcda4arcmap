@@ -12,6 +12,7 @@ namespace MCDA.Model
     {
         public static double[] Classify(IClassify method, IFeatureClass featureClass, IField field, int numberOfClasses)
         {
+            //TODO check ESRI API
             numberOfClasses--;
 
             double[] data;

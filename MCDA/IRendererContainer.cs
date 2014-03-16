@@ -12,13 +12,17 @@ namespace MCDA.Model
     {
         Renderer Renderer { get; set; }
 
-        IFeatureLayer FeatureLayer { get; set; }
+        //IFeatureLayer FeatureLayer { get; set; }
 
-        IFeatureClass FeatureClass { get; set; }
+        //IFeatureClass FeatureClass { get; set; }
 
         ClassBreaksRendererContainer ClassBreaksRendererContainer { get; set; }
 
         BiPolarRendererContainer BiPolarRendererContainer { get; set; }
+
+        //string FieldName { get; }
+
+        //string FeatureLayerName { get; }
       
     }
 }

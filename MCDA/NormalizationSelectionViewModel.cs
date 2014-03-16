@@ -9,17 +9,17 @@ using System.Windows.Input;
 
 namespace MCDA.ViewModel
 {
-    internal sealed class StandardizationSelectionViewModel : INotifyPropertyChanged
+    internal sealed class NormalizationSelectionViewModel : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
    
-        private StandardizationStrategy _selectedTtransformationStrategy;
+        private NormalizationStrategy _selectedTtransformationStrategy;
 
         private ICommand _applyCommand;
         private ICommand _okayCommand;
         private ICommand _cancelCommand;
 
-        public StandardizationStrategy SelectedTransformationStrategy{
+        public NormalizationStrategy SelectedTransformationStrategy{
 
             get{ return _selectedTtransformationStrategy; }
             set { _selectedTtransformationStrategy = value; }

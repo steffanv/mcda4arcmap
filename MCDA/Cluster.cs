@@ -13,14 +13,14 @@ namespace MCDA.Model
         private DataTable _dataTable;
         private int _featureID;
         private IList<int> _clusterIDs;
-        private StandardizationStrategy _transformationStrategy;
+        private NormalizationStrategy _transformationStrategy;
 
         private IList<Tuple<IToolParameter, double>> _globalRange;
         private IList<Tuple<IToolParameter, double>> _localRange;
         private IList<Tuple<IToolParameter, double?>> _scaledValues;
         private IList<Tuple<IToolParameter, double?>> _weights;
 
-        public Cluster(int featureID, IList<int> clusterIDs, DataTable dt, ToolParameterContainer toolParameterContainer, StandardizationStrategy transformationStrategy)
+        public Cluster(int featureID, IList<int> clusterIDs, DataTable dt, ToolParameterContainer toolParameterContainer, NormalizationStrategy transformationStrategy)
         {
             _featureID = featureID;
             _clusterIDs = clusterIDs;
@@ -87,7 +87,7 @@ namespace MCDA.Model
 
                 double actualValue = _dataTable.AsEnumerable().Where(x => x.Field<FieldTypeOID>(oidColumnIndex).OID == _featureID).Select(x => x.Field<double>(currentToolParameter.ColumnName)).FirstOrDefault();
 
-                double? result = StandardizationStrategyFactory.GetStrategy(_transformationStrategy).Transform(data, actualValue, currentToolParameter.IsBenefitCriterion);
+                double? result = NormalizationStrategyFactory.GetStrategy(_transformationStrategy).Transform(data, actualValue, currentToolParameter.IsBenefitCriterion);
 
                 listOfScaledTuple.Add(Tuple.Create(currentToolParameter, result));
             }

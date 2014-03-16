@@ -7,66 +7,68 @@ using System.ComponentModel;
 using System.Data;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using System.Diagnostics.Contracts;
 
 namespace MCDA.Model
 {
    internal sealed class WLCTool : AbstractToolTemplate
     {
-        private DataTable _workingDataTable, _backupDataTable;
-        private ToolParameterContainer _toolParameterContainer;
-        private StandardizationStrategy _transformationStrategy;
+        private DataTable workingDataTable, backupDataTable;
+        private ToolParameterContainer toolParameterContainer;
+        private NormalizationStrategy transformationStrategy;
 
         private string _wlcResultColumnName = "WLCResult";
         
         public WLCTool(DataTable dataTable, ToolParameterContainer toolParameterContainer)
         {
-            _backupDataTable = dataTable.Copy();
+            Contract.Ensures(dataTable != null);
+            Contract.Ensures(toolParameterContainer != null);
 
-            _workingDataTable = _backupDataTable;
+            backupDataTable = dataTable.Copy();
 
-            _toolParameterContainer = toolParameterContainer;
+            workingDataTable = backupDataTable;
 
-            _transformationStrategy = Model.StandardizationStrategy.MaximumScoreStandardizationStrategy;
+            this.toolParameterContainer = toolParameterContainer;
+
+            transformationStrategy = Model.NormalizationStrategy.MaximumScoreNormalizationStrategy;
         }
 
         public override DataTable Data
         {
-            get { return _workingDataTable.Copy(); }
+            get { return workingDataTable.Copy(); }
         }
 
         public override ToolParameterContainer ToolParameterContainer
         {
-            get { return _toolParameterContainer; }
-            set { _toolParameterContainer = value; }
+            get { return toolParameterContainer; }
+            set { toolParameterContainer = value; }
         }
 
-        public override StandardizationStrategy TransformationStrategy
+        public override NormalizationStrategy TransformationStrategy
         {
-            get { return _transformationStrategy; }
-            set { _transformationStrategy = value; }
+            get { return transformationStrategy; }
+            set { transformationStrategy = value; }
         }
 
         protected override void PerformScaling()
         {
-            _workingDataTable = _backupDataTable.Copy();
+            workingDataTable = backupDataTable.Copy();
 
-            foreach(IToolParameter currentToolParameter in _toolParameterContainer.ToolParameter){
-
-               StandardizationStrategyFactory.GetStrategy(_transformationStrategy).Transform(_workingDataTable.Columns[currentToolParameter.ColumnName], currentToolParameter.IsBenefitCriterion);
-            }
+            foreach(IToolParameter currentToolParameter in toolParameterContainer.ToolParameter)
+               NormalizationStrategyFactory.GetStrategy(transformationStrategy).Transform(workingDataTable.Columns[currentToolParameter.ColumnName], currentToolParameter.IsBenefitCriterion);
+          
            
         }
 
         private void RunWLC(DataTable dataTable)
         {
-            foreach (IToolParameter currentToolParameter in _toolParameterContainer.ToolParameter)
+            foreach (IToolParameter currentToolParameter in toolParameterContainer.ToolParameter)
             {
                 int columnIndex = dataTable.Columns.IndexOf(currentToolParameter.ColumnName);
 
                 foreach (DataRow currentDataRow in dataTable.Rows)
-                {
                     currentDataRow[columnIndex] = Convert.ToDouble(currentDataRow.ItemArray[columnIndex]) * currentToolParameter.ScaledWeight;
-                }
+
             }
 
             CalculateResult(dataTable);
@@ -90,36 +92,36 @@ namespace MCDA.Model
         protected override void PerformAlgorithm()
         {   
             //add result column
-            _workingDataTable.Columns.Add(new DataColumn(DefaultResultColumnName, typeof(double)));
+            workingDataTable.Columns.Add(new DataColumn(DefaultResultColumnName, typeof(double)));
 
             //it makes sense to split the table to work parallel
             //it is likely that it would make even more sense to split the table into 4 or even more sub tables, 
             //however it have only 2 cores... and no idea about the required table size
-            if (_workingDataTable.Rows.Count >= 500 && _toolParameterContainer.ToolParameter.Count > 6)
+            if (workingDataTable.Rows.Count >= 500 && toolParameterContainer.ToolParameter.Count > 6)
             {
 
-                DataTable tableOne = _workingDataTable.Clone();
-                DataTable tableTwo = _workingDataTable.Clone();
+                DataTable tableOne = workingDataTable.Clone();
+                DataTable tableTwo = workingDataTable.Clone();
 
-                IEnumerable<DataRow> dataRowsOne = _workingDataTable.Select().Take(_workingDataTable.Rows.Count / 2);
-                IEnumerable<DataRow> dataRowsTwo = _workingDataTable.Select().Skip(_workingDataTable.Rows.Count / 2).Take(_workingDataTable.Rows.Count);
+                IEnumerable<DataRow> dataRowsOne = workingDataTable.Select().Take(workingDataTable.Rows.Count / 2);
+                IEnumerable<DataRow> dataRowsTwo = workingDataTable.Select().Skip(workingDataTable.Rows.Count / 2).Take(workingDataTable.Rows.Count);
 
                 dataRowsOne.CopyToDataTable(tableOne, LoadOption.OverwriteChanges);
                 dataRowsTwo.CopyToDataTable(tableTwo, LoadOption.OverwriteChanges);
 
                 Parallel.Invoke(() => RunWLC(tableOne), () => RunWLC(tableTwo));
 
-                DataTable targetSchema = _workingDataTable.Clone();
+                DataTable targetSchema = workingDataTable.Clone();
 
                 targetSchema.Merge(tableOne);
                 targetSchema.Merge(tableTwo);
 
-                _workingDataTable = targetSchema;
+                workingDataTable = targetSchema;
             }
 
             else
             {
-                RunWLC(_workingDataTable);
+                RunWLC(workingDataTable);
             }
                   
         }

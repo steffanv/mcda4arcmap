@@ -59,7 +59,7 @@ namespace MCDA.Model
         /// </summary>
         /// <param name="renderContainer"></param>
         /// <returns></returns>
-        public static IFeatureRenderer NewUniqueValueRenderer(IRenderContainer renderContainer)
+        public static IFeatureRenderer NewUniqueValueRenderer(RendererContainer renderContainer)
         {
             BiPolarRendererContainer biPolarRendererContainer = renderContainer.BiPolarRendererContainer;
             
@@ -93,7 +93,7 @@ namespace MCDA.Model
             bool containsDBNullValue = false;
             using (ComReleaser comReleaser = new ComReleaser())
             {
-                IFeatureCursor featureCursor =  renderContainer.FeatureClass.Search(null, true);
+                IFeatureCursor featureCursor =  renderContainer.Field.Feature.FeatureClass.Search(null, true);
                
                 comReleaser.ManageLifetime(featureCursor);
 
@@ -110,7 +110,7 @@ namespace MCDA.Model
                         containsDBNullValue = true;
                         continue;
                     }
-
+                    //TODO datetime is possible???
                     setOfFeatures.Add(Convert.ToDouble(value)); 
                 }
             }
@@ -131,7 +131,7 @@ namespace MCDA.Model
 
                 // the format is important, because the normal to string will represent the power as E-05 or something like that
                 // the result are mismatches between the renderer value and the column value
-                //string classValue = currentClassValue.ToString("N20"); does not reallz work
+                //string classValue = currentClassValue.ToString("N20"); does not really work
 
                 decimal dirtyTrick = (decimal) currentClassValue;
 
@@ -207,19 +207,20 @@ namespace MCDA.Model
             //'** use the name of the color ramp you selected.
             uniqueValueRenderer.ColorScheme = "Custom";
             ////ITable pTable = pDisplayTable as ITable;
-            bool isString = renderContainer.FeatureClass.Fields.get_Field(fieldIndex).Type == esriFieldType.esriFieldTypeString;
+            bool isString = renderContainer.Field.Feature.FeatureClass.Fields.get_Field(fieldIndex).Type == esriFieldType.esriFieldTypeString;
             uniqueValueRenderer.set_FieldType(0, isString);
-            IGeoFeatureLayer geoFeatureLayer = renderContainer.FeatureLayer as IGeoFeatureLayer;
+            //TODO geoFeatureLayer
+            IGeoFeatureLayer geoFeatureLayer = renderContainer.Field.Feature.FeatureLayer as IGeoFeatureLayer;
             geoFeatureLayer.Renderer = uniqueValueRenderer as IFeatureRenderer;
 
             return (IFeatureRenderer) uniqueValueRenderer;
         }
 
-        public static IFeatureRenderer NewClassBreaksRenderer(IRenderContainer renderContainer)
+        public static IFeatureRenderer NewClassBreaksRenderer(RendererContainer renderContainer)
         {
             ClassBreaksRendererContainer classBreaksRendererContainer = renderContainer.ClassBreaksRendererContainer;
 
-            double[] classificationResult = Classification.Classify(classBreaksRendererContainer.ClassificationMethod, renderContainer.FeatureClass, classBreaksRendererContainer.Field, classBreaksRendererContainer.NumberOfClasses);
+            double[] classificationResult = Classification.Classify(classBreaksRendererContainer.ClassificationMethod, renderContainer.Field.Feature.FeatureClass, classBreaksRendererContainer.Field, classBreaksRendererContainer.NumberOfClasses);
 
             IClassBreaksRenderer classBreaksRenderer = new ClassBreaksRendererClass();
             classBreaksRenderer.Field = classBreaksRendererContainer.Field.AliasName;

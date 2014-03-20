@@ -44,7 +44,7 @@ namespace MCDA.Model
 
             DataTable dataTable = MCDA.MCDAExtension.GetExtension().GetDataTableForParameterSet(toolParameter.ToolParameter);
 
-            LWLCTool lwlcTool = new LWLCTool(dataTable,toolParameter, MCDA.MCDAExtension.GetExtension().SelectedLayer == null ? null : MCDA.MCDAExtension.GetExtension().SelectedLayer.FeatureClass);
+            LWLCTool lwlcTool = new LWLCTool(dataTable,toolParameter, MCDA.MCDAExtension.GetExtension().SelectedFeature == null ? null : MCDA.MCDAExtension.GetExtension().SelectedFeature.FeatureClass);
 
             lwlcTool.DefaultResultColumnName = MCDA.MCDAExtension.GetExtension().GetSuggestNameForResultColumn(lwlcTool.DefaultResultColumnName);
 

@@ -44,7 +44,7 @@ namespace MCDA.ViewModel
 
             _lwlcResultDataTable = _lwlcTool.Data;
 
-            _mcdaExtension.RegisterPropertyHandler(x => x.AvailableLayer, MCDAExtensionPropertyChanged);
+            _mcdaExtension.RegisterPropertyHandler(x => x.AvailableFeatures, MCDAExtensionPropertyChanged);
 
             //we have to call our own update method to make sure we have a result column
             MCDAExtensionPropertyChanged(this, null);
@@ -81,7 +81,7 @@ namespace MCDA.ViewModel
 
             _lwlcResultDataTable = _lwlcTool.Data;
 
-            if (_mcdaExtension.SelectedLayer.Fields.Count(f => f.IsSelected) >= 1){
+            if (_mcdaExtension.SelectedFeature.Fields.Count(f => f.IsSelected) >= 1){
                 HasCriteriaSelected = true;
 
                 _toolParameter = new BindingList<IToolParameter>(_lwlcTool.ToolParameterContainer.ToolParameter);
@@ -123,20 +123,20 @@ namespace MCDA.ViewModel
 
           
 
-            if (_mcdaExtension.SelectedLayer != null)
+            if (_mcdaExtension.SelectedFeature != null)
             {
 
-                foreach(var currentField in _mcdaExtension.SelectedLayer.Fields)
+                foreach(var currentField in _mcdaExtension.SelectedFeature.Fields)
                 {
                     currentField.UnRegisterPropertyHandler(f => f.IsSelected, FieldPropertyChanged);
                 }
 
-                foreach(var currentField in _mcdaExtension.SelectedLayer.Fields){
+                foreach(var currentField in _mcdaExtension.SelectedFeature.Fields){
 
                     currentField.RegisterPropertyHandler(f => f.IsSelected, FieldPropertyChanged);
                 }
 
-                if (_mcdaExtension.SelectedLayer.Fields.Count(f => f.IsSelected) >= 1){
+                if (_mcdaExtension.SelectedFeature.Fields.Count(f => f.IsSelected) >= 1){
 
                     HasCriteriaSelected = true;
 
@@ -309,7 +309,7 @@ namespace MCDA.ViewModel
             if (_isLocked)
             {
                 ProgressDialog.ShowProgressDialog("Creating In Memory Representation", (Action<AbstractToolTemplate>)_mcdaExtension.EstablishLink, _lwlcTool);
-                // the lwlc depends on the fc data, thus we have to make sure that we work on the fc of the in memory workspace
+                // the lwlc depends on the featureClass data, thus we have to make sure that we work on the featureClass of the in memory workspace
                 _lwlcTool.FeatureClass = _mcdaExtension.LinkDictionary[_lwlcTool].FeatureClass;
             }
 

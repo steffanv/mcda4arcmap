@@ -43,7 +43,7 @@ namespace MCDA.ViewModel
 
             _owaResultDataTable = _owaTool.Data;
 
-            _mcdaExtension.RegisterPropertyHandler(x => x.AvailableLayer, MCDAExtensionPropertyChanged);
+            _mcdaExtension.RegisterPropertyHandler(x => x.AvailableFeatures, MCDAExtensionPropertyChanged);
 
             //we have to call our own update method to make sure we have a result column
             MCDAExtensionPropertyChanged(this, null);
@@ -78,7 +78,7 @@ namespace MCDA.ViewModel
 
            
 
-            if (_mcdaExtension.SelectedLayer.Fields.Count(f => f.IsSelected) >= 1){
+            if (_mcdaExtension.SelectedFeature.Fields.Count(f => f.IsSelected) >= 1){
                 HasCriteriaSelected = true;
 
                 _owaTool.Run();
@@ -118,20 +118,20 @@ namespace MCDA.ViewModel
 
             _toolParameter = new BindingList<IToolParameter>(_owaTool.ToolParameterContainer.ToolParameter);
 
-            if (_mcdaExtension.SelectedLayer != null)
+            if (_mcdaExtension.SelectedFeature != null)
             {
           
-                foreach (var currentField in _mcdaExtension.SelectedLayer.Fields)
+                foreach (var currentField in _mcdaExtension.SelectedFeature.Fields)
                 {
                     currentField.UnRegisterPropertyHandler(f => f.IsSelected, FieldPropertyChanged);
                 }
 
-                foreach (var currentField in _mcdaExtension.SelectedLayer.Fields)
+                foreach (var currentField in _mcdaExtension.SelectedFeature.Fields)
                 {
                     currentField.RegisterPropertyHandler(f => f.IsSelected, FieldPropertyChanged);
                 }
 
-                if (_mcdaExtension.SelectedLayer.Fields.Count(f => f.IsSelected) >= 1){
+                if (_mcdaExtension.SelectedFeature.Fields.Count(f => f.IsSelected) >= 1){
                     HasCriteriaSelected = true;
 
                     _owaTool.Run();

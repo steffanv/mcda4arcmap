@@ -6,10 +6,15 @@ using System.ComponentModel;
 using MCDA.Extensions;
 using ESRI.ArcGIS.Geodatabase;
 using System.Threading;
+using System.Diagnostics.Contracts;
+using ESRI.ArcGIS.Carto;
 
 namespace MCDA.Model
 {
-    internal sealed class Layer : INotifyPropertyChanged
+    /// <summary>
+    /// Encapsulates a <see cref="ESRI.ArcGIS.Geodatabase.IFeatureClass"/> and if available the corresponding <see cref="ESRI.ArcGIS.Carto.IFeatureLayer2"/>
+    /// </summary>
+    internal sealed class Feature : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -17,19 +22,21 @@ namespace MCDA.Model
         private bool isFeatureLayer;
         private bool isSelected;
         //can be null
-        private ESRI.ArcGIS.Carto.IFeatureLayer2 featureLayer;
+        private IFeatureLayer2 featureLayer;
+        private IFeatureClass featureClass;
         private IList<Field> fields;
-        private ESRI.ArcGIS.Carto.ILayer layer;
+        private Field selectedFieldForRendering;
+        private ESRI.ArcGIS.Carto.ILayer esriLayer;
 
-        private static Layer lastSelectedLayer;
+        private static Feature lastSelectedLayer;
 
 
-        public Layer(ESRI.ArcGIS.Carto.ILayer layer)
+        public Feature(ESRI.ArcGIS.Carto.ILayer layer)
         {
-            this.layer = layer;
+            this.esriLayer = layer;
             layerName = layer.Name;
 
-            ESRI.ArcGIS.Carto.IFeatureLayer2 featureLayer = layer as ESRI.ArcGIS.Carto.IFeatureLayer2;
+            IFeatureLayer2 featureLayer = layer as ESRI.ArcGIS.Carto.IFeatureLayer2;
 
             if (featureLayer == null)
             {
@@ -46,16 +53,44 @@ namespace MCDA.Model
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <remarks>
+        /// The <see cref="IFeatureLayer.FeatureClass"/> attribute is set to the given <see cref="IFeatureLayer2"/>.
+        /// </remarks>
+        /// <param name="featureClass"></param>
+        /// <param name="featureLayer"></param>
+        /// <exception cref="ArgumentNullExeption"> </exception>
+        public Feature(IFeatureClass featureClass, IFeatureLayer2 featureLayer)
+        {
+            Contract.Requires<ArgumentNullException>(featureClass != null);
+            Contract.Requires<ArgumentNullException>(featureLayer != null);
+
+            featureLayer.FeatureClass = featureClass;
+
+            this.featureClass = featureClass;
+            this.featureLayer = featureLayer;
+
+            isFeatureLayer = true;
+            UniqueLayerName = ToUniqueLayerName(this.featureLayer);
+
+            this.esriLayer = featureLayer as ILayer;
+            layerName = this.esriLayer.Name;
+
+            fields = GetFields();
+            
+        }
+
         public string NotSuitableForMCDAReason
         {
             get
             {
                 if (!IsFeatureLayer)
-                    return "Layer is not a FeatureLayer.";
+                    return "Feature is not a FeatureLayer.";
                 if (!HasAreaAndTopologicalOperator())
                     return "Geometry must be Polygon.";
                 else return string.Empty;
-
             }
         }
 
@@ -71,7 +106,7 @@ namespace MCDA.Model
 
         public ESRI.ArcGIS.Carto.ILayer ESRILayer
         {
-            get { return layer; }
+            get { return esriLayer; }
         }
 
         public ESRI.ArcGIS.Carto.IFeatureLayer2 FeatureLayer
@@ -80,6 +115,12 @@ namespace MCDA.Model
         }
 
         public string UniqueLayerName { get; set; }
+
+        public Field SelectedFieldForRendering
+        {
+            get { return selectedFieldForRendering; }
+            set { PropertyChanged.ChangeAndNotify(ref selectedFieldForRendering, value, () => SelectedFieldForRendering);}
+        }
 
         public bool IsFeatureLayer
         {
@@ -105,7 +146,7 @@ namespace MCDA.Model
             }
         }
 
-        public static Layer LastSelectedLayer{
+        public static Feature LastSelectedLayer{
 
             get { return lastSelectedLayer; }
         }
@@ -127,6 +168,7 @@ namespace MCDA.Model
             return false;
         }
 
+        //TODO wozu ist das gut?
         private string ToUniqueLayerName(ESRI.ArcGIS.Carto.IFeatureLayer2 featureLayer)
         {
             return featureLayer.FeatureClass.Fields.ToString() + featureLayer.ToString();

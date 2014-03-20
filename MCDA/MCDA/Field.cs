@@ -17,13 +17,14 @@ namespace MCDA.Model
         private bool isOID = false;
         private bool isNumber = false;
         private ESRI.ArcGIS.Geodatabase.IField field;
-        private Layer layer;
-        private IRenderContainer renderContainer = new RenderContainer();
+        private RendererContainer renderContainer;
 
-        public Field(ESRI.ArcGIS.Geodatabase.IField field, Layer layer)
+        public Field(ESRI.ArcGIS.Geodatabase.IField field, Feature feature)
         {
-            this.layer = layer;
+            Feature = feature;
             this.field = field;
+
+            renderContainer = new RendererContainer(this);
    
             if (field.Type <= ESRI.ArcGIS.Geodatabase.esriFieldType.esriFieldTypeDouble)
                 isNumber = true;
@@ -31,14 +32,14 @@ namespace MCDA.Model
                 isOID = true;
         }
 
-        public IRenderContainer RenderContainer {
+        public RendererContainer RenderContainer {
 
             get { return renderContainer; }
             set { PropertyChanged.ChangeAndNotify(ref renderContainer, value, () => RenderContainer); }     
         }
 
         /// <summary>
-        /// Returns a string represenation why this Field is not suitable. Returns an empty string if the Field is suitable.
+        /// Returns a string representation why this Field is not suitable. Returns an empty string if the Field is suitable.
         /// </summary>
         public string NotSuitableForMCDAReason
         {
@@ -81,10 +82,7 @@ namespace MCDA.Model
             get { return isNumber; }
         }
 
-        public Layer Layer{
-
-            get { return layer; }
-        }
+        public Feature Feature { get; private set; }
 
         public bool IsOID
         {
@@ -102,11 +100,11 @@ namespace MCDA.Model
 
             using (ComReleaser comReleaser = new ComReleaser())
             {
-                IFeatureCursor featureCursor = layer.FeatureClass.Search(null, true);
+                IFeatureCursor featureCursor = Feature.FeatureClass.Search(null, true);
 
                 comReleaser.ManageLifetime(featureCursor);
 
-                int fieldIndex = layer.FeatureClass.FindField(FieldName);
+                int fieldIndex = Feature.FeatureClass.FindField(FieldName);
 
                 IFeature currentFeature = featureCursor.NextFeature();
 
@@ -127,6 +125,28 @@ namespace MCDA.Model
 
                 return false;
             }
+        }
+
+        public void PromoteToSelectedFieldForRendering()
+        {
+            Feature.SelectedFieldForRendering = this;
+        }
+
+        /// <summary>
+        /// Demotes the <see cref="Field"/> as selected Field for the parent <see cref="Feature"/>.
+        /// </summary>
+        /// <remarks>
+        /// The <see cref="Feature.SelectedFieldForRendering"/> is set to <code>null</code> only if the the <see cref="Field"/> is the actual selected field for rendering.
+        /// </remarks>
+        public void DemoteAsSelectedFieldForRendering()
+        {
+            if (Feature.SelectedFieldForRendering == this)
+                Feature.SelectedFieldForRendering = null;
+        }
+
+        public bool IsSelectedFieldForRendering
+        {
+            get { return Feature.SelectedFieldForRendering == this; }
         }
     }
 }

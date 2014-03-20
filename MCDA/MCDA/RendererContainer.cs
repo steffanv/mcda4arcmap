@@ -6,18 +6,26 @@ using System.ComponentModel;
 using ESRI.ArcGIS.Carto;
 using MCDA.Extensions;
 using ESRI.ArcGIS.Geodatabase;
+using System.Diagnostics.Contracts;
 
 namespace MCDA.Model
 {
-    internal sealed class RenderContainer : IRenderContainer, INotifyPropertyChanged
+    internal sealed class RendererContainer : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        //private IFeatureLayer featureLayer;
-        //private IFeatureClass featureClass;
         private Renderer renderer = Renderer.None;
         private ClassBreaksRendererContainer classBreaksRendererContainer;
         private BiPolarRendererContainer biPolarRendererContainer;
+
+        public RendererContainer(Field field)
+        {
+            Contract.Requires<ArgumentNullException>(field != null);
+
+            Field = field;
+        }
+
+        public Field Field { get; private set;}
 
         public Renderer Renderer
         {
@@ -25,21 +33,8 @@ namespace MCDA.Model
             set { PropertyChanged.ChangeAndNotify(ref renderer, value, () => Renderer); }
         }
 
-        //public IFeatureLayer FeatureLayer
-        //{
-        //    get { return featureLayer; }
-        //    set { PropertyChanged.ChangeAndNotify(ref featureLayer, value, () => FeatureLayer); }
-        //}
-
-        //public IFeatureClass FeatureClass
-        //{
-        //    get { return featureClass; }
-        //    set { PropertyChanged.ChangeAndNotify(ref featureClass, value, () => FeatureClass); }
-        //}
-
         public ClassBreaksRendererContainer ClassBreaksRendererContainer
         {
-
             get { return classBreaksRendererContainer; }
             set { PropertyChanged.ChangeAndNotify(ref classBreaksRendererContainer, value, () => ClassBreaksRendererContainer); }
         }
@@ -48,10 +43,6 @@ namespace MCDA.Model
         {
             get { return biPolarRendererContainer; }
             set { PropertyChanged.ChangeAndNotify(ref biPolarRendererContainer, value, () => BiPolarRendererContainer); }
-        }
-
-        //public string FieldName { get { return Field.Name; } }
-
-        //public string FeatureLayerName { get { return featureLayer.Name; } }
+        }      
     }
 }

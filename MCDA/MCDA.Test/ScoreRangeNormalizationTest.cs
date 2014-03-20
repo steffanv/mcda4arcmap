@@ -7,14 +7,14 @@ using System.Data;
 namespace MCDA.Test
 {
     [TestClass]
-    public class ScoreRangeStandardizationTest
+    public class ScoreRangeNormalizationTest
     {
-        private MCDA.Model.IStandardizationStrategy ScoreRangeStandardizationStrategy { get; set; }
+        private MCDA.Model.INormalizationStrategy ScoreRangeNormalizationStrategy { get; set; }
 
         [TestInitialize]
         public void Init()
         {
-            ScoreRangeStandardizationStrategy = MCDA.Model.StandardizationStrategyFactory.GetStrategy(Model.StandardizationStrategy.ScoreRangeStandardizationStrategy);
+            ScoreRangeNormalizationStrategy = MCDA.Model.NormalizationStrategyFactory.GetStrategy(Model.NormalizationStrategy.ScoreRangeNormalizationStrategy);
         }
 
         [TestMethod]
@@ -22,7 +22,7 @@ namespace MCDA.Test
         {
             DataColumn dataColumn = TestUtil.CreateDataColumn<double>(new[] { -3d, -2d, 0d });
 
-            ScoreRangeStandardizationStrategy.Transform(dataColumn);
+            ScoreRangeNormalizationStrategy.Transform(dataColumn);
 
             Assert.AreEqual(dataColumn.Table.Rows[0].Field<double>(0), 0);
             Assert.AreEqual(dataColumn.Table.Rows[1].Field<double>(0), 0.33, 0.01);
@@ -34,7 +34,7 @@ namespace MCDA.Test
         {
             DataColumn dataColumn = TestUtil.CreateDataColumn<double>(new[] { 0d, 0d, 0d });
 
-            ScoreRangeStandardizationStrategy.Transform(dataColumn);
+            ScoreRangeNormalizationStrategy.Transform(dataColumn);
 
             Assert.AreEqual(dataColumn.Table.Rows[0].Field<double>(0), 0);
             Assert.AreEqual(dataColumn.Table.Rows[1].Field<double>(0), 0);
@@ -46,7 +46,7 @@ namespace MCDA.Test
         {
             DataColumn dataColumn = TestUtil.CreateDataColumn<double>(new[] { 1d, 1d, 1d });
 
-            ScoreRangeStandardizationStrategy.Transform(dataColumn);
+            ScoreRangeNormalizationStrategy.Transform(dataColumn);
 
             Assert.AreEqual(dataColumn.Table.Rows[0].Field<double>(0), 1);
             Assert.AreEqual(dataColumn.Table.Rows[1].Field<double>(0), 1);
@@ -58,7 +58,7 @@ namespace MCDA.Test
         {
             DataColumn dataColumn = TestUtil.CreateDataColumn<double>(new[] { 1d, 2d, 3d });
 
-            ScoreRangeStandardizationStrategy.Transform(dataColumn);
+            ScoreRangeNormalizationStrategy.Transform(dataColumn);
 
             Assert.AreEqual(dataColumn.Table.Rows[0].Field<double>(0), 0);
             Assert.AreEqual(dataColumn.Table.Rows[1].Field<double>(0), 0.5);
@@ -70,7 +70,7 @@ namespace MCDA.Test
         {
             DataColumn dataColumn = TestUtil.CreateDataColumn<double>(new[] { -3d, -2d, 0d });
 
-            ScoreRangeStandardizationStrategy.Transform(dataColumn, false);
+            ScoreRangeNormalizationStrategy.Transform(dataColumn, false);
 
             Assert.AreEqual(dataColumn.Table.Rows[0].Field<double>(0), 1);
             Assert.AreEqual(dataColumn.Table.Rows[1].Field<double>(0), 0.66, 0.01);
@@ -82,7 +82,7 @@ namespace MCDA.Test
         {
             DataColumn dataColumn = TestUtil.CreateDataColumn<double>(new[] { 0d, 0d, 0d });
 
-            ScoreRangeStandardizationStrategy.Transform(dataColumn, false);
+            ScoreRangeNormalizationStrategy.Transform(dataColumn, false);
 
             Assert.AreEqual(dataColumn.Table.Rows[0].Field<double>(0), 0);
             Assert.AreEqual(dataColumn.Table.Rows[1].Field<double>(0), 0);
@@ -94,7 +94,7 @@ namespace MCDA.Test
         {
             DataColumn dataColumn = TestUtil.CreateDataColumn<double>(new[] { 1d, 1d, 1d });
 
-            ScoreRangeStandardizationStrategy.Transform(dataColumn, false);
+            ScoreRangeNormalizationStrategy.Transform(dataColumn, false);
 
             Assert.AreEqual(dataColumn.Table.Rows[0].Field<double>(0), 1);
             Assert.AreEqual(dataColumn.Table.Rows[1].Field<double>(0), 1);
@@ -106,7 +106,7 @@ namespace MCDA.Test
         {
             DataColumn dataColumn = TestUtil.CreateDataColumn<double>(new[] { 1d, 2d, 3d });
 
-            ScoreRangeStandardizationStrategy.Transform(dataColumn, false);
+            ScoreRangeNormalizationStrategy.Transform(dataColumn, false);
 
             Assert.AreEqual(dataColumn.Table.Rows[0].Field<double>(0), 1);
             Assert.AreEqual(dataColumn.Table.Rows[1].Field<double>(0), 0.5);
@@ -118,7 +118,7 @@ namespace MCDA.Test
         {
             DataColumn dataColumn = TestUtil.CreateDataColumn<int>(new[] { 1, 2, 3});
 
-            ScoreRangeStandardizationStrategy.Transform(dataColumn);
+            ScoreRangeNormalizationStrategy.Transform(dataColumn);
 
             Assert.AreEqual(dataColumn.Table.Rows[0].Field<int>(0), 0);
             Assert.AreEqual(dataColumn.Table.Rows[1].Field<int>(0), 0);
@@ -130,7 +130,7 @@ namespace MCDA.Test
         {
             DataColumn dataColumn = TestUtil.CreateDataColumn<string>(new[] { "string" });
 
-            ScoreRangeStandardizationStrategy.Transform(dataColumn);
+            ScoreRangeNormalizationStrategy.Transform(dataColumn);
 
             Assert.AreEqual(dataColumn.Table.Rows[0].Field<string>(0), "string");
         }
@@ -140,7 +140,7 @@ namespace MCDA.Test
         {
             DataColumn dataColumn = TestUtil.CreateDataColumn<double>(Enumerable.Empty<double>());
 
-            ScoreRangeStandardizationStrategy.Transform(dataColumn);
+            ScoreRangeNormalizationStrategy.Transform(dataColumn);
 
             Assert.AreEqual(dataColumn.Table.Rows.Count, 0);
         }

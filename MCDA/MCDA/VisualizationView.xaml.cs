@@ -65,17 +65,17 @@ namespace MCDA
         void ViewModelPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             //we use this so far only for the histogram
-            if (_viewModel.SelectedResult == null || _viewModel.SelectedResult.RenderContainer == null)
+            if (_viewModel.SelectedResult == null || _viewModel.SelectedResult == null)
                 return;
 
             double[] data;
             int[] freq;
            
-            Classification.Histogram(_viewModel.SelectedResult.FeatureClass, _viewModel.SelectedResult.Field, out data, out freq);
+            Classification.Histogram(_viewModel.SelectedResult.Field.Feature.FeatureClass, _viewModel.SelectedResult.Field.ESRIField, out data, out freq);
 
             _histogramControl.Data = Array.ConvertAll<int, long>(Classification.NormalizeHistogramData(data, freq), Convert.ToInt64);
 
-            double[] classes = Classification.Classify(_viewModel.SelectedClassificationMethod, _viewModel.SelectedResult.FeatureClass, _viewModel.SelectedResult.Field, _viewModel.SelectedNumberOfClasses);
+            double[] classes = Classification.Classify(_viewModel.SelectedClassificationMethod, _viewModel.SelectedResult.Field.Feature.FeatureClass, _viewModel.SelectedResult.Field.ESRIField, _viewModel.SelectedNumberOfClasses);
 
             _histogramControl.Breaks = Array.ConvertAll<int, long>(Classification.NormalizeBreaks(classes), Convert.ToInt64);   
 

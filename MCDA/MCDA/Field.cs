@@ -6,6 +6,7 @@ using MCDA.Extensions;
 using System.ComponentModel;
 using ESRI.ArcGIS.Geodatabase;
 using ESRI.ArcGIS.ADF;
+using System.Diagnostics.Contracts;
 
 namespace MCDA.Model
 {
@@ -21,6 +22,9 @@ namespace MCDA.Model
 
         public Field(ESRI.ArcGIS.Geodatabase.IField field, Feature feature)
         {
+            Contract.Requires<ArgumentNullException>(field != null);
+            Contract.Requires<ArgumentNullException>(feature != null);
+
             Feature = feature;
             this.field = field;
 
@@ -147,6 +151,6 @@ namespace MCDA.Model
         public bool IsSelectedFieldForRendering
         {
             get { return Feature.SelectedFieldForRendering == this; }
-        }
+        } 
     }
 }

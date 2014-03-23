@@ -54,7 +54,7 @@ namespace MCDA.Model
         }
 
         /// <summary>
-        /// Chechks if all required parameters are set.
+        /// Checks if all required parameters are set.
         /// </summary>
         /// <returns></returns>
         public bool IsComplete()

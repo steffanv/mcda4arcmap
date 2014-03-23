@@ -135,6 +135,9 @@ namespace MCDA
 
         protected override void OnStartup()
         {
+
+            Assembly assembly = Assembly.LoadFrom("HistogramControl.dll");
+
             extension = this;
 
             shadowWorkspace = CreateInMemoryWorkspace();
@@ -612,7 +615,6 @@ namespace MCDA
 
             if (featureClass.FindField(tool.DefaultResultColumnName) < 0)
             {
-
                 IField newField = new FieldClass();
                 IFieldEdit newFieldEdit = (IFieldEdit)newField;
                 newFieldEdit.Type_2 = esriFieldType.esriFieldTypeDouble;
@@ -620,6 +622,8 @@ namespace MCDA
                 newFieldEdit.AliasName_2 = tool.DefaultResultColumnName;
 
                 featureClass.AddField(newField);
+
+                feature.UpdateFieldsProperty();
             }
 
             using (ComReleaser comReleaser = new ComReleaser())
@@ -647,7 +651,6 @@ namespace MCDA
 
                     esriFeature = featureCursor.NextFeature();
                 }
-
             }
 
             if(feature.SelectedFieldForRendering != null)

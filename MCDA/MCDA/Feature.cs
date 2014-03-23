@@ -33,6 +33,8 @@ namespace MCDA.Model
 
         public Feature(ESRI.ArcGIS.Carto.ILayer layer)
         {
+            Contract.Requires<ArgumentNullException>(layer != null);
+
             this.esriLayer = layer;
             layerName = layer.Name;
 
@@ -42,14 +44,14 @@ namespace MCDA.Model
             {
                 isFeatureLayer = false;
                 UniqueLayerName = string.Empty;
-                fields = new List<Field>();
+                Fields = new List<Field>();
             }
             else
             { 
                 isFeatureLayer = true;
                 this.featureLayer = featureLayer;
                 UniqueLayerName = ToUniqueLayerName(featureLayer);
-                fields = GetFields();
+                Fields = GetFields();
             }
         }
 
@@ -153,8 +155,8 @@ namespace MCDA.Model
 
         public IList<Field> Fields
         {
-            get{ return fields.OrderBy(f => f.FieldName).ToList(); }
-         
+            get { return fields.OrderBy(f => f.FieldName).ToList(); }
+            private set { fields = value; }      
         }
 
         public bool HasAreaAndTopologicalOperator()
@@ -168,40 +170,48 @@ namespace MCDA.Model
             return false;
         }
 
+        /// <summary>
+        /// In case the underlying <see cref="IFeatureClass"/> is extended by a new field it is required to call this method.
+        /// </summary>
+        public void UpdateFieldsProperty()
+        {
+            Fields = GetFields();
+
+            PropertyChanged.Notify(() => Fields);
+        }
+
         //TODO wozu ist das gut?
         private string ToUniqueLayerName(ESRI.ArcGIS.Carto.IFeatureLayer2 featureLayer)
         {
             return featureLayer.FeatureClass.Fields.ToString() + featureLayer.ToString();
         }
 
-        public void RegisterListenerForEveryMemberOfFields()
-        {
-            foreach (var currentField in fields)
-            {
-                currentField.PropertyChanged -= new PropertyChangedEventHandler(FieldPropertyChanged);
-            }
+        //public void RegisterListenerForEveryMemberOfFields()
+        //{
+        //    foreach (var currentField in fields)
+        //    {
+        //        currentField.PropertyChanged -= new PropertyChangedEventHandler(FieldPropertyChanged);
+        //    }
 
-            foreach (var currentField in fields)
-            {
-                currentField.PropertyChanged +=new PropertyChangedEventHandler(FieldPropertyChanged);
-            }
-        }
+        //    foreach (var currentField in fields)
+        //    {
+        //        currentField.PropertyChanged +=new PropertyChangedEventHandler(FieldPropertyChanged);
+        //    }
+        //}
 
-        private void FieldPropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            PropertyChanged.Notify(() => Fields);
-        }
+        //private void FieldPropertyChanged(object sender, PropertyChangedEventArgs e)
+        //{
+        //    PropertyChanged.Notify(() => Fields);
+        //}
 
         private IList<Field> GetFields()
-        {
+        {//TODO using?
             ESRI.ArcGIS.Geodatabase.IFields fields = featureLayer.FeatureClass.Fields;
 
             IList<Field> listOfFields = new List<Field>();
 
             for (int i = 0; i < fields.FieldCount; i++)
-            {
                 listOfFields.Add(new Field(fields.get_Field(i),this));
-            }
 
             return listOfFields;
         }

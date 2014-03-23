@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Windows;
 
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
@@ -8,9 +9,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("MCDA")]
 [assembly: AssemblyDescription("Tool for MCDA")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Ryerson University")]
+[assembly: AssemblyCompany("Ryerson University; Steffan Voß")]
 [assembly: AssemblyProduct("MCDA")]
-[assembly: AssemblyCopyright("Copyright © Ryerson University 2012")]
+[assembly: AssemblyCopyright("Copyright © Ryerson University 2012; Steffan Voß 2012 - 2014")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -36,3 +37,8 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyFileVersion("1.0.0.0")]
 
 [assembly: InternalsVisibleTo("MCDA.Test")]
+
+[assembly: ThemeInfo(
+    ResourceDictionaryLocation.None, 
+    ResourceDictionaryLocation.SourceAssembly
+)]

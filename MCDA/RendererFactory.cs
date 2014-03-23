@@ -77,15 +77,16 @@ namespace MCDA.Model
             //uniqueValueRenderer.DefaultSymbol = simpleFillSymbol as ISymbol;
             //uniqueValueRenderer.UseDefaultSymbol = true;
 
+            //TODO wofür war das gut?
             // add the no data fill
-            ISimpleFillSymbol noDataSymbol = new SimpleFillSymbolClass();
-            noDataSymbol.Style = esriSimpleFillStyle.esriSFSDiagonalCross;
-            noDataSymbol.Outline.Width = .4;
-            noDataSymbol.Color = ToColor(Color.FromRgb(84, 204, 208));
+            //ISimpleFillSymbol noDataSymbol = new SimpleFillSymbolClass();
+            //noDataSymbol.Style = esriSimpleFillStyle.esriSFSDiagonalCross;
+            //noDataSymbol.Outline.Width = .4;
+            //noDataSymbol.Color = ToColor(Color.FromRgb(84, 204, 208));
 
-            uniqueValueRenderer.DefaultLabel = "No Data";
-            uniqueValueRenderer.DefaultSymbol = (ISymbol)noDataSymbol;
-            uniqueValueRenderer.UseDefaultSymbol = true;
+            //uniqueValueRenderer.DefaultLabel = "No Data";
+            //uniqueValueRenderer.DefaultSymbol = (ISymbol)noDataSymbol;
+            //uniqueValueRenderer.UseDefaultSymbol = true;
 
             int fieldIndex;
 
@@ -145,7 +146,7 @@ namespace MCDA.Model
             //figure out how many colors belong to which side from the neutral color
             int size = uniqueValueRenderer.ValueCount;
 
-            int left = (int) (size * (biPolarRendererContainer.NeutralColorPosition / 100));
+            int left = (int) (size * biPolarRendererContainer.NeutralColorPosition);
             int right = size - left;
 
             // for the case one or both are zero -> create color ramp crashes, the magic value seems to be 2

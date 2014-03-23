@@ -17,10 +17,10 @@ using System.Threading;
 namespace MCDA.ViewModel
 {
     internal sealed class VisualizationViewModel : INotifyPropertyChanged
-	{
+    {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private Color selectedStartColor, selectedEndColor; 
+        private Color classBreaksRendererStartColor, classBreaksRendererEndColor;
 
         private BindingList<IClassify> listOfClassificationMethod;
         private BindingList<int> listOfNumberOfClasses;
@@ -30,16 +30,15 @@ namespace MCDA.ViewModel
         private ClassBreaksRendererContainer classBreaksRendererContainer = new ClassBreaksRendererContainer();
 
         private double biPolarColorSliderValue;
-        private Color selectedBiPolarNegativColor, selectedBiPolarPositivColor, selectedBiPolarNeutralColor;
+        private Color biPolarRendererStartColor, biPolarRenderEndColor, biPolarRendererNeutralColor;
 
-        private BindingList<RendererContainer> _resultList, _completeResultList;
-        private RendererContainer selectedRendererContainer;
+        private RendererContainer selectedFieldToRender;
 
-        private ICommand _applyClassBreaksRendererCommand;
-        private ICommand _removeClassBreaksRendererCommand;
+        private ICommand applyClassBreaksRendererCommand;
+        private ICommand removeClassBreaksRendererCommand;
 
-        private ICommand _applyBiPolarRendererCommand;
-        private ICommand _removeBiPolarRendererCommand;
+        private ICommand applyBiPolarRendererCommand;
+        private ICommand removeBiPolarRendererCommand;
 
         private MCDAExtension MCDAExtension = MCDAExtension.GetExtension();
 
@@ -47,73 +46,35 @@ namespace MCDA.ViewModel
         {
             InitializeClassificationArguments();
 
-            SelectedStartColor  = Color.FromRgb(255, 0, 0);
-            SelectedEndColor  = Color.FromRgb(0, 255, 0);
+            ClassBreaksRendererStartColor = Color.FromRgb(255, 0, 0);
+            ClassBreaksRendererEndColor = Color.FromRgb(0, 255, 0);
 
-            SelectedBiPolarNegativColor = Color.FromRgb(255, 0, 0);
-            SelectedBiPolarPositivColor = Color.FromRgb(0, 255, 0);
-            SelectedBiPolarNeutralColor = Color.FromRgb(255, 255, 255);
+            BiPolarRendererStartColor = Color.FromRgb(255, 0, 0);
+            BiPolarRendererEndColor = Color.FromRgb(0, 255, 0);
+            BiPolarRendererNeutralColor = Color.FromRgb(255, 255, 255);
 
-            BiPolarColorSliderValue = 50;
+            BiPolarColorSliderValue = 0.5;
 
-            MCDAExtension.RegisterPropertyHandler(x => x.LinkDictionary, LinkDictionaryPropertyChanged);
-            MCDAExtension.RegisterPropertyHandler(x => x.AvailableFeatures, AvailableLayerChanged);
+            GetToolFieldList();
+            GetAllFieldsList();
 
-            CreateResultList();
-            CreateCompleteResultList();
-
-            PropertyChanged.Notify(() => ResultList);
-            PropertyChanged.Notify(() => CompleteResultList);
+            PropertyChanged.Notify(() => ToolFieldsList);
+            PropertyChanged.Notify(() => AllFieldsList);
         }
 
-        private void AvailableLayerChanged(object sender, PropertyChangedEventArgs e)
+        public BindingList<RendererContainer> ToolFieldsList { get; private set; }
+
+        public BindingList<RendererContainer> AllFieldsList { get; private set; }
+
+        public RendererContainer SelectedFieldToRender
         {
-            CreateCompleteResultList();
-
-            ////the user selected something, but it is no longer available
-            //if(selectedRendererContainer != null && _completeResultList.Contains(selectedRendererContainer))
-            //    DisableAllRemoveButtons();
-
-            selectedRendererContainer = _completeResultList.FirstOrDefault(r => r.Equals(selectedRendererContainer));
-
-            PropertyChanged.Notify(() => ResultList);
-            PropertyChanged.Notify(() => SelectedResult);
-            PropertyChanged.Notify(() => CompleteResultList);
-        }
-
-        private void LinkDictionaryPropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            CreateResultList();
-
-
-            //if (selectedRendererContainer == null)
-            //    DisableAllRemoveButtons();
-
-            selectedRendererContainer = _resultList.FirstOrDefault(r => r.Equals(selectedRendererContainer));
-
-            PropertyChanged.Notify(() => ResultList);
-            PropertyChanged.Notify(() => SelectedResult);
-            PropertyChanged.Notify(() => CompleteResultList);
-        }
-
-        public BindingList<RendererContainer> ResultList
-        {
-            get { return _resultList; }
-        }
-
-        public BindingList<RendererContainer> CompleteResultList
-        {
-            get { return _completeResultList; }
-        }
-
-        public RendererContainer SelectedResult
-        {
-            get { return selectedRendererContainer; }
+            get { return selectedFieldToRender; }
             set
             {
-                PropertyChanged.ChangeAndNotify(ref selectedRendererContainer, value, () => SelectedResult);
+                PropertyChanged.ChangeAndNotify(ref selectedFieldToRender, value, () => SelectedFieldToRender);
 
-            SelectedResultChanged();
+                RendererContainerToView();
+                UpdateHistogramControl();
 
             }
         }
@@ -126,59 +87,79 @@ namespace MCDA.ViewModel
 
         public BindingList<IClassify> ListOfClassificationMethod
         {
-            get { return listOfClassificationMethod; }  
+            get { return listOfClassificationMethod; }
         }
 
-        
+
         public int SelectedNumberOfClasses
         {
             get { return selectedNumberOfClasses; }
-            set { 
-                
-                selectedNumberOfClasses = value;
+            set
+            {
+
+                PropertyChanged.ChangeAndNotify(ref selectedNumberOfClasses, value, () => SelectedNumberOfClasses);
 
                 ClassBreaksRendererValuesChanged();
-                //for the histogram
-                PropertyChanged.Notify(() => SelectedNumberOfClasses);
-
-
             }
         }
 
         public IClassify SelectedClassificationMethod
         {
             get { return selectedClassificationMethod; }
-            set { 
-                
-                selectedClassificationMethod = value;
-
-                ClassBreaksRendererValuesChanged();
-
-                //for the histogram
-                PropertyChanged.Notify(() => SelectedClassificationMethod);
-
-            }
-        }
-
-        public Color SelectedStartColor
-        {
-            get { return selectedStartColor;  }
-            set {
-
-                selectedStartColor = value;
-                ClassBreaksRendererValuesChanged();
-            }
-        }
-
-        public Color SelectedEndColor
-        {
-            get { return selectedEndColor; }
             set
             {
-                selectedEndColor = value;
+                PropertyChanged.ChangeAndNotify(ref selectedClassificationMethod, value, () => SelectedClassificationMethod);
+
                 ClassBreaksRendererValuesChanged();
             }
         }
+
+        public Color ClassBreaksRendererStartColor
+        {
+            get { return classBreaksRendererStartColor; }
+            set
+            {
+                PropertyChanged.ChangeAndNotify(ref classBreaksRendererStartColor, value, () => ClassBreaksRendererStartColor);
+
+                ClassBreaksRendererValuesChanged();
+            }
+        }
+
+        public Color ClassBreaksRendererEndColor
+        {
+            get { return classBreaksRendererEndColor; }
+            set
+            {
+                PropertyChanged.ChangeAndNotify(ref classBreaksRendererEndColor, value, () => ClassBreaksRendererEndColor);
+
+                ClassBreaksRendererValuesChanged();
+            }
+        }
+
+        public long[] HistogramData { get; private set; }
+
+        public long[] HistogramBreaks { get; private set; }
+
+        private void UpdateHistogramControl()
+        {
+            if (!IsFieldToRenderSelected)
+                return;
+
+            double[] data;
+            int[] freq;
+
+            Classification.Histogram(selectedFieldToRender.Field.Feature.FeatureClass, SelectedFieldToRender.Field.ESRIField, out data, out freq);
+
+            HistogramData = System.Array.ConvertAll<int, long>(Classification.NormalizeHistogramData(data, freq), Convert.ToInt64);
+
+            double[] classes = Classification.Classify(SelectedClassificationMethod, SelectedFieldToRender.Field.Feature.FeatureClass, SelectedFieldToRender.Field.ESRIField, SelectedNumberOfClasses);
+
+            HistogramBreaks = System.Array.ConvertAll<int, long>(Classification.NormalizeBreaks(classes), Convert.ToInt64);
+
+            PropertyChanged.Notify(() => HistogramData);
+            PropertyChanged.Notify(() => HistogramBreaks);
+        }
+
         #endregion
 
         #region bi polar renderer
@@ -186,42 +167,40 @@ namespace MCDA.ViewModel
         public double BiPolarColorSliderValue
         {
             get { return biPolarColorSliderValue; }
-            set { 
-                
-                biPolarColorSliderValue = value;
-                //no more update after slider change, this takes to long on normal machines
-                //from the code behind page if slider dragged
-                //BiPolarRendererValuesChanged();
-            
-            }
-        }
-
-        public Color SelectedBiPolarNegativColor
-        {
-            get { return selectedBiPolarNegativColor; }
             set
             {
-                selectedBiPolarNegativColor = value;
+
+                PropertyChanged.ChangeAndNotify(ref biPolarColorSliderValue, value, () => BiPolarColorSliderValue);
                 BiPolarRendererValuesChanged();
             }
         }
 
-        public Color SelectedBiPolarPositivColor
+        public Color BiPolarRendererStartColor
         {
-            get { return selectedBiPolarPositivColor; }
+            get { return biPolarRendererStartColor; }
             set
             {
-                selectedBiPolarPositivColor = value;
+                PropertyChanged.ChangeAndNotify(ref biPolarRendererStartColor, value, () => BiPolarRendererStartColor);
                 BiPolarRendererValuesChanged();
             }
         }
 
-        public Color SelectedBiPolarNeutralColor
+        public Color BiPolarRendererEndColor
         {
-            get { return selectedBiPolarNeutralColor; }
+            get { return biPolarRenderEndColor; }
             set
             {
-                selectedBiPolarNeutralColor = value;
+                PropertyChanged.ChangeAndNotify(ref biPolarRenderEndColor, value, () => BiPolarRendererEndColor);
+                BiPolarRendererValuesChanged();
+            }
+        }
+
+        public Color BiPolarRendererNeutralColor
+        {
+            get { return biPolarRendererNeutralColor; }
+            set
+            {
+                PropertyChanged.ChangeAndNotify(ref biPolarRendererNeutralColor, value, () => BiPolarRendererNeutralColor);
                 BiPolarRendererValuesChanged();
             }
         }
@@ -230,19 +209,19 @@ namespace MCDA.ViewModel
 
         private void Render()
         {
-            if(selectedRendererContainer != null)
-                ProgressDialog.ShowProgressDialog("Creating Symbology", (Action<RendererContainer, IFeatureLayer2>)MCDAExtension.Render, selectedRendererContainer, selectedRendererContainer.Field.Feature.FeatureLayer);
+            if (IsFieldToRenderSelected)
+                ProgressDialog.ShowProgressDialog("Creating Symbology", (Action<RendererContainer, IFeatureLayer2>)MCDAExtension.Render, selectedFieldToRender, selectedFieldToRender.Field.Feature.FeatureLayer);
         }
 
-        private void CreateCompleteResultList()
+        private void GetAllFieldsList()
         {
-            _completeResultList = new BindingList<RendererContainer>(MCDAExtension.EligibleFeaturesForMCDA.SelectMany(f => f.Fields).Select(field => field.RenderContainer).ToList()); 
+            AllFieldsList = new BindingList<RendererContainer>(MCDAExtension.EligibleFeaturesForMCDA.SelectMany(f => f.Fields).Where(f => f.IsNumeric).Select(f => f.RenderContainer).ToList());
         }
 
-        private void CreateResultList()
+        private void GetToolFieldList()
         {
-            _resultList = new BindingList<RendererContainer>(MCDAExtension.FeaturesFromInMemoryWorkspace.SelectMany(f => f.Fields).Select(field => field.RenderContainer).ToList());
-  
+            ToolFieldsList = new BindingList<RendererContainer>(MCDAExtension.FeaturesFromInMemoryWorkspace.SelectMany(f => f.Fields).Where(f => f.IsNumeric).Select(f => f.RenderContainer).ToList());
+
         }
 
         private void InitializeClassificationArguments()
@@ -257,7 +236,7 @@ namespace MCDA.ViewModel
             listOfClassificationMethod.Add(new EqualIntervalClass());
             listOfClassificationMethod.Add(new GeometricalIntervalClass());
 
-            listOfNumberOfClasses =  new BindingList<int>(Enumerable.Range(2, 19).ToList());
+            listOfNumberOfClasses = new BindingList<int>(Enumerable.Range(2, 19).ToList());
 
             selectedNumberOfClasses = 5;
         }
@@ -266,10 +245,10 @@ namespace MCDA.ViewModel
         {
             return new BiPolarRendererContainer()
             {
-                Field = selectedRendererContainer.Field.ESRIField,
-                NegativColor = selectedBiPolarNegativColor,
-                PositivColor = selectedBiPolarPositivColor,
-                NeutralColor = selectedBiPolarNeutralColor,
+                Field = selectedFieldToRender.Field.ESRIField,
+                NegativColor = biPolarRendererStartColor,
+                PositivColor = biPolarRenderEndColor,
+                NeutralColor = biPolarRendererNeutralColor,
                 NeutralColorPosition = biPolarColorSliderValue
             };
         }
@@ -278,88 +257,72 @@ namespace MCDA.ViewModel
         {
             return new ClassBreaksRendererContainer()
             {
-                Field = selectedRendererContainer.Field.ESRIField,
+                Field = selectedFieldToRender.Field.ESRIField,
                 ClassificationMethod = selectedClassificationMethod,
-                EndColor = selectedEndColor,
-                StartColor = selectedStartColor,
+                EndColor = classBreaksRendererEndColor,
+                StartColor = classBreaksRendererStartColor,
                 NumberOfClasses = selectedNumberOfClasses
             };
         }
 
         private void RendererContainerToView()
         {
-            if (selectedRendererContainer != null)
+            if (IsFieldToRenderSelected)
             {
-                if (selectedRendererContainer.Renderer == Renderer.None)
+                if (selectedFieldToRender.Renderer == Renderer.None)
                     return;
 
-                if (selectedRendererContainer.Renderer == Renderer.ClassBreaksRenderer)
+                if (selectedFieldToRender.Renderer == Renderer.ClassBreaksRenderer)
                 {
-                    selectedClassificationMethod = selectedRendererContainer.ClassBreaksRendererContainer.ClassificationMethod;
-                    selectedNumberOfClasses = selectedRendererContainer.ClassBreaksRendererContainer.NumberOfClasses;
-                    selectedStartColor = selectedRendererContainer.ClassBreaksRendererContainer.StartColor;
-                    selectedEndColor = selectedRendererContainer.ClassBreaksRendererContainer.EndColor;
+                    selectedClassificationMethod = selectedFieldToRender.ClassBreaksRendererContainer.ClassificationMethod;
+                    selectedNumberOfClasses = selectedFieldToRender.ClassBreaksRendererContainer.NumberOfClasses;
+                    classBreaksRendererStartColor = selectedFieldToRender.ClassBreaksRendererContainer.StartColor;
+                    classBreaksRendererEndColor = selectedFieldToRender.ClassBreaksRendererContainer.EndColor;
 
                     PropertyChanged.Notify(() => SelectedClassificationMethod);
                     PropertyChanged.Notify(() => SelectedNumberOfClasses);
-                    PropertyChanged.Notify(() => SelectedStartColor);
-                    PropertyChanged.Notify(() => SelectedEndColor);
+                    PropertyChanged.Notify(() => ClassBreaksRendererStartColor);
+                    PropertyChanged.Notify(() => ClassBreaksRendererEndColor);
                 }
 
-                if (selectedRendererContainer.Renderer == Renderer.BiPolarRenderer)
+                if (selectedFieldToRender.Renderer == Renderer.BiPolarRenderer)
                 {
-                    selectedBiPolarNegativColor = selectedRendererContainer.BiPolarRendererContainer.NegativColor;
-                    selectedBiPolarPositivColor = selectedRendererContainer.BiPolarRendererContainer.PositivColor;
-                    selectedBiPolarNeutralColor = selectedRendererContainer.BiPolarRendererContainer.NeutralColor;
-                    biPolarColorSliderValue = selectedRendererContainer.BiPolarRendererContainer.NeutralColorPosition;
+                    biPolarRendererStartColor = selectedFieldToRender.BiPolarRendererContainer.NegativColor;
+                    biPolarRenderEndColor = selectedFieldToRender.BiPolarRendererContainer.PositivColor;
+                    biPolarRendererNeutralColor = selectedFieldToRender.BiPolarRendererContainer.NeutralColor;
+                    biPolarColorSliderValue = selectedFieldToRender.BiPolarRendererContainer.NeutralColorPosition;
 
-                    PropertyChanged.Notify(() => SelectedBiPolarNegativColor);
-                    PropertyChanged.Notify(() => SelectedBiPolarNeutralColor);
-                    PropertyChanged.Notify(() => SelectedBiPolarPositivColor);
+                    PropertyChanged.Notify(() => BiPolarRendererStartColor);
+                    PropertyChanged.Notify(() => BiPolarRendererNeutralColor);
+                    PropertyChanged.Notify(() => BiPolarRendererEndColor);
                     PropertyChanged.Notify(() => BiPolarColorSliderValue);
                 }
             }
         }
 
+        public bool IsFieldToRenderSelected
+        {
+            get { return SelectedFieldToRender != null; }
+        }
+
         public void BiPolarRendererValuesChanged()
         {
-            if (SelectedResult != null)
+            if (IsFieldToRenderSelected)
             {
-                SelectedResult.BiPolarRendererContainer = GetBiPolarContainer();
+                SelectedFieldToRender.BiPolarRendererContainer = GetBiPolarContainer();
                 Render();
             }
         }
 
         public void ClassBreaksRendererValuesChanged()
         {
-            if (SelectedResult != null)
+            if (IsFieldToRenderSelected)
             {
-                SelectedResult.ClassBreaksRendererContainer = GetClassBreaksRendererContainer();
+                UpdateHistogramControl();
+
+                SelectedFieldToRender.ClassBreaksRendererContainer = GetClassBreaksRendererContainer();
                 Render();
             }
-        }
-
-        private void SelectedResultChanged()
-        {
-            //_isBiPolarRendererApplyCommandExecuted = false;
-            //_isClassBreaksRendererApplyCommandExecuted = false;
-
-            //if (selectedRendererContainer != null)
-            //{
-            //    switch (selectedRendererContainer.Renderer)
-            //    {
-            //        case Renderer.None: ApplyClassBreaksRendererCommand.CanExecute(true); ApplyClassBreaksRendererCommand.CanExecute(true);
-            //            break;
-            //        case Renderer.BiPolarRenderer: RemoveBiPolarRendererCommand.CanExecute(true); /*_isBiPolarRendererApplyCommandExecuted = true;*/ ApplyClassBreaksRendererCommand.CanExecute(true);                                                  
-            //            break;
-            //        case Renderer.ClassBreaksRenderer: /*_isClassBreaksRendererApplyCommandExecuted = true;*/; RemoveClassBreaksRendererCommand.CanExecute(true); ApplyBiPolarRendererCommand.CanExecute(true);
-            //            break;             
-            //    }
-
-               
-            //}
-
-            RendererContainerToView();
         }
 
         #region commands
@@ -368,10 +331,10 @@ namespace MCDA.ViewModel
         {
             get
             {
-                if (_applyClassBreaksRendererCommand == null)
-                    _applyClassBreaksRendererCommand = new RelayCommand(p => this.DoApplyClassBreaksRendererCommand(), p => CanApplyClassBreaksRendererCommand());
+                if (applyClassBreaksRendererCommand == null)
+                    applyClassBreaksRendererCommand = new RelayCommand(p => this.DoApplyClassBreaksRendererCommand(), p => CanApplyClassBreaksRendererCommand());
 
-                return _applyClassBreaksRendererCommand;
+                return applyClassBreaksRendererCommand;
             }
         }
 
@@ -379,10 +342,10 @@ namespace MCDA.ViewModel
         {
             get
             {
-                if (_removeClassBreaksRendererCommand == null)
-                    _removeClassBreaksRendererCommand = new RelayCommand( p => this.DoRemoveClassBreaksRendererCommand(), p => CanRemoveClassBreaksRendererCommand());
+                if (removeClassBreaksRendererCommand == null)
+                    removeClassBreaksRendererCommand = new RelayCommand(p => this.DoRemoveClassBreaksRendererCommand(), p => CanRemoveClassBreaksRendererCommand());
 
-                return _removeClassBreaksRendererCommand;
+                return removeClassBreaksRendererCommand;
             }
         }
 
@@ -390,10 +353,10 @@ namespace MCDA.ViewModel
         {
             get
             {
-                if (_applyBiPolarRendererCommand == null)
-                    _applyBiPolarRendererCommand = new RelayCommand( p => this.DoApplyBiPolarRendererCommand(), p => CanApplyBiPolarRendererCommand());
+                if (applyBiPolarRendererCommand == null)
+                    applyBiPolarRendererCommand = new RelayCommand(p => this.DoApplyBiPolarRendererCommand(), p => CanApplyBiPolarRendererCommand());
 
-                return _applyBiPolarRendererCommand;
+                return applyBiPolarRendererCommand;
             }
         }
 
@@ -401,10 +364,10 @@ namespace MCDA.ViewModel
         {
             get
             {
-                if (_removeBiPolarRendererCommand == null)
-                 _removeBiPolarRendererCommand = new RelayCommand( p => this.DoRemoveBiPolarRendererCommand(), p => CanRemoveBiPolarRendererCommand());
-              
-                return _removeBiPolarRendererCommand;
+                if (removeBiPolarRendererCommand == null)
+                    removeBiPolarRendererCommand = new RelayCommand(p => this.DoRemoveBiPolarRendererCommand(), p => CanRemoveBiPolarRendererCommand());
+
+                return removeBiPolarRendererCommand;
             }
         }
 
@@ -414,73 +377,62 @@ namespace MCDA.ViewModel
 
         public bool CanApplyClassBreaksRendererCommand()
         {
-            if (SelectedResult == null)
-                return false;
-
-            return !SelectedResult.Field.IsSelectedFieldForRendering || SelectedResult.Renderer != Renderer.ClassBreaksRenderer;
+            return IsFieldToRenderSelected && (!SelectedFieldToRender.Field.IsSelectedFieldForRendering || SelectedFieldToRender.Renderer != Renderer.ClassBreaksRenderer);
         }
 
         public bool CanRemoveClassBreaksRendererCommand()
         {
-            if (SelectedResult == null)
-                return false;
-
-            return SelectedResult.Field.IsSelectedFieldForRendering && SelectedResult.Renderer == Renderer.ClassBreaksRenderer;
+            return IsFieldToRenderSelected && SelectedFieldToRender.Field.IsSelectedFieldForRendering && SelectedFieldToRender.Renderer == Renderer.ClassBreaksRenderer;
         }
 
         public bool CanApplyBiPolarRendererCommand()
         {
-            if (SelectedResult == null)
-                return false;
-
-            return !SelectedResult.Field.IsSelectedFieldForRendering || SelectedResult.Renderer != Renderer.BiPolarRenderer;
+            return IsFieldToRenderSelected && (!SelectedFieldToRender.Field.IsSelectedFieldForRendering || SelectedFieldToRender.Renderer != Renderer.BiPolarRenderer);
         }
 
         public bool CanRemoveBiPolarRendererCommand()
         {
-            if (SelectedResult == null)
-                return false;
-
-            return SelectedResult.Field.IsSelectedFieldForRendering && SelectedResult.Renderer != Renderer.BiPolarRenderer;
+            return IsFieldToRenderSelected && SelectedFieldToRender.Field.IsSelectedFieldForRendering && SelectedFieldToRender.Renderer == Renderer.BiPolarRenderer;
         }
 
-        private void DoApplyClassBreaksRendererCommand(){
+        private void DoApplyClassBreaksRendererCommand()
+        {
 
-            SelectedResult.Renderer = Renderer.ClassBreaksRenderer;
-            SelectedResult.ClassBreaksRendererContainer = GetClassBreaksRendererContainer();
+            SelectedFieldToRender.Renderer = Renderer.ClassBreaksRenderer;
+            SelectedFieldToRender.ClassBreaksRendererContainer = GetClassBreaksRendererContainer();
 
-            SelectedResult.Field.PromoteToSelectedFieldForRendering();
+            SelectedFieldToRender.Field.PromoteToSelectedFieldForRendering();
 
             Render();
         }
 
         private void DoRemoveClassBreaksRendererCommand()
         {
-            SelectedResult.Renderer = Renderer.None;
+            SelectedFieldToRender.Renderer = Renderer.None;
 
-            SelectedResult.Field.DemoteAsSelectedFieldForRendering();
+            SelectedFieldToRender.Field.DemoteAsSelectedFieldForRendering();
 
             Render();
         }
 
         private void DoApplyBiPolarRendererCommand()
         {
-            SelectedResult.Renderer = Renderer.BiPolarRenderer;
-            SelectedResult.BiPolarRendererContainer = GetBiPolarContainer();
+            SelectedFieldToRender.Renderer = Renderer.BiPolarRenderer;
+            SelectedFieldToRender.BiPolarRendererContainer = GetBiPolarContainer();
 
-            SelectedResult.Field.PromoteToSelectedFieldForRendering();
+            SelectedFieldToRender.Field.PromoteToSelectedFieldForRendering();
 
             Render();
         }
 
         private void DoRemoveBiPolarRendererCommand()
         {
-            SelectedResult.Renderer = Renderer.None;
+            SelectedFieldToRender.Renderer = Renderer.None;
 
-            SelectedResult.Field.DemoteAsSelectedFieldForRendering();
+            SelectedFieldToRender.Field.DemoteAsSelectedFieldForRendering();
 
             Render();
         }
         #endregion
-	}
+    }
 }

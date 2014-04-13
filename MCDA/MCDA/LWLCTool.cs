@@ -370,11 +370,11 @@ namespace MCDA.Model
                     IEnumIDs enumIDs = selectionSet.IDs;
 
                     int ID = enumIDs.Next();
-                    // thats ridiculous - someone at ESRI does not unterstand the iterator pattern...
+                    // thats ridiculous - someone at ESRI does not understand the iterator pattern...
                     while (ID != -1)
                     {
                         if (ID != currentFeature.OID)
-                      c  {
+                        {
                             // http://resources.arcgis.com/en/help/main/10.1/index.html#//00080000000z000000
                             IGeometryCollection polylineCollection =
                                 (IGeometryCollection)

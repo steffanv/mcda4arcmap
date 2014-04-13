@@ -79,7 +79,7 @@ namespace MCDA.Model
 
             foreach (IToolParameter currentToolParameter in toolParameterContainer.ToolParameter)
             {
-                Tuple<IToolParameter, double> currentLocalRange = localRangeList.Where(x => x.Item1 == currentToolParameter).FirstOrDefault();
+                Tuple<IToolParameter, double> currentLocalRange = localRangeList.FirstOrDefault(x => x.Item1 == currentToolParameter);
 
                 int oidColumnIndex = GetOIDColumnIndex();
 
@@ -103,8 +103,8 @@ namespace MCDA.Model
 
             foreach (IToolParameter currentToolParameter2 in toolParameterContainer.ToolParameter)
             {
-                double localRange2 = localRangeList.Where(x => x.Item1 == currentToolParameter2).First().Item2;
-                double globalRange2 = globalRangeList.Where(x => x.Item1 == currentToolParameter2).First().Item2;
+                double localRange2 = localRangeList.First(x => x.Item1 == currentToolParameter2).Item2;
+                double globalRange2 = globalRangeList.First(x => x.Item1 == currentToolParameter2).Item2;
 
                 if (globalRange2 == 0)
                 {
@@ -120,8 +120,8 @@ namespace MCDA.Model
 
             foreach (IToolParameter currentToolParameter in toolParameterContainer.ToolParameter)
             {
-                double localRange = localRangeList.Where(x => x.Item1 == currentToolParameter).FirstOrDefault().Item2;
-                double globalRange = globalRangeList.Where(x => x.Item1 == currentToolParameter).FirstOrDefault().Item2;
+                double localRange = localRangeList.FirstOrDefault(x => x.Item1 == currentToolParameter).Item2;
+                double globalRange = globalRangeList.FirstOrDefault(x => x.Item1 == currentToolParameter).Item2;
 
                 if (globalRange == 0)
                     dividend = null;
@@ -153,8 +153,8 @@ namespace MCDA.Model
 
             foreach (IToolParameter currentToolParameter in _toolParameterContainer.ToolParameter)
             {
-                double? scaledValue = _scaledValues.Where(x => x.Item1 == currentToolParameter).FirstOrDefault().Item2;
-                double? weight = _weights.Where(x => x.Item1 == currentToolParameter).FirstOrDefault().Item2;
+                double? scaledValue = _scaledValues.FirstOrDefault(x => x.Item1 == currentToolParameter).Item2;
+                double? weight = _weights.FirstOrDefault(x => x.Item1 == currentToolParameter).Item2;
 
                 if (!scaledValue.HasValue || !weight.HasValue)
                     return true;
@@ -185,10 +185,10 @@ namespace MCDA.Model
 
             foreach (IToolParameter currentToolParameter in _toolParameterContainer.ToolParameter)
             {
-                double? scaledValue = _scaledValues.Where(x => x.Item1 == currentToolParameter).FirstOrDefault().Item2;
-                double? weight = _weights.Where(x => x.Item1 == currentToolParameter).FirstOrDefault().Item2;
+                double? scaledValue = _scaledValues.FirstOrDefault(x => x.Item1 == currentToolParameter).Item2;
+                double? weight = _weights.FirstOrDefault(x => x.Item1 == currentToolParameter).Item2;
 
-                row[index] = _localRange.Where(x => x.Item1 == currentToolParameter).FirstOrDefault().Item2;
+                row[index] = _localRange.FirstOrDefault(x => x.Item1 == currentToolParameter).Item2;
 
                 if (scaledValue.HasValue)
                     row[index + 1] = scaledValue;

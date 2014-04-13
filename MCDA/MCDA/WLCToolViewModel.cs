@@ -27,6 +27,8 @@ namespace MCDA.ViewModel
        private bool _isLocked = false;
        private bool _isSendToInMemoryWorkspaceCommand = false;
        private bool _isUpdateAllowed = false;
+
+       private PropertyChangedEventHandler selectedFeaturePropertyChangedEventHandler;
      
        public WLCToolViewModel()
        {
@@ -36,11 +38,15 @@ namespace MCDA.ViewModel
 
            _wlcResultDataTable = _wlcTool.Data;
 
-           _mcdaExtension.RegisterPropertyHandler(x => x.AvailableFeatures, MCDAExtensionPropertyChanged);
+           //_mcdaExtension.RegisterPropertyHandler(x => x.AvailableFeatureses, SelectedFeaturePropertyChanged);
+           //_mcdaExtension.AvailableFeatureses.CollectionChanged += SelectedFeaturePropertyChanged;
+          selectedFeaturePropertyChangedEventHandler =  _mcdaExtension.RegisterPropertyHandler(x => x.SelectedFeature, SelectedFeaturePropertyChanged);
 
            //we have to call our own update method to make sure we have a result column
-            MCDAExtensionPropertyChanged(this, null);
+            SelectedFeaturePropertyChanged(this, null);
        }
+
+     
 
        private void WeightChanged(object sender, PropertyChangedEventArgs e)
        {
@@ -97,8 +103,8 @@ namespace MCDA.ViewModel
 
        }
 
-       private void MCDAExtensionPropertyChanged(object sender, PropertyChangedEventArgs e)
-       {
+       void SelectedFeaturePropertyChanged(object sender, PropertyChangedEventArgs e)
+       {    
            if (_isLocked)
                return;
 
@@ -108,16 +114,11 @@ namespace MCDA.ViewModel
 
            if (_mcdaExtension.SelectedFeature != null)
            {
-
                foreach (var currentField in _mcdaExtension.SelectedFeature.Fields)
-               {
                    currentField.UnRegisterPropertyHandler(f => f.IsSelected, FieldPropertyChanged);
-               }
 
                foreach (var currentField in _mcdaExtension.SelectedFeature.Fields)
-               {
                    currentField.RegisterPropertyHandler(f => f.IsSelected, FieldPropertyChanged);
-               }
 
                if (_mcdaExtension.SelectedFeature.Fields.Count(f => f.IsSelected) >= 1){
                    HasCriteriaSelected = true;
@@ -274,7 +275,7 @@ namespace MCDA.ViewModel
                {
                    _isSendToInMemoryWorkspaceCommand = !_isSendToInMemoryWorkspaceCommand;
                    _mcdaExtension.RemoveLink(_wlcTool);
-                   this.MCDAExtensionPropertyChanged(this, null);
+                   this.SelectedFeaturePropertyChanged(this, null);
 
                    PropertyChanged.Notify(() => IsSendToInMemoryWorkspaceCommand);
                }
@@ -286,7 +287,7 @@ namespace MCDA.ViewModel
            if (!_isLocked && !_isSendToInMemoryWorkspaceCommand)
            {
                _mcdaExtension.RemoveLink(_wlcTool);
-               this.MCDAExtensionPropertyChanged(this, null);
+               this.SelectedFeaturePropertyChanged(this, null);
            }
 
            PropertyChanged.Notify(() => IsLocked);

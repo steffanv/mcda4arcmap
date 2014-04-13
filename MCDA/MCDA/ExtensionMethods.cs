@@ -23,18 +23,22 @@ namespace MCDA.Extensions
             return numericTypes.Contains(column.DataType);
         }
 
-        public static void RegisterPropertyHandler<T, TProperty>(this T obj, Expression<Func<T, TProperty>> propertyExpression, PropertyChangedEventHandler handlerDelegate)
+        public static PropertyChangedEventHandler RegisterPropertyHandler<T, TProperty>(this T obj, Expression<Func<T, TProperty>> propertyExpression, PropertyChangedEventHandler handlerDelegate)
            where T : INotifyPropertyChanged
         {
             if (obj == null) throw new ArgumentNullException("obj");
 
             var propertyName = GetPropertyName(propertyExpression);
 
-            obj.PropertyChanged += (sender, args) =>
-                {
-                    if (args.PropertyName.Equals(propertyName) && handlerDelegate != null)
-                        handlerDelegate(sender, args);
-                };
+            PropertyChangedEventHandler handler = (sender, args) =>
+            {
+                if (args.PropertyName.Equals(propertyName) && handlerDelegate != null)
+                    handlerDelegate(sender, args);
+            };
+
+            obj.PropertyChanged += handler;
+
+            return handler;
         }
         public static void UnRegisterPropertyHandler<T, TProperty>(this T obj, Expression<Func<T, TProperty>> propertyExpression, PropertyChangedEventHandler handlerDelegate)
             where T : INotifyPropertyChanged
@@ -48,6 +52,15 @@ namespace MCDA.Extensions
                 if (args.PropertyName.Equals(propertyName) && handlerDelegate != null)
                     handlerDelegate(sender, args);
             };
+        }
+
+        public static void UnRegisterPropertyHandler<T>(this T obj,  PropertyChangedEventHandler handlerDelegate)
+           where T : INotifyPropertyChanged
+        {
+            if (obj == null) throw new ArgumentNullException("obj");
+
+            obj.PropertyChanged -= handlerDelegate;
+        
         }
 
         private static string GetPropertyName(LambdaExpression propertyExpression)

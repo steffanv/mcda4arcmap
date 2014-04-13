@@ -7,7 +7,6 @@ using System.ComponentModel;
 using System.Data;
 using System.Threading.Tasks;
 using System.Diagnostics;
-using System.Diagnostics.Contracts;
 
 namespace MCDA.Model
 {
@@ -21,8 +20,6 @@ namespace MCDA.Model
         
         public WLCTool(DataTable dataTable, ToolParameterContainer toolParameterContainer)
         {
-            Contract.Ensures(dataTable != null);
-            Contract.Ensures(toolParameterContainer != null);
 
             backupDataTable = dataTable.Copy();
 

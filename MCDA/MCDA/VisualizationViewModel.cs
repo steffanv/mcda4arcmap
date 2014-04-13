@@ -215,7 +215,7 @@ namespace MCDA.ViewModel
 
         private void GetAllFieldsList()
         {
-            AllFieldsList = new BindingList<RendererContainer>(MCDAExtension.EligibleFeaturesForMCDA.SelectMany(f => f.Fields).Where(f => f.IsNumeric).Select(f => f.RenderContainer).ToList());
+            AllFieldsList = new BindingList<RendererContainer>(MCDAExtension.AvailableFeatureses.Where(f => f.IsSuitableForMCDA).SelectMany(f => f.Fields).Where(f => f.IsNumeric).Select(f => f.RenderContainer).ToList());
         }
 
         private void GetToolFieldList()

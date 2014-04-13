@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.ComponentModel;
 using MCDA.Extensions;
 using ESRI.ArcGIS.Geodatabase;
 using System.Threading;
-using System.Diagnostics.Contracts;
 using ESRI.ArcGIS.Carto;
 
 namespace MCDA.Model
@@ -18,25 +18,24 @@ namespace MCDA.Model
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private string layerName;
+        private string _featureName;
         private bool isFeatureLayer;
         private bool isSelected;
         //can be null
         private IFeatureLayer2 featureLayer;
         private IFeatureClass featureClass;
-        private IList<Field> fields;
+        private readonly ObservableCollection<Field> fields;
         private Field selectedFieldForRendering;
-        private ESRI.ArcGIS.Carto.ILayer esriLayer;
+        private ESRI.ArcGIS.Carto.ILayer2 esriLayer;
 
         private static Feature lastSelectedLayer;
 
 
-        public Feature(ESRI.ArcGIS.Carto.ILayer layer)
+        public Feature(ESRI.ArcGIS.Carto.ILayer2 layer)
         {
-            Contract.Requires<ArgumentNullException>(layer != null);
 
             this.esriLayer = layer;
-            layerName = layer.Name;
+            _featureName = layer.Name;
 
             IFeatureLayer2 featureLayer = layer as ESRI.ArcGIS.Carto.IFeatureLayer2;
 
@@ -44,14 +43,14 @@ namespace MCDA.Model
             {
                 isFeatureLayer = false;
                 UniqueLayerName = string.Empty;
-                Fields = new List<Field>();
+                fields = new ObservableCollection<Field>();
             }
             else
             { 
                 isFeatureLayer = true;
                 this.featureLayer = featureLayer;
                 UniqueLayerName = ToUniqueLayerName(featureLayer);
-                Fields = GetFields();
+                fields = new ObservableCollection<Field>(GetFields());
             }
         }
 
@@ -66,8 +65,6 @@ namespace MCDA.Model
         /// <exception cref="ArgumentNullExeption"> </exception>
         public Feature(IFeatureClass featureClass, IFeatureLayer2 featureLayer)
         {
-            Contract.Requires<ArgumentNullException>(featureClass != null);
-            Contract.Requires<ArgumentNullException>(featureLayer != null);
 
             featureLayer.FeatureClass = featureClass;
 
@@ -77,10 +74,10 @@ namespace MCDA.Model
             isFeatureLayer = true;
             UniqueLayerName = ToUniqueLayerName(this.featureLayer);
 
-            this.esriLayer = featureLayer as ILayer;
-            layerName = this.esriLayer.Name;
+            this.esriLayer = featureLayer as ILayer2;
+            _featureName = this.esriLayer.Name;
 
-            fields = GetFields();
+            fields = new ObservableCollection<Field>(GetFields());
             
         }
 
@@ -106,7 +103,7 @@ namespace MCDA.Model
             get { return featureLayer.FeatureClass; }
         }
 
-        public ESRI.ArcGIS.Carto.ILayer ESRILayer
+        public ESRI.ArcGIS.Carto.ILayer2 ESRILayer
         {
             get { return esriLayer; }
         }
@@ -130,33 +127,34 @@ namespace MCDA.Model
             set { PropertyChanged.ChangeAndNotify(ref isFeatureLayer, value, () => IsFeatureLayer);}
         }
 
-        public string LayerName
+        public string FeatureName
         {
-            get { return layerName; }
-            set { PropertyChanged.ChangeAndNotify(ref layerName, value, () => LayerName); }
+            get { return _featureName; }
+            set { PropertyChanged.ChangeAndNotify(ref _featureName, value, () => FeatureName); }
         }
 
         public bool IsSelected { 
 
-            get { return isSelected; }
-            set {
+            get { return isSelected; /*lastSelectedLayer == this;*/ }
+            set
+            {
+                //isSelected = value;
 
-                if (value)
-                    lastSelectedLayer = this;
+                //if (value)
+                  //  lastSelectedLayer = this;
 
                 PropertyChanged.ChangeAndNotify(ref isSelected, value, () => IsSelected);
             }
         }
 
-        public static Feature LastSelectedLayer{
+        //public static Feature LastSelectedLayer{
 
-            get { return lastSelectedLayer; }
-        }
+        //    get { return lastSelectedLayer; }
+        //}
 
-        public IList<Field> Fields
+        public ObservableCollection<Field> Fields
         {
-            get { return fields.OrderBy(f => f.FieldName).ToList(); }
-            private set { fields = value; }      
+            get { return fields; }  
         }
 
         public bool HasAreaAndTopologicalOperator()
@@ -175,9 +173,12 @@ namespace MCDA.Model
         /// </summary>
         public void UpdateFieldsProperty()
         {
-            Fields = GetFields();
+            Fields.Clear();
 
-            PropertyChanged.Notify(() => Fields);
+            foreach (var newField in GetFields())
+                Fields.Add(newField);
+
+            //PropertyChanged.Notify(() => Fields);
         }
 
         //TODO wozu ist das gut?
@@ -186,6 +187,7 @@ namespace MCDA.Model
             return featureLayer.FeatureClass.Fields.ToString() + featureLayer.ToString();
         }
 
+        //TODO think about it - is it necessary?
         //public void RegisterListenerForEveryMemberOfFields()
         //{
         //    foreach (var currentField in fields)

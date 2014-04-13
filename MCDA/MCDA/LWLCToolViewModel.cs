@@ -23,6 +23,7 @@ namespace MCDA.ViewModel
         private DataTable _lwlcResultDataTable;
         private BindingList<IToolParameter> _toolParameter;
         private IList<List<IToolParameter>> _toolParameterStorageForAnimationLikeUpdate = new List<List<IToolParameter>>();
+        private Feature _selectedFeature;
 
         private bool _isLocked = false;
         private bool _isSendToInMemoryWorkspaceCommand = false;
@@ -36,6 +37,8 @@ namespace MCDA.ViewModel
         private ICommand _okayNeighborhoodSelectionCommand;
         private ICommand _cancelNeighborhoodSelectionCommand;
 
+        private PropertyChangedEventHandler selectedFeaturePropertyChangedEventHandler;
+
         public LWLCToolViewModel()
         {
             _mcdaExtension = MCDAExtension.GetExtension();
@@ -44,10 +47,10 @@ namespace MCDA.ViewModel
 
             _lwlcResultDataTable = _lwlcTool.Data;
 
-            _mcdaExtension.RegisterPropertyHandler(x => x.AvailableFeatures, MCDAExtensionPropertyChanged);
+            selectedFeaturePropertyChangedEventHandler = _mcdaExtension.RegisterPropertyHandler(x => x.SelectedFeature, SelectedFeaturePropertyChanged);
 
             //we have to call our own update method to make sure we have a result column
-            MCDAExtensionPropertyChanged(this, null);
+            SelectedFeaturePropertyChanged(this, null);
 
             // init stuff for the neigborhood selection
             // all commands are defined in this class and set here
@@ -81,7 +84,7 @@ namespace MCDA.ViewModel
 
             _lwlcResultDataTable = _lwlcTool.Data;
 
-            if (_mcdaExtension.SelectedFeature.Fields.Count(f => f.IsSelected) >= 1){
+            if (_selectedFeature.Fields.Count(f => f.IsSelected) >= 1){
                 HasCriteriaSelected = true;
 
                 _toolParameter = new BindingList<IToolParameter>(_lwlcTool.ToolParameterContainer.ToolParameter);
@@ -112,7 +115,7 @@ namespace MCDA.ViewModel
             }
         }
 
-        private void MCDAExtensionPropertyChanged(object sender, PropertyChangedEventArgs e)
+        private void SelectedFeaturePropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (_isLocked)
                 return;
@@ -121,23 +124,21 @@ namespace MCDA.ViewModel
 
             _toolParameter = new BindingList<IToolParameter>(_lwlcTool.ToolParameterContainer.ToolParameter);
 
-          
-
-            if (_mcdaExtension.SelectedFeature != null)
+            if (_selectedFeature != null)
             {
-
-                foreach(var currentField in _mcdaExtension.SelectedFeature.Fields)
-                {
+                foreach (var currentField in _selectedFeature.Fields)
                     currentField.UnRegisterPropertyHandler(f => f.IsSelected, FieldPropertyChanged);
-                }
+            }
 
-                foreach(var currentField in _mcdaExtension.SelectedFeature.Fields){
+            _selectedFeature = _mcdaExtension.SelectedFeature;
 
+            if (_selectedFeature != null)
+            {
+                foreach (var currentField in _selectedFeature.Fields)
                     currentField.RegisterPropertyHandler(f => f.IsSelected, FieldPropertyChanged);
-                }
 
-                if (_mcdaExtension.SelectedFeature.Fields.Count(f => f.IsSelected) >= 1){
-
+                if (_selectedFeature.Fields.Count(f => f.IsSelected) >= 1)
+                {
                     HasCriteriaSelected = true;
 
                     ProgressDialog.ShowProgressDialog("Running LWLC Tool", (Action)_lwlcTool.Run);
@@ -269,7 +270,6 @@ namespace MCDA.ViewModel
 
             if (result == true)
             {
-
                 IList<Tuple<string, object>> param = new List<Tuple<string, object>>();
 
                 param.Add(Tuple.Create<string,object>(Util.GetPropertyName(() => _lwlcTool.NeighborhoodOptions), _lwlcTool.NeighborhoodOptions));
@@ -300,7 +300,7 @@ namespace MCDA.ViewModel
                 {
                     _isSendToInMemoryWorkspaceCommand = !_isSendToInMemoryWorkspaceCommand;
                     _mcdaExtension.RemoveLink(_lwlcTool);
-                    this.MCDAExtensionPropertyChanged(this, null);
+                    this.SelectedFeaturePropertyChanged(this, null);
 
                     PropertyChanged.Notify(() => IsSendToInMemoryWorkspaceCommand);
                 }
@@ -316,7 +316,7 @@ namespace MCDA.ViewModel
             if (!_isLocked && !_isSendToInMemoryWorkspaceCommand)
             {
                 _mcdaExtension.RemoveLink(_lwlcTool);
-                this.MCDAExtensionPropertyChanged(this, null);
+                this.SelectedFeaturePropertyChanged(this, null);
             }
 
             PropertyChanged.Notify(() => IsLocked);
@@ -403,9 +403,17 @@ namespace MCDA.ViewModel
         protected override void DoClosingCommand()
         {
             if (_isLocked || _isSendToInMemoryWorkspaceCommand)
-            {
                 _mcdaExtension.RemoveLink(_lwlcTool);
 
+            _mcdaExtension.UnRegisterPropertyHandler(selectedFeaturePropertyChangedEventHandler);
+
+            foreach (var currentField in _selectedFeature.Fields)
+                currentField.UnRegisterPropertyHandler(f => f.IsSelected, FieldPropertyChanged);
+
+            foreach (var currentToolParameter in _toolParameter)
+            {
+                currentToolParameter.UnRegisterPropertyHandler(b => b.IsBenefitCriterion, BenefitCriterionChanged);
+                currentToolParameter.UnRegisterPropertyHandler(w => w.Weight, WeightChanged);
             }
         }
 

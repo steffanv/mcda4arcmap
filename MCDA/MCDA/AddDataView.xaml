@@ -5,26 +5,26 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-        <TabControl Name="tabControl1" Grid.Column="0">
-            <TabItem Header="Layer" Name="layerTabItem">
+        <TabControl Name="TabControl1" Grid.Column="0">
+            <TabItem Header="Feature" Name="LayerTabItem">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <ListView Name="layerListView" ItemsSource="{Binding Path=Layer}" HorizontalContentAlignment="Stretch" DataContext="{Binding}">
+                    <ListView Name="LayerListView" ItemsSource="{Binding Path=Features}" HorizontalContentAlignment="Stretch" DataContext="{Binding}">
                         <ListView.View>
                             <GridView>
                                 <GridViewColumn  Header="Selected"  Width="Auto">
                                     <GridViewColumn.CellTemplate>
                                         <DataTemplate>
-                                            <RadioButton Name="isSelectedRadioButton" IsChecked="{Binding Path=IsSelected, Mode=TwoWay}" IsEnabled="{Binding Path=IsSuitableForMCDA, Mode=OneWay}"/>
+                                            <RadioButton Name="isSelectedRadioButton" IsChecked="{Binding Path=IsSelected, Mode=TwoWay}" GroupName="selectedFeatureGroup" IsEnabled="{Binding Path=IsSuitableForMCDA, Mode=OneWay}"/>
                                         </DataTemplate>
                                     </GridViewColumn.CellTemplate>
                                 </GridViewColumn>
-                                <GridViewColumn  Header="Layer"  Width="130">
+                                <GridViewColumn  Header="Feature"  Width="130">
                                     <GridViewColumn.CellTemplate>
                                         <DataTemplate>
-                                            <Label Name="layerLabel" Content="{Binding Path=LayerName, Mode=OneWay}">
+                                            <Label Name="layerLabel" Content="{Binding Path=FeatureName, Mode=OneWay}">
                                                 <Label.Style>
                                                     <Style TargetType="Label">
                                                         <Style.Triggers>

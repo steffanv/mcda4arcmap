@@ -374,7 +374,7 @@ namespace MCDA.Model
                     while (ID != -1)
                     {
                         if (ID != currentFeature.OID)
-                        {
+                      c  {
                             // http://resources.arcgis.com/en/help/main/10.1/index.html#//00080000000z000000
                             IGeometryCollection polylineCollection =
                                 (IGeometryCollection)

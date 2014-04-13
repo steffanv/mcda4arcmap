@@ -6,7 +6,7 @@ using System.ComponentModel;
 using ESRI.ArcGIS.Carto;
 using MCDA.Extensions;
 using ESRI.ArcGIS.Geodatabase;
-using System.Diagnostics.Contracts;
+
 
 namespace MCDA.Model
 {
@@ -20,7 +20,6 @@ namespace MCDA.Model
 
         public RendererContainer(Field field)
         {
-            Contract.Requires<ArgumentNullException>(field != null);
 
             Field = field;
         }

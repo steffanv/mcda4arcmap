@@ -43,10 +43,10 @@ namespace MCDA.ViewModel
 
             _owaResultDataTable = _owaTool.Data;
 
-            _mcdaExtension.RegisterPropertyHandler(x => x.AvailableFeatures, MCDAExtensionPropertyChanged);
+            _mcdaExtension.RegisterPropertyHandler(x => x.SelectedFeature, SelectedFeaturePropertyChanged);
 
             //we have to call our own update method to make sure we have a result column
-            MCDAExtensionPropertyChanged(this, null);
+            SelectedFeaturePropertyChanged(this, null);
 
             // init stuff for the alpha selection
             // all commands are defined in this class and set here
@@ -75,8 +75,6 @@ namespace MCDA.ViewModel
             _owaTool = ToolFactory.NewOWATool();
 
             _toolParameter = new BindingList<IToolParameter>(_owaTool.ToolParameterContainer.ToolParameter);
-
-           
 
             if (_mcdaExtension.SelectedFeature.Fields.Count(f => f.IsSelected) >= 1){
                 HasCriteriaSelected = true;
@@ -109,7 +107,7 @@ namespace MCDA.ViewModel
 
         }
 
-        private void MCDAExtensionPropertyChanged(object sender, PropertyChangedEventArgs e)
+        private void SelectedFeaturePropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (_isLocked)
                 return;
@@ -122,14 +120,10 @@ namespace MCDA.ViewModel
             {
           
                 foreach (var currentField in _mcdaExtension.SelectedFeature.Fields)
-                {
                     currentField.UnRegisterPropertyHandler(f => f.IsSelected, FieldPropertyChanged);
-                }
 
                 foreach (var currentField in _mcdaExtension.SelectedFeature.Fields)
-                {
                     currentField.RegisterPropertyHandler(f => f.IsSelected, FieldPropertyChanged);
-                }
 
                 if (_mcdaExtension.SelectedFeature.Fields.Count(f => f.IsSelected) >= 1){
                     HasCriteriaSelected = true;
@@ -283,7 +277,7 @@ namespace MCDA.ViewModel
                 {
                     _isSendToInMemoryWorkspaceCommand = !_isSendToInMemoryWorkspaceCommand;
                     _mcdaExtension.RemoveLink(_owaTool);
-                    this.MCDAExtensionPropertyChanged(this, null);
+                    this.SelectedFeaturePropertyChanged(this, null);
                 }
 
                 PropertyChanged.Notify(() => IsSendToInMemoryWorkspaceCommand);
@@ -295,7 +289,7 @@ namespace MCDA.ViewModel
             if (!_isLocked && !_isSendToInMemoryWorkspaceCommand)
             {
                 _mcdaExtension.RemoveLink(_owaTool);
-                this.MCDAExtensionPropertyChanged(this, null);
+                this.SelectedFeaturePropertyChanged(this, null);
             }
 
             PropertyChanged.Notify(() => IsLocked);

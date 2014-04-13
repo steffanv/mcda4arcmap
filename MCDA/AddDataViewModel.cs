@@ -13,54 +13,58 @@ namespace MCDA.ViewModel
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private MCDAExtension mcdaExtension;
+        private readonly MCDAExtension _mcdaExtension;
 
         public AddDataViewModel()
         {
-            mcdaExtension = MCDAExtension.GetExtension();
+            _mcdaExtension = MCDAExtension.GetExtension();
 
-            mcdaExtension.RegisterPropertyHandler(x => x.AvailableFeatures, AvailableFeaturesListChanged);
+            _mcdaExtension.AvailableFeatureses.CollectionChanged += AvailableFeaturesCollectionChanged;
+
+            Features = new BindingList<Feature>();
+            Fields = new BindingList<Field>();
 
             //call because the extension could already have a selected feature and thus fields
-            AvailableFeaturesListChanged(this, null);
+            AvailableFeaturesCollectionChanged(this, null);
         }
 
-        public BindingList<Feature> Layer { get; set; }
+        public BindingList<Feature> Features { get; set; }
 
         public BindingList<Field> Fields { get; set; }
 
-        private void AvailableFeaturesListChanged(object sender, PropertyChangedEventArgs e)
+        private void AvailableFeaturesCollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            Layer = new BindingList<Feature>(mcdaExtension.AvailableFeatures.OrderByDescending(l => l.IsSuitableForMCDA).ThenBy(l => l.LayerName).ToList());
+            foreach (var feature in Features)
+                feature.UnRegisterPropertyHandler(f => f.IsSelected, FeatureSelectionChanged);
 
-            Feature feature = Layer.Where(l => l.IsSelected).FirstOrDefault();
+            Features = new BindingList<Feature>(_mcdaExtension.AvailableFeatureses.OrderByDescending(l => l.IsSuitableForMCDA).ThenBy(l => l.FeatureName).ToList());
 
-            if (feature != null)
-            {
-                feature.RegisterPropertyHandler(x => x.Fields, FieldsListChanged);
-                Fields = new BindingList<Field>(feature.Fields.OrderByDescending(f => f.IsSuitableForMCDA).ThenBy(f => f.FieldName).ToList());
-            }
+            foreach (var feature in Features)
+                feature.RegisterPropertyHandler(f => f.IsSelected, FeatureSelectionChanged);
+              
+            Feature selectedFeature = Features.FirstOrDefault(l => l.IsSelected);
+
+            if (selectedFeature != null)
+                Fields = new BindingList<Field>(selectedFeature.Fields.OrderByDescending(f => f.IsSuitableForMCDA).ThenBy(f => f.FieldName).ToList());
+
             else
                 Fields = new BindingList<Field>();
 
-            PropertyChanged.Notify(() => Layer);
+            PropertyChanged.Notify(() => Features);
             PropertyChanged.Notify(() => Fields);
         }
 
-        private void FieldsListChanged(object sender, PropertyChangedEventArgs e)
+        public void FeatureSelectionChanged(object sender, PropertyChangedEventArgs e)
         {
-            Feature feature = Layer.Where(l => l.IsSelected).FirstOrDefault();
+            Feature selectedFeature = Features.FirstOrDefault(l => l.IsSelected);
 
-            if (feature != null)
-            {
-                feature.RegisterPropertyHandler(x => x.Fields, FieldsListChanged);
-                Fields = new BindingList<Field>(feature.Fields.OrderByDescending(f => f.IsSuitableForMCDA).ThenBy(f => f.FieldName).ToList());
-            }
+            if (selectedFeature != null)
+                Fields = new BindingList<Field>(selectedFeature.Fields.OrderByDescending(f => f.IsSuitableForMCDA).ThenBy(f => f.FieldName).ToList());
+
             else
                 Fields = new BindingList<Field>();
 
             PropertyChanged.Notify(() => Fields);
         }
-
     }
 }

@@ -40,28 +40,34 @@ namespace MCDA.Extensions
 
             return handler;
         }
-        public static void UnRegisterPropertyHandler<T, TProperty>(this T obj, Expression<Func<T, TProperty>> propertyExpression, PropertyChangedEventHandler handlerDelegate)
-            where T : INotifyPropertyChanged
+
+        public static void UnRegisterPropertyHandler<T>(this T obj, PropertyChangedEventHandler handlerDelegate) where T : INotifyPropertyChanged
         {
-            if (obj == null) throw new ArgumentNullException("obj");
+           UnRegisterPropertyHandler(obj, new [] {handlerDelegate});
 
-            var propertyName = GetPropertyName(propertyExpression);
-
-            obj.PropertyChanged -= (sender, args) =>
-            {
-                if (args.PropertyName.Equals(propertyName) && handlerDelegate != null)
-                    handlerDelegate(sender, args);
-            };
         }
 
-        public static void UnRegisterPropertyHandler<T>(this T obj,  PropertyChangedEventHandler handlerDelegate)
-           where T : INotifyPropertyChanged
+        public static void UnRegisterPropertyHandler<T>(this T obj,
+            IEnumerable<PropertyChangedEventHandler> handlerDelegates) where T : INotifyPropertyChanged
         {
-            if (obj == null) throw new ArgumentNullException("obj");
-
-            obj.PropertyChanged -= handlerDelegate;
-        
+            foreach (var propertyChangedEventHandler in handlerDelegates)
+                obj.PropertyChanged -= propertyChangedEventHandler;
+            
         }
+
+        //public static void UnRegisterPropertyHandler<T, TProperty>(this T obj, Expression<Func<T, TProperty>> propertyExpression, PropertyChangedEventHandler handlerDelegate)
+        //    where T : INotifyPropertyChanged
+        //{
+        //    if (obj == null) throw new ArgumentNullException("obj");
+
+        //    var propertyName = GetPropertyName(propertyExpression);
+
+        //    obj.PropertyChanged -= (sender, args) =>
+        //    {
+        //        if (args.PropertyName.Equals(propertyName) && handlerDelegate != null)
+        //            handlerDelegate(sender, args);
+        //    };
+        //}
 
         private static string GetPropertyName(LambdaExpression propertyExpression)
         {

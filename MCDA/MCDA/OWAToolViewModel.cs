@@ -17,23 +17,30 @@ namespace MCDA.ViewModel
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private MCDAExtension _mcdaExtension;
+        private readonly MCDAExtension _mcdaExtension;
         private OWATool _owaTool;
         private DataTable _owaResultDataTable;
         private BindingList<IToolParameter> _toolParameter;
-        private IList<List<IToolParameter>> _toolParameterStorageForAnimationLikeUpdate = new List<List<IToolParameter>>();
+        private readonly IList<List<IToolParameter>> _toolParameterStorageForAnimationLikeUpdate = new List<List<IToolParameter>>();
+        private Feature _selectedFeature;
 
         private bool _isLocked = false;
         private bool _isSendToInMemoryWorkspaceCommand = false;
         private bool _isUpdateAllowed = false;
 
         private AlphaSelectionView _alphaSelectionView;
-        private AlphaSelectionViewModel _alphaSelectionViewModel = new AlphaSelectionViewModel();
+        private readonly AlphaSelectionViewModel _alphaSelectionViewModel = new AlphaSelectionViewModel();
         private ICommand _alphaSelectionCommand;
 
         private ICommand _applyAlphaSelectionCommand;
         private ICommand _okayAlphaSelectionCommand;
         private ICommand _cancelAlphaSelectionCommand;
+
+        private readonly PropertyChangedEventHandler _selectedFeaturePropertyChangedEventHandler;
+
+        private readonly IList<PropertyChangedEventHandler> _listOfpropertyChangedEventHandlersForToolParameterIsBenefitCriterion = new List<PropertyChangedEventHandler>();
+        private readonly IList<PropertyChangedEventHandler> _listOfpropertyChangedEventHandlersForToolParameterWeight = new List<PropertyChangedEventHandler>();
+        private readonly IList<PropertyChangedEventHandler> _listOfpropertyChangedEventHandlersForFieldIsSelected = new List<PropertyChangedEventHandler>();
 
         public OWAToolViewModel()
         {
@@ -43,7 +50,7 @@ namespace MCDA.ViewModel
 
             _owaResultDataTable = _owaTool.Data;
 
-            _mcdaExtension.RegisterPropertyHandler(x => x.SelectedFeature, SelectedFeaturePropertyChanged);
+           _selectedFeaturePropertyChangedEventHandler = _mcdaExtension.RegisterPropertyHandler(x => x.SelectedFeature, SelectedFeaturePropertyChanged);
 
             //we have to call our own update method to make sure we have a result column
             SelectedFeaturePropertyChanged(this, null);
@@ -76,7 +83,7 @@ namespace MCDA.ViewModel
 
             _toolParameter = new BindingList<IToolParameter>(_owaTool.ToolParameterContainer.ToolParameter);
 
-            if (_mcdaExtension.SelectedFeature.Fields.Count(f => f.IsSelected) >= 1){
+            if (_selectedFeature.Fields.Count(f => f.IsSelected) >= 1){
                 HasCriteriaSelected = true;
 
                 _owaTool.Run();
@@ -95,14 +102,14 @@ namespace MCDA.ViewModel
         {
             foreach (var currentToolParameter in _toolParameter)
             {
-                currentToolParameter.UnRegisterPropertyHandler(b => b.IsBenefitCriterion, BenefitCriterionChanged);
-                currentToolParameter.UnRegisterPropertyHandler(w => w.Weight, WeightChanged);
+                currentToolParameter.UnRegisterPropertyHandler(_listOfpropertyChangedEventHandlersForToolParameterIsBenefitCriterion);
+                currentToolParameter.UnRegisterPropertyHandler(_listOfpropertyChangedEventHandlersForToolParameterWeight);
             }
 
             foreach(var currentToolParameter in _toolParameter){
 
-                currentToolParameter.RegisterPropertyHandler(b => b.IsBenefitCriterion, BenefitCriterionChanged);
-                currentToolParameter.RegisterPropertyHandler(w => w.Weight, WeightChanged);
+                _listOfpropertyChangedEventHandlersForToolParameterIsBenefitCriterion.Add(currentToolParameter.RegisterPropertyHandler(b => b.IsBenefitCriterion, BenefitCriterionChanged));
+                _listOfpropertyChangedEventHandlersForToolParameterWeight.Add(currentToolParameter.RegisterPropertyHandler(w => w.Weight, WeightChanged));
             }
 
         }
@@ -116,16 +123,23 @@ namespace MCDA.ViewModel
 
             _toolParameter = new BindingList<IToolParameter>(_owaTool.ToolParameterContainer.ToolParameter);
 
-            if (_mcdaExtension.SelectedFeature != null)
+            if (_selectedFeature != null)
             {
-          
-                foreach (var currentField in _mcdaExtension.SelectedFeature.Fields)
-                    currentField.UnRegisterPropertyHandler(f => f.IsSelected, FieldPropertyChanged);
 
-                foreach (var currentField in _mcdaExtension.SelectedFeature.Fields)
-                    currentField.RegisterPropertyHandler(f => f.IsSelected, FieldPropertyChanged);
+                foreach (var currentField in _selectedFeature.Fields)
+                    currentField.UnRegisterPropertyHandler(_listOfpropertyChangedEventHandlersForFieldIsSelected);
+            }
 
-                if (_mcdaExtension.SelectedFeature.Fields.Count(f => f.IsSelected) >= 1){
+            _selectedFeature = _mcdaExtension.SelectedFeature;
+
+            if (_selectedFeature != null)
+            {
+                foreach (var currentField in _selectedFeature.Fields)
+                    _listOfpropertyChangedEventHandlersForFieldIsSelected.Add(
+                        currentField.RegisterPropertyHandler(f => f.IsSelected, FieldPropertyChanged));
+
+                if (_selectedFeature.Fields.Count(f => f.IsSelected) >= 1)
+                {
                     HasCriteriaSelected = true;
 
                     _owaTool.Run();
@@ -175,12 +189,7 @@ namespace MCDA.ViewModel
         {
             if (!_isUpdateAllowed)
             {
-                List<IToolParameter> tList = new List<IToolParameter>();
-
-                for (int i = 0; i < _toolParameter.Count; i++)
-                {
-                    tList.Add(_toolParameter[i].DeepClone());
-                }
+                List<IToolParameter> tList = _toolParameter.Select(t => t.DeepClone()).ToList();
 
                 _toolParameterStorageForAnimationLikeUpdate.Add(tList);
             }
@@ -321,22 +330,15 @@ namespace MCDA.ViewModel
         {
             var parentHandle = new IntPtr(ArcMap.Application.hWnd);
 
-            _NormalizationView = new NormalizationSelectionView();
-
-            _NormalizationView.DataContext = _NormalizationViewModel;
+            _NormalizationView = new NormalizationSelectionView { DataContext = _NormalizationViewModel };
 
             _NormalizationViewModel.SelectedTransformationStrategy = _owaTool.TransformationStrategy;
 
-            var helper = new WindowInteropHelper(_NormalizationView);
-
-            helper.Owner = parentHandle;
+            var helper = new WindowInteropHelper(_NormalizationView) { Owner = parentHandle };
 
             _NormalizationView.ShowDialog();
 
-            _NormalizationView.Closed += delegate(object sender, EventArgs e)
-           {
-               DoCancelNormalizationCommand();
-           };
+            _NormalizationView.Closed += (sender, e) => DoCancelNormalizationCommand();
         }
 
         protected override void DoApplyNormalizationCommand()
@@ -365,15 +367,8 @@ namespace MCDA.ViewModel
         {
             get
             {
-                if (_alphaSelectionCommand == null)
-                {
-                    _alphaSelectionCommand = new RelayCommand(
-                        p => this.DoAlphaSelectionCommand(),
-                        p => HasCriteriaSelected
-                        );
-                }
-
-                return _alphaSelectionCommand;
+                return _alphaSelectionCommand ?? (_alphaSelectionCommand = new RelayCommand(
+                    p => this.DoAlphaSelectionCommand(),  p => HasCriteriaSelected ));
             }
         }
 
@@ -387,9 +382,7 @@ namespace MCDA.ViewModel
 
             _alphaSelectionView.DataContext = _alphaSelectionViewModel;
 
-            var helper = new WindowInteropHelper(_alphaSelectionView);
-
-            helper.Owner = parentHandle;
+            var helper = new WindowInteropHelper(_alphaSelectionView) { Owner = parentHandle };
 
             _alphaSelectionView.ShowDialog();
 
@@ -406,13 +399,8 @@ namespace MCDA.ViewModel
         {
             get
             {
-                if (_applyAlphaSelectionCommand == null)
-                {
-                    _applyAlphaSelectionCommand = new RelayCommand(
-                        p => this.DoApplyAlphaSelectionCommand(),
-                        p => true);
-                }
-                return _applyAlphaSelectionCommand;
+                return _applyAlphaSelectionCommand ?? (_applyAlphaSelectionCommand = new RelayCommand(
+                    p => this.DoApplyAlphaSelectionCommand(), p => true));
             }
         }
 
@@ -452,13 +440,8 @@ namespace MCDA.ViewModel
         {
             get
             {
-                if (_cancelAlphaSelectionCommand == null)
-                {
-                    _cancelAlphaSelectionCommand = new RelayCommand(
-                        p => this.DoCancelAlphaSelectionCommand(),
-                        p => true);
-                }
-                return _cancelAlphaSelectionCommand;
+                return _cancelAlphaSelectionCommand ?? (_cancelAlphaSelectionCommand = new RelayCommand(
+                    p => this.DoCancelAlphaSelectionCommand(), p => true));
             }
         }
 
@@ -484,8 +467,17 @@ namespace MCDA.ViewModel
         protected override void DoClosingCommand()
         {
             if (_isLocked || _isSendToInMemoryWorkspaceCommand)
+                _mcdaExtension.RemoveLink(_owaTool);
+
+            _mcdaExtension.UnRegisterPropertyHandler(_selectedFeaturePropertyChangedEventHandler);
+
+            foreach (var currentField in _selectedFeature.Fields)
+                currentField.UnRegisterPropertyHandler(_listOfpropertyChangedEventHandlersForFieldIsSelected);
+
+            foreach (var currentToolParameter in _toolParameter)
             {
-                _mcdaExtension.RemoveLink(_owaTool); 
+                currentToolParameter.UnRegisterPropertyHandler(_listOfpropertyChangedEventHandlersForToolParameterIsBenefitCriterion);
+                currentToolParameter.UnRegisterPropertyHandler(_listOfpropertyChangedEventHandlersForToolParameterWeight);
             }
         }
     }

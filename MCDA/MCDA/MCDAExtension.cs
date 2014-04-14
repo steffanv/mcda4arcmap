@@ -21,17 +21,17 @@ namespace MCDA
 {
     internal sealed class MCDAExtension : Extension, INotifyPropertyChanged
     {
-        private static MCDAExtension extension;
+        private static MCDAExtension _extension;
 
         private readonly IDictionary<AbstractToolTemplate, Feature> _dictionaryOfLinks =
             new Dictionary<AbstractToolTemplate, Feature>();
 
-        private IList<String> _listOfSelectedUniqueLayerNamesForPersistence = new List<string>();
+        private IActiveViewEvents_Event _activeViewEvents;
+        private readonly ObservableCollection<Feature> _listOfAvailableFeatures = new ObservableCollection<Feature>();
 
-        private IActiveViewEvents_Event activeViewEvents;
-        private readonly ObservableCollection<Feature> listOfAvailableFeatures = new ObservableCollection<Feature>();
+        private IWorkspace _shadowWorkspace;
 
-        private IWorkspace shadowWorkspace;
+        private IList<PropertyChangedEventHandler> _listOfpropertyChangedEventHandlersForFeatureIsSelected = new List<PropertyChangedEventHandler>();
 
         #region properties
 
@@ -54,7 +54,7 @@ namespace MCDA
         /// </remarks>
         public ObservableCollection<Feature> AvailableFeatureses
         {
-            get { return listOfAvailableFeatures; }
+            get { return _listOfAvailableFeatures; }
             //set { PropertyChanged.ChangeAndNotify(ref listOfAvailableFeatures, value, () => AvailableFeatureses); }
         }
 
@@ -116,7 +116,7 @@ namespace MCDA
 
         public static MCDAExtension GetExtension()
         {
-            if (extension == null)
+            if (_extension == null)
             {
                 UID id = new UIDClass();
 
@@ -124,45 +124,45 @@ namespace MCDA
                 ArcMap.Application.FindExtensionByCLSID(id);
             }
 
-            return extension;
+            return _extension;
         }
 
         protected override void OnShutdown()
         {
             base.OnShutdown();
 
-            extension = null;
+            _extension = null;
         }
 
         protected override void OnStartup()
         {
             Assembly assembly = Assembly.LoadFrom("HistogramControl.dll");
 
-            extension = this;
+            _extension = this;
 
-            shadowWorkspace = CreateInMemoryWorkspace();
+            _shadowWorkspace = CreateInMemoryWorkspace();
 
             IMap map = ArcMap.Document.ActiveView.FocusMap;
 
-            activeViewEvents = map as IActiveViewEvents_Event;
+            _activeViewEvents = map as IActiveViewEvents_Event;
 
-            activeViewEvents.ItemAdded += ArcMapItemAdded;
-            activeViewEvents.ItemDeleted += ArcMapItemDeleted;
+            _activeViewEvents.ItemAdded += ArcMapItemAdded;
+            _activeViewEvents.ItemDeleted += ArcMapItemDeleted;
 
             ArcMap.Events.NewDocument += EventsNewDocument;
             //ArcMap.Events.BeforeCloseDocument += new ESRI.ArcGIS.ArcMapUI.IDocumentEvents_BeforeCloseDocumentEventHandler(EventsBeforeCloseDocument); 
             ArcMap.Events.OpenDocument += EventsOpenDocument;
 
-            listOfAvailableFeatures.CollectionChanged += ListOfAvailableFeaturesChanged;
+            _listOfAvailableFeatures.CollectionChanged += ListOfAvailableFeaturesChanged;
         }
 
         void ListOfAvailableFeaturesChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            foreach (var currentFeature in listOfAvailableFeatures)
-                currentFeature.UnRegisterPropertyHandler(f => f.IsSelected, IsSelectedChanged);
+            foreach (var currentFeature in _listOfAvailableFeatures)
+                currentFeature.UnRegisterPropertyHandler(_listOfpropertyChangedEventHandlersForFeatureIsSelected);
 
-            foreach (var currentFeature in listOfAvailableFeatures)
-                currentFeature.RegisterPropertyHandler(f => f.IsSelected, IsSelectedChanged);
+            foreach (var currentFeature in _listOfAvailableFeatures)
+                _listOfpropertyChangedEventHandlersForFeatureIsSelected.Add(currentFeature.RegisterPropertyHandler(f => f.IsSelected, IsSelectedChanged));
         }
 
         public void IsSelectedChanged(object sender, PropertyChangedEventArgs e)
@@ -183,30 +183,30 @@ namespace MCDA
 
         private void EventsNewDocument()
         {
-            activeViewEvents.ItemAdded -= ArcMapItemAdded;
-            activeViewEvents.ItemDeleted -= ArcMapItemDeleted;
+            _activeViewEvents.ItemAdded -= ArcMapItemAdded;
+            _activeViewEvents.ItemDeleted -= ArcMapItemDeleted;
 
             IMap map = ArcMap.Document.ActiveView.FocusMap;
 
-            activeViewEvents = map as IActiveViewEvents_Event;
+            _activeViewEvents = map as IActiveViewEvents_Event;
 
-            activeViewEvents.ItemAdded += ArcMapItemAdded;
-            activeViewEvents.ItemDeleted += ArcMapItemDeleted;
+            _activeViewEvents.ItemAdded += ArcMapItemAdded;
+            _activeViewEvents.ItemDeleted += ArcMapItemDeleted;
 
             //AvailableFeatureses = new List<Feature>();
         }
 
         private void EventsOpenDocument()
         {
-            activeViewEvents.ItemAdded -= ArcMapItemAdded;
-            activeViewEvents.ItemDeleted -= ArcMapItemDeleted;
+            _activeViewEvents.ItemAdded -= ArcMapItemAdded;
+            _activeViewEvents.ItemDeleted -= ArcMapItemDeleted;
 
             IMap map = ArcMap.Document.ActiveView.FocusMap;
 
-            activeViewEvents = map as IActiveViewEvents_Event;
+            _activeViewEvents = map as IActiveViewEvents_Event;
 
-            activeViewEvents.ItemAdded += ArcMapItemAdded;
-            activeViewEvents.ItemDeleted += ArcMapItemDeleted;
+            _activeViewEvents.ItemAdded += ArcMapItemAdded;
+            _activeViewEvents.ItemDeleted += ArcMapItemDeleted;
 
             //AvailableFeatureses = new List<Feature>();
         }
@@ -257,7 +257,7 @@ namespace MCDA
         /// <returns></returns>
         public Field GetOIDFieldFromSelectedFeature()
         {
-            Feature selectedFeature = listOfAvailableFeatures.FirstOrDefault(f => f.IsSelected);
+            Feature selectedFeature = _listOfAvailableFeatures.FirstOrDefault(f => f.IsSelected);
 
             if (selectedFeature == null)
                 return null;
@@ -462,7 +462,7 @@ namespace MCDA
             IFeatureLayer2 featureLayer = AvailableFeatureses.Where(l => l.IsSelected && l.IsSuitableForMCDA).ToList().First().FeatureLayer;
             IFeatureClass featureClass = featureLayer.FeatureClass;
 
-            IFeatureClass copiedFeatureClass = CopyFeatureClassIntoNewWorkspace(featureClass, shadowWorkspace,
+            IFeatureClass copiedFeatureClass = CopyFeatureClassIntoNewWorkspace(featureClass, _shadowWorkspace,
                 tool + CreateTimeStamp());
 
             //MCDA.Model.Feature feature = new MCDAWorkspaceContainer(tool, copiedFeatureClass);

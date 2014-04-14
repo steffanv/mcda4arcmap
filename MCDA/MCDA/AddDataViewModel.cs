@@ -15,6 +15,8 @@ namespace MCDA.ViewModel
 
         private readonly MCDAExtension _mcdaExtension;
 
+        private IList<PropertyChangedEventHandler> listOfpropertyChangedEventHandlersForFeatureIsSelected = new List<PropertyChangedEventHandler>();
+
         public AddDataViewModel()
         {
             _mcdaExtension = MCDAExtension.GetExtension();
@@ -35,12 +37,12 @@ namespace MCDA.ViewModel
         private void AvailableFeaturesCollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             foreach (var feature in Features)
-                feature.UnRegisterPropertyHandler(f => f.IsSelected, FeatureSelectionChanged);
+                feature.UnRegisterPropertyHandler(listOfpropertyChangedEventHandlersForFeatureIsSelected);
 
             Features = new BindingList<Feature>(_mcdaExtension.AvailableFeatureses.OrderByDescending(l => l.IsSuitableForMCDA).ThenBy(l => l.FeatureName).ToList());
 
             foreach (var feature in Features)
-                feature.RegisterPropertyHandler(f => f.IsSelected, FeatureSelectionChanged);
+                listOfpropertyChangedEventHandlersForFeatureIsSelected.Add(feature.RegisterPropertyHandler(f => f.IsSelected, FeatureSelectionChanged));
               
             Feature selectedFeature = Features.FirstOrDefault(l => l.IsSelected);
 

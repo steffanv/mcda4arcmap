@@ -18,11 +18,11 @@ namespace MCDA.ViewModel
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private MCDAExtension _mcdaExtension;
+        private readonly MCDAExtension _mcdaExtension;
         private LWLCTool _lwlcTool;
         private DataTable _lwlcResultDataTable;
         private BindingList<IToolParameter> _toolParameter;
-        private IList<List<IToolParameter>> _toolParameterStorageForAnimationLikeUpdate = new List<List<IToolParameter>>();
+        private readonly IList<List<IToolParameter>> _toolParameterStorageForAnimationLikeUpdate = new List<List<IToolParameter>>();
         private Feature _selectedFeature;
 
         private bool _isLocked = false;
@@ -30,14 +30,18 @@ namespace MCDA.ViewModel
         private bool _isUpdateAllowed = false;
 
         private NeighborhoodSelectionView _neighborhoodSelectionView;
-        private NeighborhoodSelectionViewModel _neighborhoodSelectionViewModel = new NeighborhoodSelectionViewModel();
+        private readonly NeighborhoodSelectionViewModel _neighborhoodSelectionViewModel = new NeighborhoodSelectionViewModel();
         private ICommand _neighborhoodSelectionCommand;
 
         private ICommand _applyNeighborhoodSelectionCommand;
         private ICommand _okayNeighborhoodSelectionCommand;
         private ICommand _cancelNeighborhoodSelectionCommand;
 
-        private PropertyChangedEventHandler selectedFeaturePropertyChangedEventHandler;
+        private readonly PropertyChangedEventHandler _selectedFeaturePropertyChangedEventHandler;
+
+        private readonly IList<PropertyChangedEventHandler> _listOfpropertyChangedEventHandlersForToolParameterIsBenefitCriterion = new List<PropertyChangedEventHandler>();
+        private readonly IList<PropertyChangedEventHandler> _listOfpropertyChangedEventHandlersForToolParameterWeight = new List<PropertyChangedEventHandler>();
+        private readonly IList<PropertyChangedEventHandler> _listOfpropertyChangedEventHandlersForFieldIsSelected = new List<PropertyChangedEventHandler>();
 
         public LWLCToolViewModel()
         {
@@ -47,12 +51,12 @@ namespace MCDA.ViewModel
 
             _lwlcResultDataTable = _lwlcTool.Data;
 
-            selectedFeaturePropertyChangedEventHandler = _mcdaExtension.RegisterPropertyHandler(x => x.SelectedFeature, SelectedFeaturePropertyChanged);
+            _selectedFeaturePropertyChangedEventHandler = _mcdaExtension.RegisterPropertyHandler(x => x.SelectedFeature, SelectedFeaturePropertyChanged);
 
             //we have to call our own update method to make sure we have a result column
             SelectedFeaturePropertyChanged(this, null);
 
-            // init stuff for the neigborhood selection
+            // init stuff for the neighborhood selection
             // all commands are defined in this class and set here
             _neighborhoodSelectionViewModel.OkayCommand = OkayNeighborhoodSelectionCommand;
             _neighborhoodSelectionViewModel.CancelCommand = CancelNeighborhoodSelectionCommand;
@@ -104,14 +108,14 @@ namespace MCDA.ViewModel
         {
             foreach (var currentToolParameter in _toolParameter)
             {
-                currentToolParameter.UnRegisterPropertyHandler(b => b.IsBenefitCriterion, BenefitCriterionChanged);
-                currentToolParameter.UnRegisterPropertyHandler(w => w.Weight, WeightChanged);
+                currentToolParameter.UnRegisterPropertyHandler(_listOfpropertyChangedEventHandlersForToolParameterIsBenefitCriterion);
+                currentToolParameter.UnRegisterPropertyHandler(_listOfpropertyChangedEventHandlersForToolParameterWeight);
             }
 
             foreach (var currentToolParameter in _toolParameter)
             {
-                currentToolParameter.RegisterPropertyHandler(b => b.IsBenefitCriterion, BenefitCriterionChanged);
-                currentToolParameter.RegisterPropertyHandler(w => w.Weight, WeightChanged);
+                _listOfpropertyChangedEventHandlersForToolParameterIsBenefitCriterion.Add(currentToolParameter.RegisterPropertyHandler(b => b.IsBenefitCriterion, BenefitCriterionChanged));
+                _listOfpropertyChangedEventHandlersForToolParameterWeight.Add(currentToolParameter.RegisterPropertyHandler(w => w.Weight, WeightChanged));
             }
         }
 
@@ -127,7 +131,7 @@ namespace MCDA.ViewModel
             if (_selectedFeature != null)
             {
                 foreach (var currentField in _selectedFeature.Fields)
-                    currentField.UnRegisterPropertyHandler(f => f.IsSelected, FieldPropertyChanged);
+                    currentField.UnRegisterPropertyHandler(_listOfpropertyChangedEventHandlersForFieldIsSelected);
             }
 
             _selectedFeature = _mcdaExtension.SelectedFeature;
@@ -135,7 +139,7 @@ namespace MCDA.ViewModel
             if (_selectedFeature != null)
             {
                 foreach (var currentField in _selectedFeature.Fields)
-                    currentField.RegisterPropertyHandler(f => f.IsSelected, FieldPropertyChanged);
+                    _listOfpropertyChangedEventHandlersForFieldIsSelected.Add(currentField.RegisterPropertyHandler(f => f.IsSelected, FieldPropertyChanged));
 
                 if (_selectedFeature.Fields.Count(f => f.IsSelected) >= 1)
                 {
@@ -180,12 +184,7 @@ namespace MCDA.ViewModel
         {
             if (!_isUpdateAllowed)
             {
-                List<IToolParameter> tList = new List<IToolParameter>();
-
-                for (int i = 0; i < _toolParameter.Count; i++)
-                {
-                    tList.Add(_toolParameter[i].DeepClone());
-                }
+                List<IToolParameter> tList = _toolParameter.Select(t => t.DeepClone()).ToList();
 
                 _toolParameterStorageForAnimationLikeUpdate.Add(tList);
             }
@@ -346,22 +345,15 @@ namespace MCDA.ViewModel
         {
             var parentHandle = new IntPtr(ArcMap.Application.hWnd);
 
-            _NormalizationView = new NormalizationSelectionView();
-
-            _NormalizationView.DataContext = _NormalizationViewModel;
+            _NormalizationView = new NormalizationSelectionView { DataContext = _NormalizationViewModel };
 
             _NormalizationViewModel.SelectedTransformationStrategy = _lwlcTool.TransformationStrategy;
 
-            var helper = new WindowInteropHelper(_NormalizationView);
-
-            helper.Owner = parentHandle;
+            var helper = new WindowInteropHelper(_NormalizationView) { Owner = parentHandle };
 
             _NormalizationView.ShowDialog();
 
-            _NormalizationView.Closed += delegate (object sender, EventArgs e){
-
-                DoCancelNormalizationCommand();
-            };
+            _NormalizationView.Closed += (sender, e) => DoCancelNormalizationCommand();
         }
 
         protected override void DoApplyNormalizationCommand()
@@ -405,15 +397,15 @@ namespace MCDA.ViewModel
             if (_isLocked || _isSendToInMemoryWorkspaceCommand)
                 _mcdaExtension.RemoveLink(_lwlcTool);
 
-            _mcdaExtension.UnRegisterPropertyHandler(selectedFeaturePropertyChangedEventHandler);
+            _mcdaExtension.UnRegisterPropertyHandler(_selectedFeaturePropertyChangedEventHandler);
 
-            foreach (var currentField in _selectedFeature.Fields)
-                currentField.UnRegisterPropertyHandler(f => f.IsSelected, FieldPropertyChanged);
+            foreach (var currentField in _selectedFeature.Fields) 
+                currentField.UnRegisterPropertyHandler(_listOfpropertyChangedEventHandlersForFieldIsSelected);
 
             foreach (var currentToolParameter in _toolParameter)
             {
-                currentToolParameter.UnRegisterPropertyHandler(b => b.IsBenefitCriterion, BenefitCriterionChanged);
-                currentToolParameter.UnRegisterPropertyHandler(w => w.Weight, WeightChanged);
+                currentToolParameter.UnRegisterPropertyHandler(_listOfpropertyChangedEventHandlersForToolParameterIsBenefitCriterion);
+                currentToolParameter.UnRegisterPropertyHandler(_listOfpropertyChangedEventHandlersForToolParameterWeight);
             }
         }
 

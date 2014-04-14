@@ -18,17 +18,22 @@ namespace MCDA.ViewModel
     {
        public event PropertyChangedEventHandler PropertyChanged;
 
-       private MCDAExtension _mcdaExtension;
+       private readonly MCDAExtension _mcdaExtension;
        private AbstractToolTemplate _wlcTool; 
        private DataTable _wlcResultDataTable;
        private BindingList<IToolParameter> _toolParameter;
-       private IList<List<IToolParameter>> _toolParameterStorageForAnimationLikeUpdate = new List<List<IToolParameter>>();
+       private readonly IList<List<IToolParameter>> _toolParameterStorageForAnimationLikeUpdate = new List<List<IToolParameter>>();
+       private Feature _selectedFeature;
 
        private bool _isLocked = false;
        private bool _isSendToInMemoryWorkspaceCommand = false;
        private bool _isUpdateAllowed = false;
 
-       private PropertyChangedEventHandler selectedFeaturePropertyChangedEventHandler;
+       private readonly PropertyChangedEventHandler _selectedFeaturePropertyChangedEventHandler;
+
+       private readonly IList<PropertyChangedEventHandler> _listOfpropertyChangedEventHandlersForToolParameterIsBenefitCriterion = new List<PropertyChangedEventHandler>();
+       private readonly IList<PropertyChangedEventHandler> _listOfpropertyChangedEventHandlersForToolParameterWeight = new List<PropertyChangedEventHandler>();
+       private readonly IList<PropertyChangedEventHandler> _listOfpropertyChangedEventHandlersForFieldIsSelected = new List<PropertyChangedEventHandler>();
      
        public WLCToolViewModel()
        {
@@ -40,13 +45,11 @@ namespace MCDA.ViewModel
 
            //_mcdaExtension.RegisterPropertyHandler(x => x.AvailableFeatureses, SelectedFeaturePropertyChanged);
            //_mcdaExtension.AvailableFeatureses.CollectionChanged += SelectedFeaturePropertyChanged;
-          selectedFeaturePropertyChangedEventHandler =  _mcdaExtension.RegisterPropertyHandler(x => x.SelectedFeature, SelectedFeaturePropertyChanged);
+          _selectedFeaturePropertyChangedEventHandler =  _mcdaExtension.RegisterPropertyHandler(x => x.SelectedFeature, SelectedFeaturePropertyChanged);
 
            //we have to call our own update method to make sure we have a result column
             SelectedFeaturePropertyChanged(this, null);
        }
-
-     
 
        private void WeightChanged(object sender, PropertyChangedEventArgs e)
        {
@@ -70,7 +73,7 @@ namespace MCDA.ViewModel
            _toolParameter = new BindingList<IToolParameter>(_wlcTool.ToolParameterContainer.ToolParameter);
 
 
-           if (_mcdaExtension.SelectedFeature.Fields.Count(f => f.IsSelected) >= 1){
+           if (_selectedFeature.Fields.Count(f => f.IsSelected) >= 1){
                HasCriteriaSelected = true;
 
                  _wlcTool.Run();
@@ -91,46 +94,52 @@ namespace MCDA.ViewModel
 
            foreach (var currentToolParameter in _toolParameter)
            {
-               currentToolParameter.UnRegisterPropertyHandler(b => b.IsBenefitCriterion, BenefitCriterionChanged);
-               currentToolParameter.UnRegisterPropertyHandler(w => w.Weight, WeightChanged);
+               currentToolParameter.UnRegisterPropertyHandler(_listOfpropertyChangedEventHandlersForToolParameterIsBenefitCriterion);
+               currentToolParameter.UnRegisterPropertyHandler(_listOfpropertyChangedEventHandlersForToolParameterWeight);
            }
 
            foreach (var currentToolParameter in _toolParameter)
            {
-               currentToolParameter.RegisterPropertyHandler(b => b.IsBenefitCriterion, BenefitCriterionChanged);
-               currentToolParameter.RegisterPropertyHandler(w => w.Weight, WeightChanged);
+               _listOfpropertyChangedEventHandlersForToolParameterIsBenefitCriterion.Add(currentToolParameter.RegisterPropertyHandler(b => b.IsBenefitCriterion, BenefitCriterionChanged));
+               _listOfpropertyChangedEventHandlersForToolParameterWeight.Add(currentToolParameter.RegisterPropertyHandler(w => w.Weight, WeightChanged));
            }
 
        }
 
-       void SelectedFeaturePropertyChanged(object sender, PropertyChangedEventArgs e)
-       {    
-           if (_isLocked)
-               return;
+        private void SelectedFeaturePropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (_isLocked)
+                return;
 
-           _wlcTool = ToolFactory.NewWLCTool();
+            _wlcTool = ToolFactory.NewWLCTool();
 
-           _toolParameter = new BindingList<IToolParameter>(_wlcTool.ToolParameterContainer.ToolParameter);
+            _toolParameter = new BindingList<IToolParameter>(_wlcTool.ToolParameterContainer.ToolParameter);
 
-           if (_mcdaExtension.SelectedFeature != null)
-           {
-               foreach (var currentField in _mcdaExtension.SelectedFeature.Fields)
-                   currentField.UnRegisterPropertyHandler(f => f.IsSelected, FieldPropertyChanged);
+            if (_selectedFeature != null)
+            {
+                foreach (var currentField in _selectedFeature.Fields)
+                    currentField.UnRegisterPropertyHandler(_listOfpropertyChangedEventHandlersForFieldIsSelected);
+            }
+            _selectedFeature = _mcdaExtension.SelectedFeature;
 
-               foreach (var currentField in _mcdaExtension.SelectedFeature.Fields)
-                   currentField.RegisterPropertyHandler(f => f.IsSelected, FieldPropertyChanged);
+            if (_selectedFeature != null)
+            {
+                foreach (var currentField in _selectedFeature.Fields)
+                    _listOfpropertyChangedEventHandlersForFieldIsSelected.Add(
+                        currentField.RegisterPropertyHandler(f => f.IsSelected, FieldPropertyChanged));
 
-               if (_mcdaExtension.SelectedFeature.Fields.Count(f => f.IsSelected) >= 1){
-                   HasCriteriaSelected = true;
+                if (_selectedFeature.Fields.Count(f => f.IsSelected) >= 1)
+                {
+                    HasCriteriaSelected = true;
 
-                   _wlcTool.Run();
+                    _wlcTool.Run();
 
-                   _wlcResultDataTable = _wlcTool.Data;
-               }
-               else
-                   HasCriteriaSelected = false;
-           }
-
+                    _wlcResultDataTable = _wlcTool.Data;
+                }
+                else
+                    HasCriteriaSelected = false;
+            }
+        
            RegisterToolParameterEvents();
 
            PropertyChanged.Notify(() => WLCParameter);
@@ -173,12 +182,7 @@ namespace MCDA.ViewModel
        {
            if (!_isUpdateAllowed)
            {
-               List<IToolParameter> tList = new List<IToolParameter>();
-
-               for (int i = 0; i < _toolParameter.Count; i++)
-               {
-                   tList.Add(_toolParameter[i].DeepClone());
-               }
+               List<IToolParameter> tList = _toolParameter.Select(t => t.DeepClone()).ToList();
 
                _toolParameterStorageForAnimationLikeUpdate.Add(tList);
            }
@@ -373,12 +377,21 @@ namespace MCDA.ViewModel
             PropertyChanged.Notify(() => WLCResult);
         }
 
+
        protected override void DoClosingCommand()
        {
            if (_isLocked || _isSendToInMemoryWorkspaceCommand)
-           {
                _mcdaExtension.RemoveLink(_wlcTool);
- 
+
+           _mcdaExtension.UnRegisterPropertyHandler(_selectedFeaturePropertyChangedEventHandler);
+
+           foreach (var currentField in _selectedFeature.Fields)
+               currentField.UnRegisterPropertyHandler(_listOfpropertyChangedEventHandlersForFieldIsSelected);
+
+           foreach (var currentToolParameter in _toolParameter)
+           {
+               currentToolParameter.UnRegisterPropertyHandler(_listOfpropertyChangedEventHandlersForToolParameterIsBenefitCriterion);
+               currentToolParameter.UnRegisterPropertyHandler(_listOfpropertyChangedEventHandlersForToolParameterWeight);
            }
        }
     }

@@ -62,7 +62,7 @@
                             <GridViewColumn  Header="Owner"  Width="100">
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate>
-                                        <Label Content="{Binding Path=Field.Feature.LayerName, Mode=OneWay}"/>
+                                        <Label Content="{Binding Path=Field.Feature.FeatureName, Mode=OneWay}"/>
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>

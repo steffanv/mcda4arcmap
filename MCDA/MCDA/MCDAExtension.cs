@@ -16,6 +16,7 @@ using MCDA.Extensions;
 using MCDA.Model;
 using Feature = MCDA.Model.Feature;
 using Field = MCDA.Model.Field;
+using MCDA.ViewModel;
 
 namespace MCDA
 {
@@ -27,11 +28,15 @@ namespace MCDA
             new Dictionary<AbstractToolTemplate, Feature>();
 
         private IActiveViewEvents_Event _activeViewEvents;
-        private readonly ObservableCollection<Feature> _listOfAvailableFeatures = new ObservableCollection<Feature>();
 
         private IWorkspace _shadowWorkspace;
 
-        private IList<PropertyChangedEventHandler> _listOfpropertyChangedEventHandlersForFeatureIsSelected = new List<PropertyChangedEventHandler>();
+        private readonly IList<PropertyChangedEventHandler> _listOfpropertyChangedEventHandlersForFeatureIsSelected = new List<PropertyChangedEventHandler>();
+
+        public MCDAExtension()
+        {
+            AvailableFeatures = new ObservableCollection<Feature>();
+        }
 
         #region properties
 
@@ -40,7 +45,7 @@ namespace MCDA
         /// </summary>
         public Feature SelectedFeature
         {
-            get { return AvailableFeatureses.FirstOrDefault(l => l.IsSelected); }
+            get { return AvailableFeatures.FirstOrDefault(l => l.IsSelected); }
         }
 
         /// <summary>
@@ -52,22 +57,7 @@ namespace MCDA
         ///     that they provide a topological operator. Thus, not all of the <see cref="MCDA.Model.Feature" /> in this list are
         ///     eligible for MCDA.
         /// </remarks>
-        public ObservableCollection<Feature> AvailableFeatureses
-        {
-            get { return _listOfAvailableFeatures; }
-            //set { PropertyChanged.ChangeAndNotify(ref listOfAvailableFeatures, value, () => AvailableFeatureses); }
-        }
-
-        ///// <summary>
-        /////     Gets a list of <see cref="MCDA.Model.Feature" /> that are eligible for MCDA.
-        ///// </summary>
-        //public ObservableCollection<Feature> EligibleFeaturesForMCDA
-        //{
-        //    get
-        //    {
-        //        return AvailableFeatureses.Where(l => l.IsSuitableForMCDA).ToList().OrderBy(f => f.FeatureName).ToList();
-        //    }
-        //}
+        public ObservableCollection<Feature> AvailableFeatures { get; private set; }
 
         /// <summary>
         ///     Gets all <see cref="MCDA.Model.Feature" /> from the in-memory workspace.
@@ -97,7 +87,7 @@ namespace MCDA
         //}
 
         /// <summary>
-        ///     A single feature in the list of <see cref="AvailableFeatureses" /> has changed.
+        ///     A single feature in the list of <see cref="AvailableFeatures" /> has changed.
         ///     This method also ensures that only one feature is selected at every time.
         /// </summary>
         /// <param name="sender"></param>
@@ -107,7 +97,7 @@ namespace MCDA
         //    foreach (Feature currentAvailableLayer in listOfAvailableFeatures.Where(l => Feature.LastSelectedLayer != l))
         //        currentAvailableLayer.IsSelected = false;
 
-        //    PropertyChanged.Notify(() => AvailableFeatureses);
+        //    PropertyChanged.Notify(() => AvailableFeatures);
         //}
 
         #endregion
@@ -142,6 +132,8 @@ namespace MCDA
 
             _shadowWorkspace = CreateInMemoryWorkspace();
 
+            AvailableFeatures.CollectionChanged += ListOfAvailableFeaturesChanged;
+
             IMap map = ArcMap.Document.ActiveView.FocusMap;
 
             _activeViewEvents = map as IActiveViewEvents_Event;
@@ -153,15 +145,15 @@ namespace MCDA
             //ArcMap.Events.BeforeCloseDocument += new ESRI.ArcGIS.ArcMapUI.IDocumentEvents_BeforeCloseDocumentEventHandler(EventsBeforeCloseDocument); 
             ArcMap.Events.OpenDocument += EventsOpenDocument;
 
-            _listOfAvailableFeatures.CollectionChanged += ListOfAvailableFeaturesChanged;
+            AddItemsOnStartup(ArcMap.Document.ActiveView);
         }
 
         void ListOfAvailableFeaturesChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            foreach (var currentFeature in _listOfAvailableFeatures)
+            foreach (var currentFeature in AvailableFeatures)
                 currentFeature.UnRegisterPropertyHandler(_listOfpropertyChangedEventHandlersForFeatureIsSelected);
 
-            foreach (var currentFeature in _listOfAvailableFeatures)
+            foreach (var currentFeature in AvailableFeatures)
                 _listOfpropertyChangedEventHandlersForFeatureIsSelected.Add(currentFeature.RegisterPropertyHandler(f => f.IsSelected, IsSelectedChanged));
         }
 
@@ -193,7 +185,7 @@ namespace MCDA
             _activeViewEvents.ItemAdded += ArcMapItemAdded;
             _activeViewEvents.ItemDeleted += ArcMapItemDeleted;
 
-            //AvailableFeatureses = new List<Feature>();
+            //AvailableFeatures = new List<Feature>();
         }
 
         private void EventsOpenDocument()
@@ -208,18 +200,30 @@ namespace MCDA
             _activeViewEvents.ItemAdded += ArcMapItemAdded;
             _activeViewEvents.ItemDeleted += ArcMapItemDeleted;
 
-            //AvailableFeatureses = new List<Feature>();
+            //AvailableFeatures = new List<Feature>();
         }
 
-        private void ArcMapItemDeleted(object Item)
+        private void AddItemsOnStartup(ESRI.ArcGIS.Carto.IActiveView activeView)
         {
-            //RefreshAvailableLayerListAfterAddOrDelete(ArcMap.Document.ActiveView);
+            ESRI.ArcGIS.Carto.IMap map = activeView.FocusMap;
 
-            AvailableFeatureses.Remove(AvailableFeatureses.FirstOrDefault(f => f.ESRILayer == Item));
+            int numberOfLayers = map.LayerCount;
 
-            //PropertyChanged.Notify(() => AvailableFeatureses);
-            //PropertyChanged.Notify(() => EligibleFeaturesForMCDA);
-            
+            for (int i = 0; i < numberOfLayers; i++)
+                ArcMapItemAdded(map.Layer[i]);
+        }
+
+        private void ArcMapItemDeleted(object item)
+        {
+            var featureToRemove = AvailableFeatures.FirstOrDefault(f => f.ESRILayer == item);
+
+            if (featureToRemove != null && featureToRemove.IsSelected) { 
+
+                featureToRemove.IsSelected = false;
+                PropertyChanged.Notify(() => SelectedFeature);
+            }
+
+            AvailableFeatures.Remove(featureToRemove);         
         }
 
         private void ArcMapItemAdded(object item)
@@ -227,9 +231,9 @@ namespace MCDA
            ILayer2 newLayer = item as ILayer2;
 
            if (newLayer != null)
-               AvailableFeatureses.Add(new Feature(newLayer));
+               AvailableFeatures.Add(new Feature(newLayer));
 
-            //PropertyChanged.Notify(() => AvailableFeatureses);
+            //PropertyChanged.Notify(() => AvailableFeatures);
             //PropertyChanged.Notify(() => EligibleFeaturesForMCDA);
         }
 
@@ -241,7 +245,7 @@ namespace MCDA
         {
             IList<IToolParameter> toolParameter = new List<IToolParameter>();
 
-            foreach (Feature currentAvailableLayer in AvailableFeatureses.Where(l => l.IsSelected))
+            foreach (Feature currentAvailableLayer in AvailableFeatures.Where(l => l.IsSelected))
             {
                 foreach (Field currentField in currentAvailableLayer.Fields.Where(f => f.IsSelected && f.IsNumeric))
                     toolParameter.Add(new ToolParameter(currentField.FieldName));
@@ -257,12 +261,9 @@ namespace MCDA
         /// <returns></returns>
         public Field GetOIDFieldFromSelectedFeature()
         {
-            Feature selectedFeature = _listOfAvailableFeatures.FirstOrDefault(f => f.IsSelected);
+            Feature selectedFeature = AvailableFeatures.FirstOrDefault(f => f.IsSelected);
 
-            if (selectedFeature == null)
-                return null;
-
-            return selectedFeature.Fields.FirstOrDefault(f => f.IsOID);
+            return selectedFeature == null ? null : selectedFeature.Fields.FirstOrDefault(f => f.IsOID);
         }
 
         /// <summary>
@@ -294,15 +295,7 @@ namespace MCDA
 
         public IList<Field> GetFieldsFromSelectedLayerWhichAreNumeric(IList<Feature> layer)
         {
-            IList<Field> fieldList = new List<Field>();
-
-            foreach (Feature currentLayer in layer.Where(l => l.IsSelected))
-            {
-                foreach (Field currentField in currentLayer.Fields.Where(f => f.IsNumeric))
-                    fieldList.Add(currentField);
-            }
-
-            return fieldList;
+            return layer.Where(l => l.IsSelected).SelectMany(currentLayer => currentLayer.Fields.Where(f => f.IsNumeric)).ToList();
         }
 
         public DataTable GetDataTableForParameterSet<T>(IList<T> toolParameter) where T : IToolParameter
@@ -394,15 +387,15 @@ namespace MCDA
             IList<double> listOfValuesFromField = new List<double>();
 
             //this should be always the case, as we have only fields from feature feature
-            IFeatureLayer2 _featureLayer = field.Feature.FeatureLayer;
+            IFeatureLayer2 featureLayer = field.Feature.FeatureLayer;
 
             using (var comReleaser = new ComReleaser())
             {
-                IFeatureCursor featureCursor = _featureLayer.FeatureClass.Search(null, true);
+                IFeatureCursor featureCursor = featureLayer.FeatureClass.Search(null, true);
 
                 comReleaser.ManageLifetime(featureCursor);
 
-                int fieldIndex = _featureLayer.FeatureClass.FindField(field.FieldName);
+                int fieldIndex = featureLayer.FeatureClass.FindField(field.FieldName);
 
                 IFeature currentFeature;
                 while ((currentFeature = featureCursor.NextFeature()) != null)
@@ -459,7 +452,7 @@ namespace MCDA
 
         public void EstablishLink(AbstractToolTemplate tool)
         {
-            IFeatureLayer2 featureLayer = AvailableFeatureses.Where(l => l.IsSelected && l.IsSuitableForMCDA).ToList().First().FeatureLayer;
+            IFeatureLayer2 featureLayer = AvailableFeatures.Where(l => l.IsSelected && l.IsSuitableForMCDA).ToList().First().FeatureLayer;
             IFeatureClass featureClass = featureLayer.FeatureClass;
 
             IFeatureClass copiedFeatureClass = CopyFeatureClassIntoNewWorkspace(featureClass, _shadowWorkspace,
@@ -509,7 +502,7 @@ namespace MCDA
             if (!_dictionaryOfLinks.TryGetValue(tool, out feature))
                 return;
 
-            IFeatureClass featureClass = feature.FeatureClass;
+            var featureClass = feature.FeatureClass;
 
             if (featureClass.FindField(tool.DefaultResultColumnName) < 0)
             {
@@ -526,22 +519,21 @@ namespace MCDA
 
             using (var comReleaser = new ComReleaser())
             {
-                IFeatureCursor featureCursor = featureClass.Update(null, true);
+                var featureCursor = featureClass.Update(null, true);
 
                 comReleaser.ManageLifetime(featureCursor);
 
-                IFeature esriFeature = featureCursor.NextFeature();
+                var esriFeature = featureCursor.NextFeature();
 
-                int fieldIndex = featureClass.FindField(tool.DefaultResultColumnName);
+                var fieldIndex = featureClass.FindField(tool.DefaultResultColumnName);
 
-                int oidIndex = featureClass.FindField(featureClass.OIDFieldName);
+                var oidIndex = featureClass.FindField(featureClass.OIDFieldName);
 
                 while (esriFeature != null)
                 {
-                    int oid = Convert.ToInt32(esriFeature.get_Value(oidIndex));
-                    EnumerableRowCollection<DataRow> dataRows =
-                        dataTable.AsEnumerable()
-                            .Where(dr => dr.Field<FieldTypeOID>(featureClass.OIDFieldName).OID == oid);
+                    var oid = Convert.ToInt32(esriFeature.get_Value(oidIndex));
+
+                    var dataRows = dataTable.AsEnumerable().Where(dr => dr.Field<FieldTypeOID>(featureClass.OIDFieldName).OID == oid);
 
                     DataRow dRow = dataRows.FirstOrDefault();
 
@@ -554,7 +546,8 @@ namespace MCDA
             }
 
             if (feature.SelectedFieldForRendering != null)
-                Render(feature.SelectedFieldForRendering.RenderContainer, feature.FeatureLayer);
+                ProgressDialog.ShowProgressDialog("Creating Symbology", (Action<RendererContainer, IFeatureLayer2>)Render, feature.SelectedFieldForRendering.RenderContainer, feature.FeatureLayer);
+                //Render(feature.SelectedFieldForRendering.RenderContainer, feature.FeatureLayer);
 
             PropertyChanged.Notify(() => LinkDictionary);
         }
@@ -626,7 +619,7 @@ namespace MCDA
 
             foreach (IToolParameter currentToolParameter in toolParameter)
             {
-                foreach (Feature currentAvailableLayer in AvailableFeatureses.Where(l => l.IsSelected))
+                foreach (Feature currentAvailableLayer in AvailableFeatures.Where(l => l.IsSelected))
                 {
                     foreach (
                         Field currentField in
@@ -682,7 +675,7 @@ namespace MCDA
         //    //and do not forget to register the new feature
         //    RegisterListenerForEveryMemberOfListOfAvailableLayer();
 
-        //    PropertyChanged.Notify(() => AvailableFeatureses);
+        //    PropertyChanged.Notify(() => AvailableFeatures);
         //}
 
         private IWorkspace CreateInMemoryWorkspace()

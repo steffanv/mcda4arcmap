@@ -74,6 +74,11 @@ namespace MCDA.ViewModel
             base.Update();
         }
 
+        protected override bool HasCriteriaSelected()
+        {
+            return _selectedFeature != null && _selectedFeature.Fields.Count(f => f.IsSelected) >= 1;
+        }
+
         private void FieldPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (_isLocked)
@@ -83,19 +88,18 @@ namespace MCDA.ViewModel
 
             _toolParameter = new BindingList<IToolParameter>(_owaTool.ToolParameterContainer.ToolParameter);
 
-            if (_selectedFeature.Fields.Count(f => f.IsSelected) >= 1){
-                HasCriteriaSelected = true;
+            if (_selectedFeature.Fields.Count(f => f.IsSelected) >= 1){      
 
                 _owaTool.Run();
                 _owaResultDataTable = _owaTool.Data;
             }
-            else
-                HasCriteriaSelected = false;
 
             RegisterToolParameterEvents();
 
             PropertyChanged.Notify(() => OWAParameter);
             PropertyChanged.Notify(() => OWAResult);
+
+            CommandManager.InvalidateRequerySuggested();
         }
 
         private void RegisterToolParameterEvents()
@@ -140,19 +144,17 @@ namespace MCDA.ViewModel
 
                 if (_selectedFeature.Fields.Count(f => f.IsSelected) >= 1)
                 {
-                    HasCriteriaSelected = true;
-
                     _owaTool.Run();
                     _owaResultDataTable = _owaTool.Data;
                 }
-                else
-                    HasCriteriaSelected = false;
             }
 
             RegisterToolParameterEvents();
 
             PropertyChanged.Notify(() => OWAParameter);
             PropertyChanged.Notify(() => OWAResult);
+
+            CommandManager.InvalidateRequerySuggested();
         }
 
         //called from the code behind page if something changed
@@ -171,7 +173,7 @@ namespace MCDA.ViewModel
             _owaResultDataTable = _owaTool.Data;
 
             if (_isSendToInMemoryWorkspaceCommand)
-                ProgressDialog.ShowProgressDialog("Creating Symbology", (Action<AbstractToolTemplate, DataTable>)_mcdaExtension.JoinToolResultByOID, _owaTool, _owaTool.Data);
+                _mcdaExtension.JoinToolResultByOID(_owaTool, _owaTool.Data);
 
             _isUpdateAllowed = false;
         }
@@ -330,20 +332,20 @@ namespace MCDA.ViewModel
         {
             var parentHandle = new IntPtr(ArcMap.Application.hWnd);
 
-            _NormalizationView = new NormalizationSelectionView { DataContext = _NormalizationViewModel };
+            NormalizationView = new NormalizationSelectionView { DataContext = NormalizationViewModel };
 
-            _NormalizationViewModel.SelectedTransformationStrategy = _owaTool.TransformationStrategy;
+            NormalizationViewModel.SelectedTransformationStrategy = _owaTool.TransformationStrategy;
 
-            var helper = new WindowInteropHelper(_NormalizationView) { Owner = parentHandle };
+            var helper = new WindowInteropHelper(NormalizationView) { Owner = parentHandle };
 
-            _NormalizationView.ShowDialog();
+            NormalizationView.ShowDialog();
 
-            _NormalizationView.Closed += (sender, e) => DoCancelNormalizationCommand();
+            NormalizationView.Closed += (sender, e) => DoCancelNormalizationCommand();
         }
 
         protected override void DoApplyNormalizationCommand()
         {
-            _owaTool.TransformationStrategy = _NormalizationViewModel.SelectedTransformationStrategy;
+            _owaTool.TransformationStrategy = NormalizationViewModel.SelectedTransformationStrategy;
 
             _isUpdateAllowed = true;
             base.Update();
@@ -351,16 +353,16 @@ namespace MCDA.ViewModel
 
         protected override void DoCancelNormalizationCommand()
         {
-            _NormalizationViewModel.SelectedTransformationStrategy = _owaTool.TransformationStrategy;
-            _NormalizationView.Close();
+            NormalizationViewModel.SelectedTransformationStrategy = _owaTool.TransformationStrategy;
+            NormalizationView.Close();
         }
 
         protected override void DoOkayNormalizationCommand()
         {
-            if (_owaTool.TransformationStrategy != _NormalizationViewModel.SelectedTransformationStrategy)
+            if (_owaTool.TransformationStrategy != NormalizationViewModel.SelectedTransformationStrategy)
                 DoApplyNormalizationCommand();
 
-            _NormalizationView.Close();
+            NormalizationView.Close();
         }
 
         public ICommand AlphaSelectionCommand
@@ -368,7 +370,7 @@ namespace MCDA.ViewModel
             get
             {
                 return _alphaSelectionCommand ?? (_alphaSelectionCommand = new RelayCommand(
-                    p => this.DoAlphaSelectionCommand(),  p => HasCriteriaSelected ));
+                    p => this.DoAlphaSelectionCommand(),  p => HasCriteriaSelected() ));
             }
         }
 
@@ -471,7 +473,8 @@ namespace MCDA.ViewModel
 
             _mcdaExtension.UnRegisterPropertyHandler(_selectedFeaturePropertyChangedEventHandler);
 
-            foreach (var currentField in _selectedFeature.Fields)
+            if (_selectedFeature != null)
+             foreach (var currentField in _selectedFeature.Fields)
                 currentField.UnRegisterPropertyHandler(_listOfpropertyChangedEventHandlersForFieldIsSelected);
 
             foreach (var currentToolParameter in _toolParameter)

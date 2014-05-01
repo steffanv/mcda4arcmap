@@ -43,8 +43,8 @@ namespace MCDA.ViewModel
 
            _wlcResultDataTable = _wlcTool.Data;
 
-           //_mcdaExtension.RegisterPropertyHandler(x => x.AvailableFeatureses, SelectedFeaturePropertyChanged);
-           //_mcdaExtension.AvailableFeatureses.CollectionChanged += SelectedFeaturePropertyChanged;
+           //_mcdaExtension.RegisterPropertyHandler(x => x.AvailableFeatures, SelectedFeaturePropertyChanged);
+           //_mcdaExtension.AvailableFeatures.CollectionChanged += SelectedFeaturePropertyChanged;
           _selectedFeaturePropertyChangedEventHandler =  _mcdaExtension.RegisterPropertyHandler(x => x.SelectedFeature, SelectedFeaturePropertyChanged);
 
            //we have to call our own update method to make sure we have a result column
@@ -63,7 +63,12 @@ namespace MCDA.ViewModel
            base.Update();
        }
 
-       private void FieldPropertyChanged(object sender, PropertyChangedEventArgs e)
+        protected override bool HasCriteriaSelected()
+        {
+            return _selectedFeature != null && _selectedFeature.Fields.Count(f => f.IsSelected) >= 1;
+        }
+
+        private void FieldPropertyChanged(object sender, PropertyChangedEventArgs e)
        {
            if (_isLocked)
                return;
@@ -74,19 +79,18 @@ namespace MCDA.ViewModel
 
 
            if (_selectedFeature.Fields.Count(f => f.IsSelected) >= 1){
-               HasCriteriaSelected = true;
 
                  _wlcTool.Run();
 
                 _wlcResultDataTable = _wlcTool.Data;
            }
-           else
-               HasCriteriaSelected = false;
 
            RegisterToolParameterEvents();
 
            PropertyChanged.Notify(() => WLCParameter);
            PropertyChanged.Notify(() => WLCResult);
+
+           CommandManager.InvalidateRequerySuggested();
        }
 
        private void RegisterToolParameterEvents()
@@ -130,21 +134,20 @@ namespace MCDA.ViewModel
 
                 if (_selectedFeature.Fields.Count(f => f.IsSelected) >= 1)
                 {
-                    HasCriteriaSelected = true;
-
                     _wlcTool.Run();
 
                     _wlcResultDataTable = _wlcTool.Data;
                 }
-                else
-                    HasCriteriaSelected = false;
+
             }
-        
+
            RegisterToolParameterEvents();
 
            PropertyChanged.Notify(() => WLCParameter);
            PropertyChanged.Notify(() => WLCResult);
-       }
+
+            CommandManager.InvalidateRequerySuggested();
+        }
 
         //called from the code behind page if something changed
        public void UpdateAllowedEvent()
@@ -163,7 +166,7 @@ namespace MCDA.ViewModel
           _wlcResultDataTable = _wlcTool.Data;
 
           if (_isSendToInMemoryWorkspaceCommand)
-              ProgressDialog.ShowProgressDialog("Creating Symbology", (Action<AbstractToolTemplate, DataTable>)_mcdaExtension.JoinToolResultByOID, _wlcTool, _wlcTool.Data);
+              _mcdaExtension.JoinToolResultByOID(_wlcTool, _wlcTool.Data);
 
           _isUpdateAllowed = false;
            
@@ -249,12 +252,12 @@ namespace MCDA.ViewModel
 
        protected override void DoExportAsCSVCommand()
        {
-           SaveFileDialog saveFileDialog = new SaveFileDialog();
+           var saveFileDialog = new SaveFileDialog();
            saveFileDialog.FileName = _wlcTool.ToString();
            saveFileDialog.DefaultExt = ".csv";
            saveFileDialog.Filter = "Comma Separated Values (.csv)|*.csv";
 
-           Nullable<bool> result = saveFileDialog.ShowDialog();
+           bool? result = saveFileDialog.ShowDialog();
 
            if(result == true)
                Export.ToCSV<IToolParameter>(_wlcTool.Data,_wlcTool.ToolParameterContainer.ToolParameter, saveFileDialog.FileName);
@@ -321,29 +324,25 @@ namespace MCDA.ViewModel
        {
            var parentHandle = new IntPtr(ArcMap.Application.hWnd);
 
-           _NormalizationView = new NormalizationSelectionView();
+           NormalizationView = new NormalizationSelectionView { DataContext = NormalizationViewModel };
 
-           _NormalizationView.DataContext = _NormalizationViewModel;
+           NormalizationViewModel.SelectedTransformationStrategy = _wlcTool.TransformationStrategy;
 
-           _NormalizationViewModel.SelectedTransformationStrategy = _wlcTool.TransformationStrategy;
+           var helper = new WindowInteropHelper(NormalizationView) { Owner = parentHandle };
 
-           var helper = new WindowInteropHelper(_NormalizationView);
-
-           helper.Owner = parentHandle;
-
-           _NormalizationView.Closing += NormalizationViewClosing;
+           NormalizationView.Closing += NormalizationViewClosing;
           
-           _NormalizationView.ShowDialog();        
+           NormalizationView.ShowDialog();        
        }
 
        void NormalizationViewClosing(object sender, CancelEventArgs e)
        {
-           _NormalizationViewModel.SelectedTransformationStrategy = _wlcTool.TransformationStrategy;
+           NormalizationViewModel.SelectedTransformationStrategy = _wlcTool.TransformationStrategy;
        }
 
        protected override void DoApplyNormalizationCommand()
        {
-           _wlcTool.TransformationStrategy = _NormalizationViewModel.SelectedTransformationStrategy;
+           _wlcTool.TransformationStrategy = NormalizationViewModel.SelectedTransformationStrategy;
 
            _isUpdateAllowed = true;
            base.Update();
@@ -351,19 +350,19 @@ namespace MCDA.ViewModel
 
        protected override void DoCancelNormalizationCommand()
        {
-           _NormalizationViewModel.SelectedTransformationStrategy = _wlcTool.TransformationStrategy;
+           NormalizationViewModel.SelectedTransformationStrategy = _wlcTool.TransformationStrategy;
 
-           _NormalizationView.Closing -= NormalizationViewClosing;
-           _NormalizationView.Close();
+           NormalizationView.Closing -= NormalizationViewClosing;
+           NormalizationView.Close();
        }
 
        protected override void DoOkayNormalizationCommand()
        {
-           if (_wlcTool.TransformationStrategy != _NormalizationViewModel.SelectedTransformationStrategy)
+           if (_wlcTool.TransformationStrategy != NormalizationViewModel.SelectedTransformationStrategy)
                DoApplyNormalizationCommand();
 
-           _NormalizationView.Closing -= NormalizationViewClosing;
-           _NormalizationView.Close();
+           NormalizationView.Closing -= NormalizationViewClosing;
+           NormalizationView.Close();
        }
 
        protected override void DoDistributionCommand()
@@ -385,7 +384,8 @@ namespace MCDA.ViewModel
 
            _mcdaExtension.UnRegisterPropertyHandler(_selectedFeaturePropertyChangedEventHandler);
 
-           foreach (var currentField in _selectedFeature.Fields)
+           if (_selectedFeature != null)
+             foreach (var currentField in _selectedFeature.Fields)
                currentField.UnRegisterPropertyHandler(_listOfpropertyChangedEventHandlersForFieldIsSelected);
 
            foreach (var currentToolParameter in _toolParameter)

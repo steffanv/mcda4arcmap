@@ -21,7 +21,7 @@ namespace MCDA.ViewModel
         {
             _mcdaExtension = MCDAExtension.GetExtension();
 
-            _mcdaExtension.AvailableFeatureses.CollectionChanged += AvailableFeaturesCollectionChanged;
+            _mcdaExtension.AvailableFeatures.CollectionChanged += AvailableFeaturesCollectionChanged;
 
             Features = new BindingList<Feature>();
             Fields = new BindingList<Field>();
@@ -39,7 +39,7 @@ namespace MCDA.ViewModel
             foreach (var feature in Features)
                 feature.UnRegisterPropertyHandler(listOfpropertyChangedEventHandlersForFeatureIsSelected);
 
-            Features = new BindingList<Feature>(_mcdaExtension.AvailableFeatureses.OrderByDescending(l => l.IsSuitableForMCDA).ThenBy(l => l.FeatureName).ToList());
+            Features = new BindingList<Feature>(_mcdaExtension.AvailableFeatures.OrderByDescending(l => l.IsSuitableForMCDA).ThenBy(l => l.FeatureName).ToList());
 
             foreach (var feature in Features)
                 listOfpropertyChangedEventHandlersForFeatureIsSelected.Add(feature.RegisterPropertyHandler(f => f.IsSelected, FeatureSelectionChanged));

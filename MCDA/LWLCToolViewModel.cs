@@ -79,6 +79,11 @@ namespace MCDA.ViewModel
             base.Update();
         }
 
+        protected override bool HasCriteriaSelected()
+        {
+            return _selectedFeature != null && _selectedFeature.Fields.Count(f => f.IsSelected) >= 1;
+        }
+
         private void FieldPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (_isLocked)
@@ -89,19 +94,19 @@ namespace MCDA.ViewModel
             _lwlcResultDataTable = _lwlcTool.Data;
 
             if (_selectedFeature.Fields.Count(f => f.IsSelected) >= 1){
-                HasCriteriaSelected = true;
 
                 _toolParameter = new BindingList<IToolParameter>(_lwlcTool.ToolParameterContainer.ToolParameter);
 
                 ProgressDialog.ShowProgressDialog("Running LWLC Tool", (Action)_lwlcTool.Run);
             }
             else
-                HasCriteriaSelected = false;
 
             RegisterToolParameterEvents();
 
             PropertyChanged.Notify(() => LWLCParameter);
             PropertyChanged.Notify(() => LWLCResult);
+
+            CommandManager.InvalidateRequerySuggested();
         }
 
         private void RegisterToolParameterEvents()
@@ -143,21 +148,19 @@ namespace MCDA.ViewModel
 
                 if (_selectedFeature.Fields.Count(f => f.IsSelected) >= 1)
                 {
-                    HasCriteriaSelected = true;
-
                     ProgressDialog.ShowProgressDialog("Running LWLC Tool", (Action)_lwlcTool.Run);
 
                     _lwlcResultDataTable = _lwlcTool.Data;
 
                 }
-                else
-                    HasCriteriaSelected = false;
             }
 
             RegisterToolParameterEvents();
 
             PropertyChanged.Notify(() => LWLCParameter);
             PropertyChanged.Notify(() => LWLCResult);
+
+            CommandManager.InvalidateRequerySuggested();
         }
 
         // called from the code behind page if something changed
@@ -175,7 +178,7 @@ namespace MCDA.ViewModel
             _lwlcResultDataTable = _lwlcTool.Data;
 
             if (_isSendToInMemoryWorkspaceCommand)
-                ProgressDialog.ShowProgressDialog("Creating Symbology", (Action<AbstractToolTemplate, DataTable>)_mcdaExtension.JoinToolResultByOID, _lwlcTool, _lwlcTool.Data);
+                _mcdaExtension.JoinToolResultByOID(_lwlcTool, _lwlcTool.Data);
 
             _isUpdateAllowed = false;
         }
@@ -331,7 +334,7 @@ namespace MCDA.ViewModel
             if (_isSendToInMemoryWorkspaceCommand)
             {
                 _mcdaExtension.DisplayLink(_lwlcTool);
-                ProgressDialog.ShowProgressDialog("Creating Symbology", (Action<AbstractToolTemplate, DataTable>)_mcdaExtension.JoinToolResultByOID, _lwlcTool, _lwlcTool.Data);
+                _mcdaExtension.JoinToolResultByOID( _lwlcTool, _lwlcTool.Data);
             }
 
             if (!_isSendToInMemoryWorkspaceCommand)
@@ -345,20 +348,20 @@ namespace MCDA.ViewModel
         {
             var parentHandle = new IntPtr(ArcMap.Application.hWnd);
 
-            _NormalizationView = new NormalizationSelectionView { DataContext = _NormalizationViewModel };
+            NormalizationView = new NormalizationSelectionView { DataContext = NormalizationViewModel };
 
-            _NormalizationViewModel.SelectedTransformationStrategy = _lwlcTool.TransformationStrategy;
+            NormalizationViewModel.SelectedTransformationStrategy = _lwlcTool.TransformationStrategy;
 
-            var helper = new WindowInteropHelper(_NormalizationView) { Owner = parentHandle };
+            var helper = new WindowInteropHelper(NormalizationView) { Owner = parentHandle };
 
-            _NormalizationView.ShowDialog();
+            NormalizationView.ShowDialog();
 
-            _NormalizationView.Closed += (sender, e) => DoCancelNormalizationCommand();
+            NormalizationView.Closed += (sender, e) => DoCancelNormalizationCommand();
         }
 
         protected override void DoApplyNormalizationCommand()
         {
-            _lwlcTool.TransformationStrategy = _NormalizationViewModel.SelectedTransformationStrategy;
+            _lwlcTool.TransformationStrategy = NormalizationViewModel.SelectedTransformationStrategy;
 
             _isUpdateAllowed = true;
             base.Update();
@@ -366,16 +369,16 @@ namespace MCDA.ViewModel
 
         protected override void DoCancelNormalizationCommand()
         {
-            _NormalizationViewModel.SelectedTransformationStrategy = _lwlcTool.TransformationStrategy;
-            _NormalizationView.Close();
+            NormalizationViewModel.SelectedTransformationStrategy = _lwlcTool.TransformationStrategy;
+            NormalizationView.Close();
         }
 
         protected override void DoOkayNormalizationCommand()
         {
-            if (_lwlcTool.TransformationStrategy != _NormalizationViewModel.SelectedTransformationStrategy)
+            if (_lwlcTool.TransformationStrategy != NormalizationViewModel.SelectedTransformationStrategy)
                 DoApplyNormalizationCommand();
 
-            _NormalizationView.Close();
+            NormalizationView.Close();
         }
 
         protected override void DoDistributionCommand()
@@ -399,8 +402,9 @@ namespace MCDA.ViewModel
 
             _mcdaExtension.UnRegisterPropertyHandler(_selectedFeaturePropertyChangedEventHandler);
 
-            foreach (var currentField in _selectedFeature.Fields) 
-                currentField.UnRegisterPropertyHandler(_listOfpropertyChangedEventHandlersForFieldIsSelected);
+            if(_selectedFeature != null)
+               foreach (var currentField in _selectedFeature.Fields) 
+                 currentField.UnRegisterPropertyHandler(_listOfpropertyChangedEventHandlersForFieldIsSelected);
 
             foreach (var currentToolParameter in _toolParameter)
             {
@@ -413,15 +417,8 @@ namespace MCDA.ViewModel
         {
             get
             {
-                if (_neighborhoodSelectionCommand == null)
-                {
-                    _neighborhoodSelectionCommand = new RelayCommand(
-                        p => this.DoNeighborhoodSelectionCommand(),
-                        p => HasCriteriaSelected
-                        );
-                }
-
-                return _neighborhoodSelectionCommand;
+                return _neighborhoodSelectionCommand ?? (_neighborhoodSelectionCommand = new RelayCommand(
+                    p => this.DoNeighborhoodSelectionCommand(),  p => HasCriteriaSelected() ));
             }
         }
 
@@ -436,9 +433,7 @@ namespace MCDA.ViewModel
 
             _neighborhoodSelectionView.DataContext = _neighborhoodSelectionViewModel;
 
-            var helper = new WindowInteropHelper(_neighborhoodSelectionView);
-
-            helper.Owner = parentHandle;
+            var helper = new WindowInteropHelper(_neighborhoodSelectionView) { Owner = parentHandle };
 
             _neighborhoodSelectionView.Closing += NeighborhoodSelectionViewClosing;
 
@@ -458,13 +453,8 @@ namespace MCDA.ViewModel
         {
             get
             {
-                if (_okayNeighborhoodSelectionCommand == null)
-                {
-                    _okayNeighborhoodSelectionCommand= new RelayCommand(
-                        p => this.DoOkayNeighborhoodSelectionCommand(),
-                        p => true);
-                }
-                return _okayNeighborhoodSelectionCommand;
+                return _okayNeighborhoodSelectionCommand ?? (_okayNeighborhoodSelectionCommand = new RelayCommand(
+                    p => this.DoOkayNeighborhoodSelectionCommand(), p => true));
             }
         }
 

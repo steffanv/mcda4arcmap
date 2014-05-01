@@ -215,7 +215,7 @@ namespace MCDA.ViewModel
 
         private void GetAllFieldsList()
         {
-            AllFieldsList = new BindingList<RendererContainer>(MCDAExtension.AvailableFeatureses.Where(f => f.IsSuitableForMCDA).SelectMany(f => f.Fields).Where(f => f.IsNumeric).Select(f => f.RenderContainer).ToList());
+            AllFieldsList = new BindingList<RendererContainer>(MCDAExtension.AvailableFeatures.Where(f => f.IsSuitableForMCDA).SelectMany(f => f.Fields).Where(f => f.IsNumeric).Select(f => f.RenderContainer).ToList());
         }
 
         private void GetToolFieldList()
@@ -226,15 +226,17 @@ namespace MCDA.ViewModel
 
         private void InitializeClassificationArguments()
         {
-            QuantileClass quantileClass = new QuantileClass();
+            var quantileClass = new QuantileClass();
 
             selectedClassificationMethod = quantileClass;
 
-            listOfClassificationMethod = new BindingList<IClassify>();
-            listOfClassificationMethod.Add(new NaturalBreaksClass());
-            listOfClassificationMethod.Add(quantileClass);
-            listOfClassificationMethod.Add(new EqualIntervalClass());
-            listOfClassificationMethod.Add(new GeometricalIntervalClass());
+            listOfClassificationMethod = new BindingList<IClassify>
+            {
+                new NaturalBreaksClass(),
+                quantileClass,
+                new EqualIntervalClass(),
+                new GeometricalIntervalClass()
+            };
 
             listOfNumberOfClasses = new BindingList<int>(Enumerable.Range(2, 19).ToList());
 

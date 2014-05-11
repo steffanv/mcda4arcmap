@@ -100,6 +100,7 @@ namespace MCDA
         protected override void OnStartup()
         {
             Assembly assembly = Assembly.LoadFrom("HistogramControl.dll");
+            Assembly assembly2 = Assembly.LoadFrom("Xceed.Wpf.Toolkit.dll");
 
             _extension = this;
 

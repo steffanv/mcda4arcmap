@@ -8,7 +8,7 @@
   <Company>Steffan Voss</Company>
   <Date>05/1/2014</Date>
   <Targets>
-    <Target name="Desktop" version="10.1" />
+    <Target name="Desktop" version="10.2" />
   </Targets>
   <AddIn language="CLR4.5" library="MCDA.dll" namespace="MCDA">
     <ArcMap>
@@ -26,19 +26,7 @@
       <DockableWindows>
         <DockableWindow id="Ryerson_University_MCDA_AddDataView" class="AddDataView+AddinImpl" caption="Data Manager" image="Images\AddDataWindow.png">
           <InitialPlacement height="500" width="300" state="unpinned" position="group"  />
-        </DockableWindow>
-        <!--<DockableWindow id="Ryerson_University_MCDA_OWAToolView" class="OWAToolView+AddinImpl" caption="OWA Tool" image="Images\OWAToolView.png">
-          <InitialPlacement height="500" width="400" state="pinned" position="float" />
-        </DockableWindow>-->
-        <!--<DockableWindow id="Ryerson_University_MCDA_WLCToolView" class="WLCToolView+AddinImpl" caption="WLC Tool" image="Images\WLCToolView.png">
-          <InitialPlacement height="300" width="500" state="pinned" position="group" />
-        </DockableWindow>-->
-        <!--<DockableWindow id="Ryerson_University_MCDA_ConfigView" class="ConfigView+AddinImpl" caption="Configuration" image="Images\ConfigView.png">
-          <InitialPlacement height="300" width="300" state="unpinned" position="group" />
-        </DockableWindow>-->
-        <!--<DockableWindow id="Ryerson_University_MCDA_VisualizationView" class="VisualizationView+AddinImpl" caption="Visualization" image="Images\VisualizationView.png">
-          <InitialPlacement height="300" width="500" state="unpinned" position="group" />
-        </DockableWindow>-->
+        </DockableWindow>      
       </DockableWindows>
       <Toolbars>
         <Toolbar id="Ryerson_University_MCDA_MCDA_Toolbar" caption="MCDA" showInitially="true">

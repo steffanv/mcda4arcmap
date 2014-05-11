@@ -44,5 +44,19 @@ namespace MCDA
             fc.Flip();
         }
 
+        private void TreeViewSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+
+            Field selectedField = e.NewValue as Field;
+
+            if (selectedField != null)
+            {
+                VisualizationViewModel visualizationViewModel = DataContext as VisualizationViewModel;
+
+                visualizationViewModel.SelectedFieldToRender = selectedField.RenderContainer;
+            }
+
+        }
+
     }
 }

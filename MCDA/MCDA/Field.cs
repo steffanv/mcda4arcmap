@@ -13,30 +13,30 @@ namespace MCDA.Model
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private bool isSelected;
-        private bool isOID = false;
-        private bool isNumber = false;
-        private ESRI.ArcGIS.Geodatabase.IField field;
-        private RendererContainer renderContainer;
+        private bool _isSelected;
+        private readonly bool _isOid = false;
+        private readonly bool _isNumber = false;
+        private readonly ESRI.ArcGIS.Geodatabase.IField _field;
+        private RendererContainer _renderContainer;
 
         public Field(ESRI.ArcGIS.Geodatabase.IField field, Feature feature)
         {
 
             Feature = feature;
-            this.field = field;
+            this._field = field;
 
-            renderContainer = new RendererContainer(this);
+            _renderContainer = new RendererContainer(this);
    
             if (field.Type <= ESRI.ArcGIS.Geodatabase.esriFieldType.esriFieldTypeDouble)
-                isNumber = true;
+                _isNumber = true;
             if (field.Type == ESRI.ArcGIS.Geodatabase.esriFieldType.esriFieldTypeOID)
-                isOID = true;
+                _isOid = true;
         }
 
         public RendererContainer RenderContainer {
 
-            get { return renderContainer; }
-            set { PropertyChanged.ChangeAndNotify(ref renderContainer, value, () => RenderContainer); }     
+            get { return _renderContainer; }
+            set { PropertyChanged.ChangeAndNotify(ref _renderContainer, value, () => RenderContainer); }     
         }
 
         /// <summary>
@@ -48,10 +48,12 @@ namespace MCDA.Model
             {
                 if (!IsNumeric) 
                     return "Field is not numeric.";
+                if (ContainsNullValue())
+                    return "Field contains NULL values.";
                 if (!HasDifferentNumericValues())
                     return "Field has no distinct values.";
-                else return string.Empty; 
-            
+
+                return string.Empty;
             }
         }
         /// <summary>
@@ -59,66 +61,88 @@ namespace MCDA.Model
         /// </summary>
         public bool IsSuitableForMCDA
         {
-            get { return IsNumeric && HasDifferentNumericValues(); }
+            get { return IsNumeric && !ContainsNullValue() && HasDifferentNumericValues(); }
         }
 
         public bool IsSelected
         {
-            get { return isSelected; }
-            set { PropertyChanged.ChangeAndNotify(ref isSelected, value, () => IsSelected); }
+            get { return _isSelected; }
+            set { PropertyChanged.ChangeAndNotify(ref _isSelected, value, () => IsSelected); }
         }
 
         public ESRI.ArcGIS.Geodatabase.IField ESRIField 
         {
-            get { return field; }       
+            get { return _field; }       
         }
 
         public string FieldName
         {
-            get { return field.Name; }
+            get { return _field.Name; }
         }
 
         public bool IsNumeric
         {
-            get { return isNumber; }
+            get { return _isNumber; }
         }
 
         public Feature Feature { get; private set; }
 
         public bool IsOID
         {
-            get { return isOID; }
+            get { return _isOid; }
+        }
+
+        private bool ContainsNullValue()
+        {
+            using (var comReleaser = new ComReleaser())
+            {
+                var featureCursor = Feature.FeatureClass.Search(null, true);
+
+                comReleaser.ManageLifetime(featureCursor);
+
+                var fieldIndex = Feature.FeatureClass.FindField(FieldName);
+
+                IFeature currentFeature; 
+
+                while ((currentFeature = featureCursor.NextFeature()) != null)
+                {
+                    if(currentFeature.Value[fieldIndex] is DBNull)
+                        return true;
+                }
+
+                return false;
+            }
         }
 
         /// <summary>
         /// Determines if the values of the Field have at least one value that is distinct from all other values. A non numeric field returns always false.
         /// </summary>
         /// <returns></returns>
-        public bool HasDifferentNumericValues()
+        private bool HasDifferentNumericValues()
         {
             if(!IsNumeric)
                 return false;
 
-            using (ComReleaser comReleaser = new ComReleaser())
+            using (var comReleaser = new ComReleaser())
             {
-                IFeatureCursor featureCursor = Feature.FeatureClass.Search(null, true);
+                var featureCursor = Feature.FeatureClass.Search(null, true);
 
                 comReleaser.ManageLifetime(featureCursor);
 
-                int fieldIndex = Feature.FeatureClass.FindField(FieldName);
+                var fieldIndex = Feature.FeatureClass.FindField(FieldName);
 
-                IFeature currentFeature = featureCursor.NextFeature();
+                var currentFeature = featureCursor.NextFeature();
 
                 double value = 0;
 
                 if (currentFeature != null)
-                    value = (Convert.ToDouble(currentFeature.get_Value(fieldIndex)));
+                    value = (Convert.ToDouble(currentFeature.Value[fieldIndex]));
                 else
                     return false;
 
                 while ((currentFeature = featureCursor.NextFeature()) != null)
                 {
-                    double t = (Convert.ToDouble(currentFeature.get_Value(fieldIndex)));
+                    double t = (Convert.ToDouble(currentFeature.Value[fieldIndex]));
 
                     if (t != value)
                         return true;

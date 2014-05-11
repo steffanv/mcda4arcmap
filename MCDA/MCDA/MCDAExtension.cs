@@ -41,7 +41,8 @@ namespace MCDA
         #region properties
 
         /// <summary>
-        ///     If non is selected the property returns <code>null</code>.
+        /// If non is selected the property returns <code>null</code>.
+        /// The system ensures that all clients that listen for changes are informed in case the <see cref="SelectedFeature"/> changes.
         /// </summary>
         public Feature SelectedFeature
         {
@@ -71,34 +72,6 @@ namespace MCDA
         {
             get { return _dictionaryOfLinks; }
         }
-
-        #endregion
-
-        #region event handling for listOfAvailableFeatures
-
-        //private void RegisterListenerForEveryMemberOfListOfAvailableLayer()
-        //{
-        //    //unregister for all member to avoid unnecessary multiple call
-        //    foreach (Feature currentAvailableLayer in listOfAvailableFeatures)
-        //        currentAvailableLayer.PropertyChanged -= AvailalbeLayerListMemberPropertyChanged;
-
-        //    foreach (Feature currentAvailableLayer in listOfAvailableFeatures)
-        //        currentAvailableLayer.PropertyChanged += AvailalbeLayerListMemberPropertyChanged;
-        //}
-
-        /// <summary>
-        ///     A single feature in the list of <see cref="AvailableFeatures" /> has changed.
-        ///     This method also ensures that only one feature is selected at every time.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        //private void AvailalbeLayerListMemberPropertyChanged(object sender, PropertyChangedEventArgs e)
-        //{
-        //    foreach (Feature currentAvailableLayer in listOfAvailableFeatures.Where(l => Feature.LastSelectedLayer != l))
-        //        currentAvailableLayer.IsSelected = false;
-
-        //    PropertyChanged.Notify(() => AvailableFeatures);
-        //}
 
         #endregion
 
@@ -232,9 +205,6 @@ namespace MCDA
 
            if (newLayer != null)
                AvailableFeatures.Add(new Feature(newLayer));
-
-            //PropertyChanged.Notify(() => AvailableFeatures);
-            //PropertyChanged.Notify(() => EligibleFeaturesForMCDA);
         }
 
         #endregion

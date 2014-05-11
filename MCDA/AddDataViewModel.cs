@@ -15,7 +15,7 @@ namespace MCDA.ViewModel
 
         private readonly MCDAExtension _mcdaExtension;
 
-        private IList<PropertyChangedEventHandler> listOfpropertyChangedEventHandlersForFeatureIsSelected = new List<PropertyChangedEventHandler>();
+        private readonly IList<PropertyChangedEventHandler> _listOfpropertyChangedEventHandlersForFeatureIsSelected = new List<PropertyChangedEventHandler>();
 
         public AddDataViewModel()
         {
@@ -23,50 +23,22 @@ namespace MCDA.ViewModel
 
             _mcdaExtension.AvailableFeatures.CollectionChanged += AvailableFeaturesCollectionChanged;
 
-            Features = new BindingList<Feature>();
-            Fields = new BindingList<Field>();
+            Features = new ObservableCollection<Feature>();
 
             //call because the extension could already have a selected feature and thus fields
             AvailableFeaturesCollectionChanged(this, null);
         }
 
-        public BindingList<Feature> Features { get; set; }
-
-        public BindingList<Field> Fields { get; set; }
+        public ObservableCollection<Feature> Features { get; set; }
 
         private void AvailableFeaturesCollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             foreach (var feature in Features)
-                feature.UnRegisterPropertyHandler(listOfpropertyChangedEventHandlersForFeatureIsSelected);
+                feature.UnRegisterPropertyHandler(_listOfpropertyChangedEventHandlersForFeatureIsSelected);
 
-            Features = new BindingList<Feature>(_mcdaExtension.AvailableFeatures.OrderByDescending(l => l.IsSuitableForMCDA).ThenBy(l => l.FeatureName).ToList());
-
-            foreach (var feature in Features)
-                listOfpropertyChangedEventHandlersForFeatureIsSelected.Add(feature.RegisterPropertyHandler(f => f.IsSelected, FeatureSelectionChanged));
-              
-            Feature selectedFeature = Features.FirstOrDefault(l => l.IsSelected);
-
-            if (selectedFeature != null)
-                Fields = new BindingList<Field>(selectedFeature.Fields.OrderByDescending(f => f.IsSuitableForMCDA).ThenBy(f => f.FieldName).ToList());
-
-            else
-                Fields = new BindingList<Field>();
+            Features = new ObservableCollection<Feature>(_mcdaExtension.AvailableFeatures.OrderByDescending(l => l.IsSuitableForMCDA).ThenBy(l => l.FeatureName).ToList());
 
             PropertyChanged.Notify(() => Features);
-            PropertyChanged.Notify(() => Fields);
-        }
-
-        public void FeatureSelectionChanged(object sender, PropertyChangedEventArgs e)
-        {
-            Feature selectedFeature = Features.FirstOrDefault(l => l.IsSelected);
-
-            if (selectedFeature != null)
-                Fields = new BindingList<Field>(selectedFeature.Fields.OrderByDescending(f => f.IsSuitableForMCDA).ThenBy(f => f.FieldName).ToList());
-
-            else
-                Fields = new BindingList<Field>();
-
-            PropertyChanged.Notify(() => Fields);
-        }
+        }     
     }
 }

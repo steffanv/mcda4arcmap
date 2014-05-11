@@ -19,38 +19,31 @@ namespace MCDA.Model
         public event PropertyChangedEventHandler PropertyChanged;
 
         private string _featureName;
-        private bool isFeatureLayer;
-        private bool isSelected;
-        //can be null
-        private IFeatureLayer2 featureLayer;
-        private IFeatureClass featureClass;
-        private readonly ObservableCollection<Field> fields;
-        private Field selectedFieldForRendering;
-        private ESRI.ArcGIS.Carto.ILayer2 esriLayer;
-
-        private static Feature lastSelectedLayer;
-
+        private bool _isFeatureLayer;
+        private bool _isSelected;
+        private readonly IFeatureLayer2 _featureLayer;
+        private IFeatureClass _featureClass;
+        private readonly ObservableCollection<Field> _fields;
+        private Field _selectedFieldForRendering;
+        private readonly ESRI.ArcGIS.Carto.ILayer2 _esriLayer;
 
         public Feature(ESRI.ArcGIS.Carto.ILayer2 layer)
         {
-
-            this.esriLayer = layer;
+            this._esriLayer = layer;
             _featureName = layer.Name;
 
-            IFeatureLayer2 featureLayer = layer as ESRI.ArcGIS.Carto.IFeatureLayer2;
+            var featureLayer = layer as ESRI.ArcGIS.Carto.IFeatureLayer2;
 
             if (featureLayer == null)
             {
-                isFeatureLayer = false;
-                UniqueLayerName = string.Empty;
-                fields = new ObservableCollection<Field>();
+                _isFeatureLayer = false;
+                _fields = new ObservableCollection<Field>();
             }
             else
             { 
-                isFeatureLayer = true;
-                this.featureLayer = featureLayer;
-                UniqueLayerName = ToUniqueLayerName(featureLayer);
-                fields = new ObservableCollection<Field>(GetFields());
+                _isFeatureLayer = true;
+                this._featureLayer = featureLayer;
+                _fields = new ObservableCollection<Field>(GetFields().OrderByDescending(f => f.IsSuitableForMCDA).ThenBy(l => l.FieldName));
             }
         }
 
@@ -65,19 +58,17 @@ namespace MCDA.Model
         /// <exception cref="ArgumentNullExeption"> </exception>
         public Feature(IFeatureClass featureClass, IFeatureLayer2 featureLayer)
         {
-
             featureLayer.FeatureClass = featureClass;
 
-            this.featureClass = featureClass;
-            this.featureLayer = featureLayer;
+            this._featureClass = featureClass;
+            this._featureLayer = featureLayer;
 
-            isFeatureLayer = true;
-            UniqueLayerName = ToUniqueLayerName(this.featureLayer);
+            _isFeatureLayer = true;
 
-            this.esriLayer = featureLayer as ILayer2;
-            _featureName = this.esriLayer.Name;
+            this._esriLayer = featureLayer as ILayer2;
+            _featureName = this._esriLayer.Name;
 
-            fields = new ObservableCollection<Field>(GetFields());
+            _fields = new ObservableCollection<Field>(GetFields());
             
         }
 
@@ -86,7 +77,7 @@ namespace MCDA.Model
             get
             {
                 if (!IsFeatureLayer)
-                    return "Feature is not a FeatureLayer.";
+                    return "Feature has not all FeatureLayer properties.";
                 if (!HasAreaAndTopologicalOperator())
                     return "Geometry must be Polygon.";
                 else return string.Empty;
@@ -100,31 +91,29 @@ namespace MCDA.Model
 
         public IFeatureClass FeatureClass
         {
-            get { return featureLayer.FeatureClass; }
+            get { return _featureLayer.FeatureClass; }
         }
 
         public ESRI.ArcGIS.Carto.ILayer2 ESRILayer
         {
-            get { return esriLayer; }
+            get { return _esriLayer; }
         }
 
         public ESRI.ArcGIS.Carto.IFeatureLayer2 FeatureLayer
         {
-            get { return featureLayer; }
+            get { return _featureLayer; }
         }
-
-        public string UniqueLayerName { get; set; }
 
         public Field SelectedFieldForRendering
         {
-            get { return selectedFieldForRendering; }
-            set { PropertyChanged.ChangeAndNotify(ref selectedFieldForRendering, value, () => SelectedFieldForRendering);}
+            get { return _selectedFieldForRendering; }
+            set { PropertyChanged.ChangeAndNotify(ref _selectedFieldForRendering, value, () => SelectedFieldForRendering);}
         }
 
         public bool IsFeatureLayer
         {
-            get { return isFeatureLayer; }
-            set { PropertyChanged.ChangeAndNotify(ref isFeatureLayer, value, () => IsFeatureLayer);}
+            get { return _isFeatureLayer; }
+            set { PropertyChanged.ChangeAndNotify(ref _isFeatureLayer, value, () => IsFeatureLayer);}
         }
 
         public string FeatureName
@@ -135,26 +124,13 @@ namespace MCDA.Model
 
         public bool IsSelected { 
 
-            get { return isSelected; /*lastSelectedLayer == this;*/ }
-            set
-            {
-                //isSelected = value;
-
-                //if (value)
-                  //  lastSelectedLayer = this;
-
-                PropertyChanged.ChangeAndNotify(ref isSelected, value, () => IsSelected);
-            }
+            get { return _isSelected; }
+            set { PropertyChanged.ChangeAndNotify(ref _isSelected, value, () => IsSelected); }
         }
-
-        //public static Feature LastSelectedLayer{
-
-        //    get { return lastSelectedLayer; }
-        //}
 
         public ObservableCollection<Field> Fields
         {
-            get { return fields; }  
+            get { return _fields; }  
         }
 
         public bool HasAreaAndTopologicalOperator()
@@ -177,46 +153,18 @@ namespace MCDA.Model
 
             foreach (var newField in GetFields())
                 Fields.Add(newField);
-
-            //PropertyChanged.Notify(() => Fields);
         }
 
-        //TODO wozu ist das gut?
-        private string ToUniqueLayerName(ESRI.ArcGIS.Carto.IFeatureLayer2 featureLayer)
+        private IEnumerable<Field> GetFields()
         {
-            return featureLayer.FeatureClass.Fields.ToString() + featureLayer.ToString();
-        }
-
-        //TODO think about it - is it necessary?
-        //public void RegisterListenerForEveryMemberOfFields()
-        //{
-        //    foreach (var currentField in fields)
-        //    {
-        //        currentField.PropertyChanged -= new PropertyChangedEventHandler(FieldPropertyChanged);
-        //    }
-
-        //    foreach (var currentField in fields)
-        //    {
-        //        currentField.PropertyChanged +=new PropertyChangedEventHandler(FieldPropertyChanged);
-        //    }
-        //}
-
-        //private void FieldPropertyChanged(object sender, PropertyChangedEventArgs e)
-        //{
-        //    PropertyChanged.Notify(() => Fields);
-        //}
-
-        private IList<Field> GetFields()
-        {//TODO using?
-            ESRI.ArcGIS.Geodatabase.IFields fields = featureLayer.FeatureClass.Fields;
+            var fields = _featureLayer.FeatureClass.Fields;
 
             IList<Field> listOfFields = new List<Field>();
 
             for (int i = 0; i < fields.FieldCount; i++)
-                listOfFields.Add(new Field(fields.get_Field(i),this));
+                listOfFields.Add(new Field(fields.Field[i],this));
 
             return listOfFields;
         }
-
     }
 }

@@ -9,7 +9,8 @@
         WindowStyle="ToolWindow"
         ShowInTaskbar="False"
         ResizeMode="CanResize"
-        WindowStartupLocation="CenterOwner"     
+        WindowStartupLocation="CenterOwner" 
+        xmlns:model="clr-namespace:MCDA.Model"
     Height="400" Width="700">
     <Window.Resources>
         <local:NullToFalseConverter x:Key="nullToFalseConverter" />
@@ -27,48 +28,38 @@
         </Grid.RowDefinitions>
         <customControl:FlipControl x:Name="fc" Grid.Column="0" Grid.Row="0" HorizontalContentAlignment="Stretch">
             <customControl:FlipControl.Front>
-                <ListView ItemsSource="{Binding Path=ToolFieldsList, Mode=OneWay}" MouseRightButtonUp="SwitchList" SelectedItem="{Binding Path=SelectedFieldToRender, Mode=TwoWay}" >
-                    <ListView.View>
-                        <GridView>
-                            <GridViewColumn  Header="Field"  Width="80">
-                                <GridViewColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <Label Content="{Binding Path=Field.FieldName, Mode=OneWay}"/>
-                                    </DataTemplate>
-                                </GridViewColumn.CellTemplate>
-                            </GridViewColumn>
-                            <GridViewColumn  Header="Owner"  Width="200">
-                                <GridViewColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <Label Content="{Binding Path=Field.Feature.FeatureName, Mode=OneWay}"/>
-                                    </DataTemplate>
-                                </GridViewColumn.CellTemplate>
-                            </GridViewColumn>
-                        </GridView>
-                    </ListView.View>
-                </ListView >
+                <TreeView ItemsSource="{Binding AllFieldsList}" SelectedItemChanged="TreeViewSelectedItemChanged">
+                    <TreeView.ItemContainerStyle>
+                        <Style TargetType="{x:Type TreeViewItem}">
+                            <Setter Property="IsExpanded" Value="True" />
+                        </Style>
+                    </TreeView.ItemContainerStyle>
+                    <TreeView.Resources>
+                        <HierarchicalDataTemplate ItemsSource="{Binding Fields}" DataType="{x:Type model:Feature}">
+                            <Label Content="{Binding Path=FeatureName}"/>
+                        </HierarchicalDataTemplate>
+                        <DataTemplate DataType="{x:Type model:Field}">
+                            <Label Content="{Binding Path=FieldName}"/>
+                        </DataTemplate >
+                    </TreeView.Resources>
+                </TreeView>              
             </customControl:FlipControl.Front>
             <customControl:FlipControl.Back>
-                <ListView ItemsSource="{Binding Path=AllFieldsList, Mode=OneWay}" MouseRightButtonUp="SwitchList" SelectedItem="{Binding Path=SelectedFieldToRender, Mode=TwoWay}" >
-                    <ListView.View>
-                        <GridView>
-                            <GridViewColumn  Header="Field"  Width="80">
-                                <GridViewColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <Label Content="{Binding Path=Field.FieldName, Mode=OneWay}"/>
-                                    </DataTemplate>
-                                </GridViewColumn.CellTemplate>
-                            </GridViewColumn>
-                            <GridViewColumn  Header="Owner"  Width="100">
-                                <GridViewColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <Label Content="{Binding Path=Field.Feature.FeatureName, Mode=OneWay}"/>
-                                    </DataTemplate>
-                                </GridViewColumn.CellTemplate>
-                            </GridViewColumn>
-                        </GridView>
-                    </ListView.View>
-                </ListView >
+                <TreeView ItemsSource="{Binding ToolFieldsList}" SelectedItemChanged="TreeViewSelectedItemChanged">
+                    <TreeView.ItemContainerStyle>
+                        <Style TargetType="{x:Type TreeViewItem}">
+                            <Setter Property="IsExpanded" Value="True" />
+                        </Style>
+                    </TreeView.ItemContainerStyle>
+                    <TreeView.Resources>
+                        <HierarchicalDataTemplate ItemsSource="{Binding Fields}" DataType="{x:Type model:Feature}">
+                            <Label Content="{Binding Path=FeatureName}"/>
+                        </HierarchicalDataTemplate>
+                        <DataTemplate DataType="{x:Type model:Field}">
+                            <Label Content="{Binding Path=FieldName}"/>
+                        </DataTemplate >
+                    </TreeView.Resources>
+                </TreeView>
             </customControl:FlipControl.Back>
         </customControl:FlipControl>
         <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ResizeBehavior="PreviousAndNext" />
@@ -129,8 +120,8 @@
                                 </Grid.RowDefinitions>
                                 <Label  Content="Classification Method" Grid.Column="1" Grid.Row="0" />
                                 <Label  Content="Classes" Grid.Column="2" Grid.Row="0" />
-                                <ComboBox HorizontalAlignment="Left" Width="120" ItemsSource="{Binding Path=ListOfClassificationMethod, Mode=OneWay}" DisplayMemberPath="MethodName" SelectedValue="{Binding Path=SelectedClassificationMethod, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding SelectedValue, ElementName=attributeComboBox, Converter={StaticResource nullToFalseConverter}}" Name="classificationComboBox" Grid.Column="1" Grid.Row="1"/>
-                                <ComboBox HorizontalAlignment="Left" Width="50" ItemsSource="{Binding Path=NumberOfClasses, Mode=OneWay}" SelectedValue="{Binding Path=SelectedNumberOfClasses, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding SelectedValue, ElementName=attributeComboBox, Converter={StaticResource nullToFalseConverter}}" Name="classesComboBox" Grid.Column="2" Grid.Row="1"/>
+                                <ComboBox HorizontalAlignment="Left" Width="120" ItemsSource="{Binding Path=ListOfClassificationMethod, Mode=OneWay}" DisplayMemberPath="MethodName" SelectedValue="{Binding Path=SelectedClassificationMethod, UpdateSourceTrigger=PropertyChanged}"  Name="classificationComboBox" Grid.Column="1" Grid.Row="1"/>
+                                <ComboBox HorizontalAlignment="Left" Width="50" ItemsSource="{Binding Path=NumberOfClasses, Mode=OneWay}" SelectedValue="{Binding Path=SelectedNumberOfClasses, UpdateSourceTrigger=PropertyChanged}" Name="classesComboBox" Grid.Column="2" Grid.Row="1"/>
                                 <GroupBox Name="HistogramGroupBox" Header="Histogram" Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2">
                                     <externalCustomControl:HistogramControl Data="{Binding Path=HistogramData}" Breaks="{Binding Path=HistogramBreaks}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
                                 </GroupBox>

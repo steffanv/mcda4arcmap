@@ -57,13 +57,13 @@ namespace MCDA.Model
             }
         }
         /// <summary>
-        /// Returns true if the Field is numeric and has different numeric values.
+        /// Returns true if the Field is numeric, does not have NULL values and has different numeric values.
         /// </summary>
         public bool IsSuitableForMCDA
         {
             get { return IsNumeric && !ContainsNullValue() && HasDifferentNumericValues(); }
         }
-
+ 
         public bool IsSelected
         {
             get { return _isSelected; }
@@ -141,7 +141,7 @@ namespace MCDA.Model
                     return false;
 
                 while ((currentFeature = featureCursor.NextFeature()) != null)
-                {
+                {                   
                     double t = (Convert.ToDouble(currentFeature.Value[fieldIndex]));
 
                     if (t != value)
@@ -150,6 +150,43 @@ namespace MCDA.Model
 
                 return false;
             }
+        }
+
+        /// <summary>
+        /// Returns the values in case the field is numeric, otherwise the IEnumerable is empty.
+        /// DBNull values are skipped.
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<double> GetFieldData()
+        {
+            if (!IsNumeric)
+                return Enumerable.Empty<double>();
+
+            IList<double> data = new List<double>();
+
+            using (var comReleaser = new ComReleaser())
+            {
+                var featureCursor = Feature.FeatureClass.Search(null, true);
+
+                comReleaser.ManageLifetime(featureCursor);
+
+                var fieldIndex = Feature.FeatureClass.FindField(FieldName);
+
+                var currentFeature = featureCursor.NextFeature();
+
+                while ((currentFeature = featureCursor.NextFeature()) != null)
+                {
+                    if(currentFeature.Value[fieldIndex] is DBNull)
+                        continue;
+
+                    double t = (Convert.ToDouble(currentFeature.Value[fieldIndex]));
+
+                    data.Add(t);
+                   
+                }
+            }
+
+            return data.AsEnumerable();
         }
 
         public void PromoteToSelectedFieldForRendering()

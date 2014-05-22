@@ -32,8 +32,8 @@
                             <RowDefinition Height="20" />
                         </Grid.RowDefinitions>
                         <RadioButton Grid.Row="1" Grid.Column="1" IsChecked="{Binding Path=SelectedRenderOption, Converter={StaticResource enumToBooleanConverter}, ConverterParameter={x:Static local:RenderOption.AfterSliderDrag}}"  ToolTip="Refreshes the view after dragging the slider (fast)" >After Slider Drag</RadioButton>
-                        <RadioButton Grid.Row="2" Grid.Column="2" IsChecked="{Binding Path=SelectedRenderOption, Converter={StaticResource enumToBooleanConverter}, ConverterParameter={x:Static local:RenderOption.AnimationLike}}"  ToolTip="Refreshs the view after dragging the slider for a limited amount of ticks (medium)" >Animation Like</RadioButton>
-                        <RadioButton Grid.Row="3" Grid.Column="3" IsChecked="{Binding Path=SelectedRenderOption, Converter={StaticResource enumToBooleanConverter}, ConverterParameter={x:Static local:RenderOption.Realtime}}" ToolTip="Refreshes the view for every slider tick (slow)." >Realtime</RadioButton>
+                        <RadioButton Grid.Row="2" Grid.Column="1" IsChecked="{Binding Path=SelectedRenderOption, Converter={StaticResource enumToBooleanConverter}, ConverterParameter={x:Static local:RenderOption.AnimationLike}}"  ToolTip="Refreshes the view after dragging the slider for a limited amount of ticks (medium)" >Animation Like</RadioButton>
+                        <RadioButton Grid.Row="3" Grid.Column="1" IsChecked="{Binding Path=SelectedRenderOption, Converter={StaticResource enumToBooleanConverter}, ConverterParameter={x:Static local:RenderOption.Realtime}}" ToolTip="Refreshes the view for every slider tick (slow)." >Realtime</RadioButton>
                     </Grid>
                 </GroupBox>
                 </Grid>

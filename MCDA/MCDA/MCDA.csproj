@@ -99,6 +99,18 @@
       <Private>False</Private>
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </Reference>
+    <Reference Include="OxyPlot, Version=2014.1.308.1, Culture=neutral, PublicKeyToken=638079a8f0bd61e9, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\OxyPlot.Core.2014.1.308.1\lib\portable-net4+sl4+wp71+win8\OxyPlot.dll</HintPath>
+    </Reference>
+    <Reference Include="OxyPlot.Wpf, Version=2014.1.308.1, Culture=neutral, PublicKeyToken=75e952ba404cdbb0, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\OxyPlot.Wpf.2014.1.308.1\lib\NET45\OxyPlot.Wpf.dll</HintPath>
+    </Reference>
+    <Reference Include="OxyPlot.Xps, Version=2014.1.308.1, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\OxyPlot.Wpf.2014.1.308.1\lib\NET45\OxyPlot.Xps.dll</HintPath>
+    </Reference>
     <Reference Include="Xceed.Wpf.Toolkit, Version=2.1.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Extended.Wpf.Toolkit.2.1.0\lib\net40\Xceed.Wpf.Toolkit.dll</HintPath>
@@ -123,88 +135,88 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AbstractToolParameter.cs" />
-    <Compile Include="AbstractToolViewModel.cs" />
-    <Compile Include="AddDataViewModel.cs" />
-    <Compile Include="AlphaSelectionView.xaml.cs">
+    <Compile Include="Model\AbstractToolParameter.cs" />
+    <Compile Include="Model\AbstractToolViewModel.cs" />
+    <Compile Include="ViewModel\AddDataViewModel.cs" />
+    <Compile Include="View\AlphaSelectionView.xaml.cs">
       <DependentUpon>AlphaSelectionView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="AlphaSelectionViewModel.cs" />
-    <Compile Include="Cluster.cs" />
-    <Compile Include="ExtensionMethods.cs" />
-    <Compile Include="FlipControl.xaml.cs">
+    <Compile Include="ViewModel\AlphaSelectionViewModel.cs" />
+    <Compile Include="Model\Cluster.cs" />
+    <Compile Include="Misc\ExtensionMethods.cs" />
+    <Compile Include="CustomControls\FlipControl.xaml.cs">
       <DependentUpon>FlipControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="IdentityStandardizationStrategy.cs" />
-    <Compile Include="LWLCTool.cs" />
-    <Compile Include="LWLCToolButton.cs" />
-    <Compile Include="LWLCToolView.xaml.cs">
+    <Compile Include="Model\IdentityStandardizationStrategy.cs" />
+    <Compile Include="Model\LWLCTool.cs" />
+    <Compile Include="Misc\LWLCToolButton.cs" />
+    <Compile Include="View\LWLCToolView.xaml.cs">
       <DependentUpon>LWLCToolView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="LWLCToolViewModel.cs" />
-    <Compile Include="NeighborhoodSelectionView.xaml.cs">
+    <Compile Include="ViewModel\LWLCToolViewModel.cs" />
+    <Compile Include="View\NeighborhoodSelectionView.xaml.cs">
       <DependentUpon>NeighborhoodSelectionView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="NeighborhoodSelectionViewModel.cs" />
-    <Compile Include="ProgressDialog.cs" />
-    <Compile Include="RendererContainer.cs" />
-    <Compile Include="ClassBreaksRendererContainer.cs" />
-    <Compile Include="Classification.cs" />
+    <Compile Include="ViewModel\NeighborhoodSelectionViewModel.cs" />
+    <Compile Include="Misc\ProgressDialog.cs" />
+    <Compile Include="Model\RendererContainer.cs" />
+    <Compile Include="Model\ClassBreaksRendererContainer.cs" />
+    <Compile Include="Misc\Classification.cs" />
     <Compile Include="Config.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Config.esriaddinx</DependentUpon>
     </Compile>
-    <Compile Include="ConfigButton.cs" />
-    <Compile Include="ConfigSingleton.cs" />
-    <Compile Include="ConfigView.xaml.cs">
+    <Compile Include="Misc\ConfigButton.cs" />
+    <Compile Include="Model\ConfigSingleton.cs" />
+    <Compile Include="View\ConfigView.xaml.cs">
       <DependentUpon>ConfigView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ConfigViewModel.cs" />
-    <Compile Include="EnumToBooleanConverter.cs" />
-    <Compile Include="Export.cs" />
-    <Compile Include="Field.cs" />
-    <Compile Include="FieldTypeOID.cs" />
-    <Compile Include="IDeepCloneable.cs" />
-    <Compile Include="ITool.cs" />
-    <Compile Include="IToolParameter.cs" />
-    <Compile Include="AbstractToolTemplate.cs" />
-    <Compile Include="IStandardizationStrategy.cs" />
-    <Compile Include="IWeightDistributeStrategy.cs" />
-    <Compile Include="Feature.cs" />
-    <Compile Include="NullToFalseCoverter.cs" />
-    <Compile Include="OWATool.cs" />
-    <Compile Include="OWAToolButton.cs" />
-    <Compile Include="OWAToolView.xaml.cs">
+    <Compile Include="ViewModel\ConfigViewModel.cs" />
+    <Compile Include="ViewModel\EnumToBooleanConverter.cs" />
+    <Compile Include="Misc\Export.cs" />
+    <Compile Include="Model\Field.cs" />
+    <Compile Include="Model\FieldTypeOID.cs" />
+    <Compile Include="Model\IDeepCloneable.cs" />
+    <Compile Include="Model\ITool.cs" />
+    <Compile Include="Model\IToolParameter.cs" />
+    <Compile Include="Model\AbstractToolTemplate.cs" />
+    <Compile Include="Model\IStandardizationStrategy.cs" />
+    <Compile Include="Model\IWeightDistributeStrategy.cs" />
+    <Compile Include="Model\Feature.cs" />
+    <Compile Include="Model\NullToFalseCoverter.cs" />
+    <Compile Include="Model\OWATool.cs" />
+    <Compile Include="Misc\OWAToolButton.cs" />
+    <Compile Include="View\OWAToolView.xaml.cs">
       <DependentUpon>OWAToolView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="OWAToolViewModel.cs" />
+    <Compile Include="ViewModel\OWAToolViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="MaximumScoreNormalizationStrategy.cs" />
-    <Compile Include="ProportionalDistributionStrategy.cs" />
-    <Compile Include="RelayCommand.cs" />
-    <Compile Include="RendererFactory.cs" />
-    <Compile Include="ScoreRangeNormalizationStrategy.cs" />
-    <Compile Include="NormalizationSelectionView.xaml.cs">
+    <Compile Include="Model\MaximumScoreNormalizationStrategy.cs" />
+    <Compile Include="Model\ProportionalDistributionStrategy.cs" />
+    <Compile Include="Model\RelayCommand.cs" />
+    <Compile Include="Model\RendererFactory.cs" />
+    <Compile Include="Model\ScoreRangeNormalizationStrategy.cs" />
+    <Compile Include="View\NormalizationSelectionView.xaml.cs">
       <DependentUpon>NormalizationSelectionView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="NormalizationSelectionViewModel.cs" />
-    <Compile Include="ToolFactory.cs" />
-    <Compile Include="Util.cs" />
-    <Compile Include="VisualizationButton.cs" />
-    <Compile Include="VisualizationView.xaml.cs">
+    <Compile Include="ViewModel\NormalizationSelectionViewModel.cs" />
+    <Compile Include="Model\ToolFactory.cs" />
+    <Compile Include="Misc\Util.cs" />
+    <Compile Include="Misc\VisualizationButton.cs" />
+    <Compile Include="View\VisualizationView.xaml.cs">
       <DependentUpon>VisualizationView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="VisualizationViewModel.cs" />
-    <Compile Include="ToolParameter.cs" />
-    <Compile Include="NormalizationStrategyFactory.cs" />
-    <Compile Include="WeightDistributionStrategyFactory.cs" />
-    <Compile Include="ToolParameterContainer.cs" />
-    <Compile Include="WLCTool.cs" />
-    <Compile Include="WLCToolButton.cs" />
-    <Compile Include="WLCToolView.xaml.cs">
+    <Compile Include="ViewModel\VisualizationViewModel.cs" />
+    <Compile Include="Model\ToolParameter.cs" />
+    <Compile Include="Model\NormalizationStrategyFactory.cs" />
+    <Compile Include="Model\WeightDistributionStrategyFactory.cs" />
+    <Compile Include="Model\ToolParameterContainer.cs" />
+    <Compile Include="Model\WLCTool.cs" />
+    <Compile Include="Misc\WLCToolButton.cs" />
+    <Compile Include="View\WLCToolView.xaml.cs">
       <DependentUpon>WLCToolView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="WLCToolViewModel.cs" />
+    <Compile Include="ViewModel\WLCToolViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <AddInContent Include="Config.esriaddinx">
@@ -217,10 +229,10 @@
     <AddInContent Include="Images\MCDA Add-in.png" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AddDataButton.cs" />
+    <Compile Include="Misc\AddDataButton.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="MCDAExtension.cs" />
+    <Compile Include="Misc\MCDAExtension.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="PresentationCore" />
@@ -231,50 +243,50 @@
     <Reference Include="System.Drawing" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="AddDataView.xaml">
+    <Page Include="View\AddDataView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Compile Include="AddDataView.xaml.cs">
+    <Compile Include="View\AddDataView.xaml.cs">
       <DependentUpon>AddDataView.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
     <AddInContent Include="Images\AddDataWindow.png" />
-    <Page Include="AlphaSelectionView.xaml">
+    <Page Include="View\AlphaSelectionView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="ConfigView.xaml">
+    <Page Include="View\ConfigView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="FlipControl.xaml">
+    <Page Include="CustomControls\FlipControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="LWLCToolView.xaml">
+    <Page Include="View\LWLCToolView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="NeighborhoodSelectionView.xaml">
+    <Page Include="View\NeighborhoodSelectionView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="OWAToolView.xaml">
+    <Page Include="View\OWAToolView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="NormalizationSelectionView.xaml">
+    <Page Include="View\NormalizationSelectionView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="VisualizationView.xaml">
+    <Page Include="View\VisualizationView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="WLCToolView.xaml">
+    <Page Include="View\WLCToolView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -352,17 +364,11 @@
     <Resource Include="Images\toolbargraphics\Neighborhood.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
-    <Content Include="README.txt" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\..\Visual Studio 2013\Projects\HistogramControl\HistogramControl\HistogramControl.csproj">
-      <Project>{ac95b4db-0463-4e2d-82d9-4535f7cfbec1}</Project>
-      <Name>HistogramControl</Name>
-    </ProjectReference>
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
@@ -404,6 +410,7 @@
     <CodeContractsReferenceAssembly>%28none%29</CodeContractsReferenceAssembly>
     <CodeContractsAnalysisWarningLevel>1</CodeContractsAnalysisWarningLevel>
     <PlatformTarget>x86</PlatformTarget>
+    <RegisterForComInterop>false</RegisterForComInterop>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
     <StartAction>Program</StartAction>

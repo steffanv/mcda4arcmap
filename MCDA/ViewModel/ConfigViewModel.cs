@@ -14,50 +14,29 @@ namespace MCDA.ViewModel
         private ICommand _applyCommand;
         private ICommand _okayCommand;
         private ICommand _cancelCommand;
-        private RenderOption _seletectedRenderOption;
 
         public ConfigViewModel()
         {
             SelectedRenderOption = ConfigSingleton.Instance.SelectedRenderoption;
         }
 
-        public RenderOption SelectedRenderOption
-        {
-            get { return _seletectedRenderOption; }
-            set {_seletectedRenderOption = value;}
-        }
+        public RenderOption SelectedRenderOption { get; set; }
 
         public ICommand CancelCommand
         {
-            get
-            {
-                if (_cancelCommand == null)
-                    _cancelCommand = new RelayCommand( p => this.DoCancelNormalizationCommand(), p => true);
-
-                return _cancelCommand;
+            get {
+                return _cancelCommand ?? (_cancelCommand = new RelayCommand(p => this.DoCancelCommand(), p => true));
             }
         }
 
         public ICommand OkayCommand
         {
-            get
-            {
-                if (_okayCommand == null)
-                    _okayCommand = new RelayCommand( p => this.DoOkayCommand(), p => true);
-                
-                return _okayCommand;
-            }
+            get { return _okayCommand ?? (_okayCommand = new RelayCommand(p => this.DoOkayCommand(), p => true)); }
         }
 
         public ICommand ApplyCommand
         {
-            get
-            {
-                if (_applyCommand == null)
-                    _applyCommand = new RelayCommand(p => this.DoApplyCommand(), p => true);
-
-                return _applyCommand;
-            }
+            get { return _applyCommand ?? (_applyCommand = new RelayCommand(p => this.DoApplyCommand(), p => true)); }
         }
 
         private void DoApplyCommand()
@@ -71,7 +50,7 @@ namespace MCDA.ViewModel
             RequestClose(null, null);
         }
 
-        private void DoCancelNormalizationCommand()
+        private void DoCancelCommand()
         {
             RequestClose(null, null);
         }

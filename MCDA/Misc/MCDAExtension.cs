@@ -99,9 +99,9 @@ namespace MCDA
 
         protected override void OnStartup()
         {
-            Assembly assembly = Assembly.LoadFrom("HistogramControl.dll");
-            Assembly assembly2 = Assembly.LoadFrom("Xceed.Wpf.Toolkit.dll");
-
+            //Assembly assembly = Assembly.LoadFrom("HistogramControl.dll");
+            //Assembly assembly2 = Assembly.LoadFrom("Xceed.Wpf.Toolkit.dll");
+            
             _extension = this;
 
             _shadowWorkspace = CreateInMemoryWorkspace();
@@ -120,6 +120,7 @@ namespace MCDA
             ArcMap.Events.OpenDocument += EventsOpenDocument;
 
             AddItemsOnStartup(ArcMap.Document.ActiveView);
+             
         }
 
         void ListOfAvailableFeaturesChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)

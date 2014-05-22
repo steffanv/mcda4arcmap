@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Data;
 using System.Linq;
@@ -43,7 +44,7 @@ namespace MCDA.Extensions
 
         public static void UnRegisterPropertyHandler<T>(this T obj, PropertyChangedEventHandler handlerDelegate) where T : INotifyPropertyChanged
         {
-           UnRegisterPropertyHandler(obj, new [] {handlerDelegate});
+            UnRegisterPropertyHandler(obj, new[] { handlerDelegate });
 
         }
 
@@ -52,7 +53,7 @@ namespace MCDA.Extensions
         {
             foreach (var propertyChangedEventHandler in handlerDelegates)
                 obj.PropertyChanged -= propertyChangedEventHandler;
-            
+
         }
 
         //public static void UnRegisterPropertyHandler<T, TProperty>(this T obj, Expression<Func<T, TProperty>> propertyExpression, PropertyChangedEventHandler handlerDelegate)
@@ -91,26 +92,22 @@ namespace MCDA.Extensions
             return propertyInfo.Name;
         }
 
-         public static bool ChangeAndNotify<T>(this PropertyChangedEventHandler handler,
-        ref T field, T value, Expression<Func<T>> memberExpression)
+        public static bool ChangeAndNotify<T>(this PropertyChangedEventHandler handler, ref T field, T value, Expression<Func<T>> memberExpression)
         {
             if (memberExpression == null)
-            {
                 throw new ArgumentNullException("memberExpression");
-            }
+
             var body = memberExpression.Body as MemberExpression;
             if (body == null)
-            {
                 throw new ArgumentException("Lambda must return a property.");
-            }
+
             if (EqualityComparer<T>.Default.Equals(field, value))
-            {
                 return false;
-            }
 
             field = value;
 
             var vmExpression = body.Expression as ConstantExpression;
+
             if (vmExpression != null)
             {
                 LambdaExpression lambda = Expression.Lambda(vmExpression);
@@ -118,25 +115,21 @@ namespace MCDA.Extensions
                 object sender = vmFunc.DynamicInvoke();
 
                 if (handler != null)
-                {
                     handler(sender, new PropertyChangedEventArgs(body.Member.Name));
-                }
             }
-   
+
             return true;
         }
 
         public static void Notify<T>(this PropertyChangedEventHandler handler, Expression<Func<T>> memberExpression)
         {
             if (memberExpression == null)
-            {
                 throw new ArgumentNullException("memberExpression");
-            }
+
             var body = memberExpression.Body as MemberExpression;
+
             if (body == null)
-            {
                 throw new ArgumentException("Lambda must return a property.");
-            }
 
             var vmExpression = body.Expression as ConstantExpression;
             if (vmExpression != null)
@@ -146,30 +139,44 @@ namespace MCDA.Extensions
                 object sender = vmFunc.DynamicInvoke();
 
                 if (handler != null)
-                {
                     handler(sender, new PropertyChangedEventArgs(body.Member.Name));
-                }
             }
 
         }
 
         public static void Notify(this PropertyChangedEventHandler handler, object sender, string propertyName)
         {
-            if(sender == null){
-
+            if (sender == null)
                 throw new ArgumentNullException("sender");
-            }
 
             if (propertyName == null)
-            {
                 throw new ArgumentNullException("propertyName");
-            }
-           
-                if (handler != null)
-                {
-                    handler(sender, new PropertyChangedEventArgs(propertyName));
-                }
-            }
 
-        }  
+            if (handler != null)
+                handler(sender, new PropertyChangedEventArgs(propertyName));
+        }
+
+        #region OberseableCollection extensions
+
+        public static void SortBy<TSource, TKey>(this ObservableCollection<TSource> source, Func<TSource, TKey> keySelector)
+        {
+            SortOberserveablecollection(source, keySelector);
+        }
+
+        public static void SortByDescending<TSource, TKey>(this ObservableCollection<TSource> source, Func<TSource, TKey> keySelector)
+        {
+            SortOberserveablecollection(source, keySelector, false);
+        }
+
+        private static void SortOberserveablecollection<TSource, TKey>(ObservableCollection<TSource> observableCollection, Func<TSource, TKey> keySelector, bool ascending = true)
+        {
+            var sorted = @ascending ? observableCollection.OrderBy(keySelector).ToList() : observableCollection.OrderByDescending(keySelector).ToList();
+
+            for (var i = 0; i < sorted.Count(); i++)
+                observableCollection.Move(observableCollection.IndexOf(sorted[i]), i);
+        }
+
+        #endregion
+
+    }
 }

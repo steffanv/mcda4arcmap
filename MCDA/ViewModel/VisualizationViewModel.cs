@@ -14,6 +14,8 @@ using System.Windows;
 using System.Windows.Input;
 using System.Threading;
 using System.Collections.ObjectModel;
+using Feature = MCDA.Model.Feature;
+using OxyPlot.Series;
 
 namespace MCDA.ViewModel
 {
@@ -40,6 +42,7 @@ namespace MCDA.ViewModel
         private ICommand _removeBiPolarRendererCommand;
 
         private readonly MCDAExtension _mcdaExtension = MCDAExtension.GetExtension();
+        private int _bins;
 
         public VisualizationViewModel()
         {
@@ -54,8 +57,11 @@ namespace MCDA.ViewModel
 
             BiPolarColorSliderValue = 0.5;
 
-            GetToolFieldList();
-            GetAllFieldsList();
+            AllFieldsList = new ObservableCollection<MCDA.Model.Feature>(_mcdaExtension.AvailableFeatures.Where(f => f.Fields.Any(x => x.IsSuitableForMCDA)).OrderBy(f => f.FeatureName).ToList());
+            ToolFieldsList = new ObservableCollection<MCDA.Model.Feature>(_mcdaExtension.FeaturesFromInMemoryWorkspace.Where(x => x.Fields.Any(f => f.IsSuitableForMCDA)).ToList());
+
+            Bins = 5;
+            HistogramMajorStep = 5;
 
             PropertyChanged.Notify(() => ToolFieldsList);
             PropertyChanged.Notify(() => AllFieldsList);
@@ -72,11 +78,115 @@ namespace MCDA.ViewModel
             {
                 PropertyChanged.ChangeAndNotify(ref _selectedFieldToRender, value, () => SelectedFieldToRender);
 
+                // calculate the number of bins for the histogram
+                // this is done only the first time when the selected field changed
+                int bins = (int)Math.Sqrt(_selectedFieldToRender.Field.GetFieldData().Count());
+
+                if (bins > 1000)
+                    bins = 1000;
+                if (bins < 10)
+                    bins = 10;
+
+                Bins = bins;
+
                 RendererContainerToView();
                 UpdateHistogramControl();
 
             }
         }
+
+        #region histogram
+
+        public IList<ColumnItem> HistogramData { get; private set; }
+
+        public IList<string> HistogramLabels { get; private set; }
+
+        public IList<string> HistogramActualLabels { get; private set; }
+
+        public IList<double> HistogramBreaks { get; private set; }
+
+        public int Bins
+        {
+            get { return _bins; }
+
+            set { PropertyChanged.ChangeAndNotify(ref _bins, value, () => Bins);
+
+                UpdateHistogramControl();
+            }
+        }
+
+        public int HistogramMajorStep { get; private set; }
+
+        private void UpdateHistogramControl()
+        {
+            if (!IsFieldToRenderSelected)
+                return;
+
+            //double[] data;
+            //int[] freq;
+
+            //Classification.Histogram(_selectedFieldToRender.Field.Feature.FeatureClass, SelectedFieldToRender.Field.ESRIField, out data, out freq);
+
+            ////TODO data.count == 1?
+
+            //double stepSize = Util.SmallestDifference(data);
+            //int numberOfSteps = (int) ((data.Max() - data.Min())/stepSize);
+
+            //IList<ColumnItem> columnItems = new List<ColumnItem>();
+
+            //double xValue = data.Min();
+            //int dataIndex = 0;
+
+            //for (int i = 0; i < numberOfSteps; i++)
+            //{
+            //    if(xValue <= data[dataIndex] && xValue+stepSize > data[dataIndex]){
+
+            //        columnItems.Add(new ColumnItem(freq[dataIndex]));
+            //        if (dataIndex + 1 < data.Count())
+            //            dataIndex++;
+            //    }
+            //    else
+            //    {
+            //        columnItems.Add(new ColumnItem(0));
+            //    }
+
+            //    xValue += stepSize;
+            //}
+
+            //OxyPlot.Axes.CategoryAxis a = new OxyPlot.Axes.CategoryAxis();
+            //a.a
+
+            HistogramActualLabels = new List<string>();
+            HistogramLabels = new List<string>();
+
+            IList<ColumnItem> columnItems = new List<ColumnItem>();
+
+            Tuple<double,int> [] histo = Classification.Histogram(SelectedFieldToRender.Field, Bins);
+
+            foreach (var currentValue in histo)
+            {
+                columnItems.Add(new ColumnItem(currentValue.Item2));
+                HistogramActualLabels.Add(currentValue.Item1.ToString("0.00"));
+                HistogramLabels.Add(currentValue.Item1.ToString("0.00"));
+            }
+
+            HistogramData = columnItems;
+
+            //we want always 5 Labels
+            HistogramMajorStep = (int) Math.Ceiling(histo.Count() / 5d);
+
+            //HistogramData = System.Array.ConvertAll<int, long>(Classification.NormalizeHistogramData(data, freq), Convert.ToInt64);
+
+            HistogramBreaks = Classification.Classify(SelectedClassificationMethod, SelectedFieldToRender.Field.Feature.FeatureClass, SelectedFieldToRender.Field.ESRIField, SelectedNumberOfClasses).ToList();
+
+            PropertyChanged.Notify(() => HistogramLabels);
+            PropertyChanged.Notify(() => HistogramMajorStep);
+
+            PropertyChanged.Notify(() => HistogramData);
+            PropertyChanged.Notify(() => HistogramBreaks);
+        }
+
+        #endregion
 
         #region class breaks renderer
 
@@ -130,30 +240,6 @@ namespace MCDA.ViewModel
             }
         }
 
-        public long[] HistogramData { get; private set; }
-
-        public long[] HistogramBreaks { get; private set; }
-
-        private void UpdateHistogramControl()
-        {
-            if (!IsFieldToRenderSelected)
-                return;
-
-            double[] data;
-            int[] freq;
-
-            Classification.Histogram(_selectedFieldToRender.Field.Feature.FeatureClass, SelectedFieldToRender.Field.ESRIField, out data, out freq);
-
-            HistogramData = System.Array.ConvertAll<int, long>(Classification.NormalizeHistogramData(data, freq), Convert.ToInt64);
-
-            double[] classes = Classification.Classify(SelectedClassificationMethod, SelectedFieldToRender.Field.Feature.FeatureClass, SelectedFieldToRender.Field.ESRIField, SelectedNumberOfClasses);
-
-            HistogramBreaks = System.Array.ConvertAll<int, long>(Classification.NormalizeBreaks(classes), Convert.ToInt64);
-
-            PropertyChanged.Notify(() => HistogramData);
-            PropertyChanged.Notify(() => HistogramBreaks);
-        }
-
         #endregion
 
         #region bi polar renderer
@@ -204,16 +290,6 @@ namespace MCDA.ViewModel
         {
             if (IsFieldToRenderSelected)
                 ProgressDialog.ShowProgressDialog("Creating Symbology", (Action<RendererContainer, IFeatureLayer2>)_mcdaExtension.Render, _selectedFieldToRender, _selectedFieldToRender.Field.Feature.FeatureLayer);
-        }
-
-        private void GetAllFieldsList()
-        {
-            AllFieldsList = new ObservableCollection<MCDA.Model.Feature>(_mcdaExtension.AvailableFeatures.Where(f => f.IsSuitableForMCDA).Where(f => f.Fields.Any(x => x.IsSuitableForMCDA)).ToList());
-        }
-
-        private void GetToolFieldList()
-        {
-            ToolFieldsList = new ObservableCollection<MCDA.Model.Feature>(_mcdaExtension.FeaturesFromInMemoryWorkspace.Where(f => f.IsSuitableForMCDA).Where(x => x.Fields.Any(f => f.IsSuitableForMCDA)).ToList());
         }
 
         private void InitializeClassificationArguments()

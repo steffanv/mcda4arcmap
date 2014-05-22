@@ -17,15 +17,7 @@ namespace MCDA.Model
 
         public static ConfigSingleton Instance
         {
-            get
-            {
-                if (_instance == null)
-                {
-                    _instance = new ConfigSingleton();
-                }
-
-                return _instance;
-            }
+            get { return _instance ?? (_instance = new ConfigSingleton()); }
         }
 
         public RenderOption SelectedRenderoption

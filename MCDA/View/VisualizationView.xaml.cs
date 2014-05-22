@@ -18,6 +18,10 @@ using MCDA.ViewModel;
 using MCDA.Model;
 using System.Collections.ObjectModel;
 using MCDA.Extensions;
+using OxyPlot;
+using OxyPlot.Wpf;
+using OxyPlot.Xps;
+using OxyPlot.Series;
 
 namespace MCDA
 {
@@ -25,6 +29,12 @@ namespace MCDA
     {
         public VisualizationView()
         {
+
+            //WORKAROUND to load the assemblys before XAML comes into play
+            new OxyPlot.Wpf.BarSeries();
+            new OxyPlot.Xps.XpsExporter();
+            new OxyPlot.Series.BarItem();
+
             InitializeComponent();
 
             DataContext = new VisualizationViewModel();
@@ -37,6 +47,7 @@ namespace MCDA
 
             BiPolarRendererNeutralColor.AvailableColors = greyScaleColors;
 
+            
         }
 
         private void SwitchList(object sender, EventArgs e)
@@ -48,12 +59,19 @@ namespace MCDA
         {
 
             Field selectedField = e.NewValue as Field;
-
+            
             if (selectedField != null)
             {
-                VisualizationViewModel visualizationViewModel = DataContext as VisualizationViewModel;
+                if (!selectedField.IsSuitableForMCDA)
+                {
+                    //TreeViewFeatureName.SelectedItem = e.OldValue;
+                }
+                else
+                {
+                    VisualizationViewModel visualizationViewModel = DataContext as VisualizationViewModel;
 
-                visualizationViewModel.SelectedFieldToRender = selectedField.RenderContainer;
+                    visualizationViewModel.SelectedFieldToRender = selectedField.RenderContainer;
+                }
             }
 
         }

@@ -6,7 +6,7 @@ using System.ComponentModel;
 using MCDA.Extensions;
 using System.Windows.Input;
 
-namespace MCDA.Model
+namespace MCDA.ViewModel
 {
     class AlphaSelectionViewModel : INotifyPropertyChanged
     {

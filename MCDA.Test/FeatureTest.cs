@@ -12,13 +12,13 @@ namespace MCDA.Test
         [TestMethod]
         public void TestMethod1()
         {
-            object o = new object();
+            /*object o = new object();
 
             IFeatureLayer2 featureLayer = o as IFeatureLayer2;
             IFeatureClass featureClass = o as IFeatureClass;
 
             MCDA.Model.Feature feature = new MCDA.Model.Feature(featureClass, featureLayer);
-
+            */
             
         }
     }

@@ -28,7 +28,7 @@
         </Grid.RowDefinitions>
         <customControl:FlipControl x:Name="fc" Grid.Column="0" Grid.Row="0" HorizontalContentAlignment="Stretch">
             <customControl:FlipControl.Front>
-                <TreeView ItemsSource="{Binding AllFieldsList}" SelectedItemChanged="TreeViewSelectedItemChanged">
+                <TreeView ItemsSource="{Binding AllFieldsList}" SelectedItemChanged="TreeViewSelectedItemChanged" Loaded="TreeViewLoaded">
                     <TreeView.ItemContainerStyle>
                         <Style TargetType="{x:Type TreeViewItem}">
                             <Setter Property="IsExpanded" Value="True" />
@@ -43,7 +43,7 @@
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>                               
+                                </Grid.ColumnDefinitions>
                                 <Label Grid.Column="0" Content="{Binding Path=FieldName}" IsEnabled="{Binding Path=IsSuitableForMCDA}" />
                                 <Label Grid.Column="1">
                                     <Label.Style>
@@ -59,10 +59,10 @@
                             </Grid>
                         </DataTemplate >
                     </TreeView.Resources>
-                </TreeView>              
+                </TreeView>
             </customControl:FlipControl.Front>
             <customControl:FlipControl.Back>
-                <TreeView ItemsSource="{Binding ToolFieldsList}" SelectedItemChanged="TreeViewSelectedItemChanged">
+                <TreeView ItemsSource="{Binding ToolFieldsList}" SelectedItemChanged="TreeViewSelectedItemChanged" Loaded="TreeViewLoaded">
                     <TreeView.ItemContainerStyle>
                         <Style TargetType="{x:Type TreeViewItem}">
                             <Setter Property="IsExpanded" Value="True" />
@@ -116,6 +116,8 @@
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="50"/>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="70"/>
                                 </Grid.RowDefinitions>
                                 <GroupBox Header="Start Color" Grid.Column="1" Grid.Row="0" Height="50">
                                     <DockPanel LastChildFill="True" Name="dockPanel1">
@@ -136,6 +138,25 @@
                                             </LinearGradientBrush>
                                         </Rectangle.Fill>
                                     </Rectangle>
+                                </GroupBox>
+                                <GroupBox Header="Normalization" Grid.Column="1" Grid.Row="3" Grid.ColumnSpan="2">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="20"/>
+                                            <RowDefinition Height="50"/>
+                                        </Grid.RowDefinitions>
+                                        <RadioButton Content="None" Grid.Column="0" Grid.Row="0" GroupName="NormalizationRadioButton"/>
+                                        <RadioButton Content="Field" Grid.Column="1" Grid.Row="0" GroupName="NormalizationRadioButton"/>
+                                        <RadioButton Content="Logarithm" Grid.Column="2" Grid.Row="0" GroupName="NormalizationRadioButton"/>
+                                        <RadioButton Content="Square Root" Grid.Column="3" Grid.Row="0" GroupName="NormalizationRadioButton"/>
+                                        <ComboBox  Grid.Column="1" Height="25" ItemsSource="{Binding Path=SelectedFieldToRender.Field.Feature.Fields.FieldName}" Margin="0,0,0,25" Grid.Row="1" />
+                                    </Grid>
                                 </GroupBox>
                             </Grid>
                         </TabItem>
@@ -158,7 +179,7 @@
                                 <Label  Content="Bins" Grid.Column="3" Grid.Row="0" />
                                 <ComboBox HorizontalAlignment="Left" Width="120" ItemsSource="{Binding Path=ListOfClassificationMethod, Mode=OneWay}" DisplayMemberPath="MethodName" SelectedValue="{Binding Path=SelectedClassificationMethod, UpdateSourceTrigger=PropertyChanged}"  Name="classificationComboBox" Grid.Column="1" Grid.Row="1"/>
                                 <ComboBox HorizontalAlignment="Left" Width="50" ItemsSource="{Binding Path=NumberOfClasses, Mode=OneWay}" SelectedValue="{Binding Path=SelectedNumberOfClasses, UpdateSourceTrigger=PropertyChanged}" Name="classesComboBox" Grid.Column="2" Grid.Row="1"/>
-                                <xctk:DoubleUpDown HorizontalAlignment="Right" Value="{Binding Path=Bins}" Maximum="1000" Minimum="5" Increment="1" Width="50" Grid.Column="3" Grid.Row="1"/>
+                                <xctk:DoubleUpDown HorizontalAlignment="Right" Value="{Binding Path=Bins}" Maximum="1000" Minimum="5" Increment="1" Width="50" Grid.Column="3" Grid.Row="1" ToolTip="Bins are used to group the data."/>
                                 <GroupBox Name="HistogramGroupBox" Header="Histogram" Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3">
                                     <oxy:Plot>
                                         <oxy:Plot.Series>

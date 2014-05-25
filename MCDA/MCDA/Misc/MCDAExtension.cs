@@ -354,6 +354,7 @@ namespace MCDA
             return dataTable;
         }
 
+        //TODO part of field?
         public IList<double> GetValuesOfField(Field field)
         {
             IList<double> listOfValuesFromField = new List<double>();
@@ -430,17 +431,9 @@ namespace MCDA
             IFeatureClass copiedFeatureClass = CopyFeatureClassIntoNewWorkspace(featureClass, _shadowWorkspace,
                 tool + CreateTimeStamp());
 
-            //MCDA.Model.Feature feature = new MCDAWorkspaceContainer(tool, copiedFeatureClass);
-
-            //IFeatureClass featureClass = feature.FeatureClass;
-
-            //create feature feature to display the result on a map
             var newFeatureLayer = new FeatureLayerClass();
-            //newFeatureLayer.FeatureClass = feature.FeatureClass;
 
             newFeatureLayer.Name = CreateLayerName(tool);
-
-            //feature.FeatureLayer = newFeatureLayer;
 
             var feature = new Feature(copiedFeatureClass, newFeatureLayer);
 
@@ -448,7 +441,6 @@ namespace MCDA
 
             PropertyChanged.Notify(() => LinkDictionary);
 
-            //return feature;
         }
 
         private String CreateLayerName(AbstractToolTemplate tool)
@@ -519,7 +511,6 @@ namespace MCDA
 
             if (feature.SelectedFieldForRendering != null)
                 ProgressDialog.ShowProgressDialog("Creating Symbology", (Action<RendererContainer, IFeatureLayer2>)Render, feature.SelectedFieldForRendering.RenderContainer, feature.FeatureLayer);
-                //Render(feature.SelectedFieldForRendering.RenderContainer, feature.FeatureLayer);
 
             PropertyChanged.Notify(() => LinkDictionary);
         }

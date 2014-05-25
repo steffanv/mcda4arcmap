@@ -229,6 +229,9 @@ namespace MCDA.Model
             //TODO hier knallt es auch, existiert das result nicht immer?
             classBreaksRenderer.MinimumBreak = classificationResult.Min();
 
+            //TODO normalization
+            //classBreaksRenderer.NormField
+
             Color startColor = classBreaksRendererContainer.StartColor;
             Color endColor = classBreaksRendererContainer.EndColor;
 

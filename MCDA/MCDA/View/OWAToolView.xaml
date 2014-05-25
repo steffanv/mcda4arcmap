@@ -32,11 +32,11 @@
                             <Style TargetType="{x:Type Image}">
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding IsLocked}" Value="false">
-                                        <Setter Property="Source" Value="Images\toolbargraphics\LockOpen.png" />
+                                        <Setter Property="Source" Value="..\Images\toolbargraphics\LockOpen.png" />
                                         <Setter Property="ToolTip" Value="Lock the OWA Tool data." />
                                     </DataTrigger>
                                     <DataTrigger Binding="{Binding IsLocked}" Value="true">
-                                        <Setter Property="Source" Value="Images\toolbargraphics\LockLocked.png" />
+                                        <Setter Property="Source" Value="..\Images\toolbargraphics\LockLocked.png" />
                                         <Setter Property="ToolTip" Value="Unlock the OWA Tool data." />
                                     </DataTrigger>
                                 </Style.Triggers>
@@ -55,7 +55,7 @@
                             </Style.Triggers>
                         </Style>
                     </Button.Style>
-                    <Image Source="Images\toolbargraphics\Distribution.png" ToolTip="Distribute the weights equally."/>
+                    <Image Source="..\Images\toolbargraphics\Distribution.png" ToolTip="Distribute the weights equally."/>
                 </Button>
                 <Button Command="{Binding Path=NormalizationSelectionCommand}" ToolTip="Choose another Normalization strategy.">
                     <Button.Style>
@@ -67,7 +67,7 @@
                             </Style.Triggers>
                         </Style>
                     </Button.Style>
-                    <Image Source="Images\toolbargraphics\Normalization.png" RenderOptions.BitmapScalingMode="HighQuality" ToolTip="Choose another Normalization strategy." />
+                    <Image Source="..\Images\toolbargraphics\Normalization.png" RenderOptions.BitmapScalingMode="HighQuality" ToolTip="Choose another Normalization strategy." />
                 </Button>
                 <Button Command="{Binding Path=AlphaSelectionCommand}" ToolTip="Choose another alpha value.">
                     <Button.Style>
@@ -79,7 +79,7 @@
                             </Style.Triggers>
                         </Style>
                     </Button.Style>
-                    <Image Source="Images\toolbargraphics\Alpha.png" Width="16" Height="16" RenderOptions.BitmapScalingMode="HighQuality" ToolTip="Choose an alpha value." />
+                    <Image Source="..\Images\toolbargraphics\Alpha.png" Width="16" Height="16" RenderOptions.BitmapScalingMode="HighQuality" ToolTip="Choose an alpha value." />
                 </Button>
                 <Separator />
                 <Button Command="{Binding Path=SendToInMemoryWorkspaceCommand}" ToolTip="Send to in-memory workspace">
@@ -97,11 +97,11 @@
                             <Style TargetType="{x:Type Image}">
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding IsSendToInMemoryWorkspaceCommand}" Value="false">
-                                        <Setter Property="Source" Value="Images\toolbargraphics\MapAdd.png" />
+                                        <Setter Property="Source" Value="..\Images\toolbargraphics\MapAdd.png" />
                                         <Setter Property="ToolTip" Value="Send to in-memory workspace." />
                                     </DataTrigger>
                                     <DataTrigger Binding="{Binding IsSendToInMemoryWorkspaceCommand}" Value="true">
-                                        <Setter Property="Source" Value="Images\toolbargraphics\MapDelete.png" />
+                                        <Setter Property="Source" Value="..\Images\toolbargraphics\MapDelete.png" />
                                         <Setter Property="ToolTip" Value="Disconnect from in-memory workspace." />
                                     </DataTrigger>
                                 </Style.Triggers>
@@ -119,7 +119,7 @@
                             </Style.Triggers>
                         </Style>
                     </Button.Style>
-                    <Image Source="Images\toolbargraphics\Export.png" ToolTip="Export the result table." />
+                    <Image Source="..\Images\toolbargraphics\Export.png" ToolTip="Export the result table." />
                 </Button>
             </ToolBar>
         </ToolBarTray>

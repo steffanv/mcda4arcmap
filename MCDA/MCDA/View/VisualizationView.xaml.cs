@@ -61,19 +61,46 @@ namespace MCDA
             Field selectedField = e.NewValue as Field;
             
             if (selectedField != null)
-            {
-                if (!selectedField.IsSuitableForMCDA)
-                {
-                    //TreeViewFeatureName.SelectedItem = e.OldValue;
-                }
-                else
-                {
-                    VisualizationViewModel visualizationViewModel = DataContext as VisualizationViewModel;
+            {    
+                VisualizationViewModel visualizationViewModel = DataContext as VisualizationViewModel;
 
-                    visualizationViewModel.SelectedFieldToRender = selectedField.RenderContainer;
-                }
+                visualizationViewModel.SelectedFieldToRender = selectedField.RenderContainer;
+                
             }
 
+        }
+
+        /// <summary>
+        /// Make sure that certain fields can not be selected/ focused as they are not suitable for MCDA.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void TreeViewLoaded(object sender, RoutedEventArgs e)
+        {
+            var treeView = e.Source as TreeView;
+
+            SetFocusable(treeView);
+        }
+
+        private static void SetFocusable(ItemsControl parentContainer)
+        {
+            foreach (Object item in parentContainer.Items)
+            {
+                TreeViewItem currentContainer = parentContainer.ItemContainerGenerator.ContainerFromItem(item) as TreeViewItem;
+
+                if (currentContainer != null && currentContainer.Items.Count > 0)
+                    SetFocusable(currentContainer);
+
+                Field field = currentContainer.Header as Field;
+
+                if (field != null)
+                {
+
+                    if (!field.IsSuitableForMCDA)
+                        currentContainer.Focusable = false;
+                }
+
+            }
         }
 
     }

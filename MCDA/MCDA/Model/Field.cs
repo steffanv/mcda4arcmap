@@ -19,6 +19,9 @@ namespace MCDA.Model
         private readonly ESRI.ArcGIS.Geodatabase.IField _field;
         private RendererContainer _renderContainer;
 
+        private bool? _containsNullValue = null;
+        private bool? _hasDifferentNumericValue = null;
+
         public Field(ESRI.ArcGIS.Geodatabase.IField field, Feature feature)
         {
 
@@ -48,9 +51,9 @@ namespace MCDA.Model
             {
                 if (!IsNumeric) 
                     return "Field is not numeric.";
-                if (ContainsNullValue())
+                if (ContainsNullValues)
                     return "Field contains NULL values.";
-                if (!HasDifferentNumericValues())
+                if (!HasDifferentNumericValues)
                     return "Field has no distinct values.";
 
                 return string.Empty;
@@ -61,7 +64,33 @@ namespace MCDA.Model
         /// </summary>
         public bool IsSuitableForMCDA
         {
-            get { return IsNumeric && !ContainsNullValue() && HasDifferentNumericValues(); }
+            get { return IsNumeric && !ContainsNullValues && HasDifferentNumericValues; }
+        }
+
+        public bool ContainsNullValues
+        {
+            get
+            {
+                if (_containsNullValue.HasValue)
+                    return _containsNullValue.Value;
+
+                _containsNullValue = ContainsNullValueMethod();
+
+                return _containsNullValue.Value;
+            }
+        }
+
+        public bool HasDifferentNumericValues
+        {
+            get
+            {
+                if (_hasDifferentNumericValue.HasValue)
+                    return _hasDifferentNumericValue.Value;
+
+                _hasDifferentNumericValue = HasDifferentNumericValuesMethod();
+
+                return _hasDifferentNumericValue.Value;
+            }
         }
  
         public bool IsSelected
@@ -92,7 +121,7 @@ namespace MCDA.Model
             get { return _isOid; }
         }
 
-        private bool ContainsNullValue()
+        private bool ContainsNullValueMethod()
         {
             using (var comReleaser = new ComReleaser())
             {
@@ -118,7 +147,7 @@ namespace MCDA.Model
         /// Determines if the values of the Field have at least one value that is distinct from all other values. A non numeric field returns always false.
         /// </summary>
         /// <returns></returns>
-        private bool HasDifferentNumericValues()
+        private bool HasDifferentNumericValuesMethod()
         {
             if(!IsNumeric)
                 return false;

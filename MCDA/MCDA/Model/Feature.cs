@@ -68,7 +68,7 @@ namespace MCDA.Model
             this._esriLayer = featureLayer as ILayer2;
             _featureName = this._esriLayer.Name;
 
-            _fields = new ObservableCollection<Field>(GetFields());
+            _fields = new ObservableCollection<Field>(GetFields().OrderByDescending(f => f.IsSuitableForMCDA).ThenBy(l => l.FieldName));
             
         }
 
@@ -151,7 +151,7 @@ namespace MCDA.Model
         {
             Fields.Clear();
 
-            foreach (var newField in GetFields())
+            foreach (var newField in GetFields().OrderByDescending(f => f.IsSuitableForMCDA).ThenBy(l => l.FieldName))
                 Fields.Add(newField);
         }
 

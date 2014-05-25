@@ -137,6 +137,7 @@
   <ItemGroup>
     <Compile Include="Model\AbstractToolParameter.cs" />
     <Compile Include="Model\AbstractToolViewModel.cs" />
+    <Compile Include="Model\BiPolarRendererContainer.cs" />
     <Compile Include="ViewModel\AddDataViewModel.cs" />
     <Compile Include="View\AlphaSelectionView.xaml.cs">
       <DependentUpon>AlphaSelectionView.xaml</DependentUpon>

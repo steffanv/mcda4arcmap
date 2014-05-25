@@ -57,7 +57,7 @@ namespace MCDA.ViewModel
 
             BiPolarColorSliderValue = 0.5;
 
-            AllFieldsList = new ObservableCollection<MCDA.Model.Feature>(_mcdaExtension.AvailableFeatures.Where(f => f.Fields.Any(x => x.IsSuitableForMCDA)).OrderBy(f => f.FeatureName).ToList());
+            AllFieldsList = new ObservableCollection<MCDA.Model.Feature>(_mcdaExtension.AvailableFeatures.Where(f => f.Fields.Any(x => x.IsSuitableForMCDA)).ToList());
             ToolFieldsList = new ObservableCollection<MCDA.Model.Feature>(_mcdaExtension.FeaturesFromInMemoryWorkspace.Where(x => x.Fields.Any(f => f.IsSuitableForMCDA)).ToList());
 
             Bins = 5;
@@ -84,8 +84,8 @@ namespace MCDA.ViewModel
 
                 if (bins > 1000)
                     bins = 1000;
-                if (bins < 10)
-                    bins = 10;
+                if (bins < 5)
+                    bins = 5;
 
                 Bins = bins;
 
@@ -121,40 +121,6 @@ namespace MCDA.ViewModel
         {
             if (!IsFieldToRenderSelected)
                 return;
-
-            //double[] data;
-            //int[] freq;
-
-            //Classification.Histogram(_selectedFieldToRender.Field.Feature.FeatureClass, SelectedFieldToRender.Field.ESRIField, out data, out freq);
-
-            ////TODO data.count == 1?
-
-            //double stepSize = Util.SmallestDifference(data);
-            //int numberOfSteps = (int) ((data.Max() - data.Min())/stepSize);
-
-            //IList<ColumnItem> columnItems = new List<ColumnItem>();
-
-            //double xValue = data.Min();
-            //int dataIndex = 0;
-
-            //for (int i = 0; i < numberOfSteps; i++)
-            //{
-            //    if(xValue <= data[dataIndex] && xValue+stepSize > data[dataIndex]){
-
-            //        columnItems.Add(new ColumnItem(freq[dataIndex]));
-            //        if (dataIndex + 1 < data.Count())
-            //            dataIndex++;
-            //    }
-            //    else
-            //    {
-            //        columnItems.Add(new ColumnItem(0));
-            //    }
-
-            //    xValue += stepSize;
-            //}
-
-            //OxyPlot.Axes.CategoryAxis a = new OxyPlot.Axes.CategoryAxis();
-            //a.a
 
             HistogramActualLabels = new List<string>();
             HistogramLabels = new List<string>();
@@ -326,12 +292,13 @@ namespace MCDA.ViewModel
         private ClassBreaksRendererContainer GetClassBreaksRendererContainer()
         {
             return new ClassBreaksRendererContainer()
-            {
+            {               
                 Field = _selectedFieldToRender.Field.ESRIField,
                 ClassificationMethod = _selectedClassificationMethod,
                 EndColor = _classBreaksRendererEndColor,
                 StartColor = _classBreaksRendererStartColor,
-                NumberOfClasses = _selectedNumberOfClasses
+                NumberOfClasses = _selectedNumberOfClasses,
+                Bins = _bins
             };
         }
 
@@ -348,11 +315,13 @@ namespace MCDA.ViewModel
                 _selectedNumberOfClasses = _selectedFieldToRender.ClassBreaksRendererContainer.NumberOfClasses;
                 _classBreaksRendererStartColor = _selectedFieldToRender.ClassBreaksRendererContainer.StartColor;
                 _classBreaksRendererEndColor = _selectedFieldToRender.ClassBreaksRendererContainer.EndColor;
+                _bins = _selectedFieldToRender.ClassBreaksRendererContainer.Bins;
 
                 PropertyChanged.Notify(() => SelectedClassificationMethod);
                 PropertyChanged.Notify(() => SelectedNumberOfClasses);
                 PropertyChanged.Notify(() => ClassBreaksRendererStartColor);
                 PropertyChanged.Notify(() => ClassBreaksRendererEndColor);
+                PropertyChanged.Notify(() => Bins);
             }
 
             if (_selectedFieldToRender.Renderer == Renderer.BiPolarRenderer)

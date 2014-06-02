@@ -221,7 +221,7 @@ namespace MCDA.Model
 
             IAlgorithmicColorRamp algorithmicColorRamp = new AlgorithmicColorRampClass();
 
-            algorithmicColorRamp.Algorithm = esriColorRampAlgorithm.esriHSVAlgorithm;
+            algorithmicColorRamp.Algorithm = esriColorRampAlgorithm.esriCIELabAlgorithm;
 
             RgbColor fromColor = new RgbColorClass();
             fromColor.Red = startColor.R;

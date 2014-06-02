@@ -58,6 +58,7 @@ namespace MCDA.ViewModel
             BiPolarColorSliderValue = 0.5;
 
             AllFieldsList = new ObservableCollection<MCDA.Model.Feature>(_mcdaExtension.AvailableFeatures.Where(f => f.Fields.Any(x => x.IsSuitableForMCDA)).ToList());
+           
             ToolFieldsList = new ObservableCollection<MCDA.Model.Feature>(_mcdaExtension.FeaturesFromInMemoryWorkspace.Where(x => x.Fields.Any(f => f.IsSuitableForMCDA)).ToList());
 
             Bins = 5;
@@ -78,8 +79,8 @@ namespace MCDA.ViewModel
             {
                 PropertyChanged.ChangeAndNotify(ref _selectedFieldToRender, value, () => SelectedFieldToRender);
 
-                // calculate the number of bins for the histogram
-                // this is done only the first time when the selected field changed
+                //calculate the number of bins for the histogram
+                //this is done only the first time when the selected field changed
                 int bins = (int)Math.Sqrt(_selectedFieldToRender.Field.GetFieldData().Count());
 
                 if (bins > 1000)

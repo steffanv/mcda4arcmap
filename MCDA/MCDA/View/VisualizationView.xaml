@@ -139,7 +139,7 @@
                                         </Rectangle.Fill>
                                     </Rectangle>
                                 </GroupBox>
-                                <GroupBox Header="Normalization" Grid.Column="1" Grid.Row="3" Grid.ColumnSpan="2">
+                                <!--<GroupBox Header="Normalization" Grid.Column="1" Grid.Row="3" Grid.ColumnSpan="2">
                                     <Grid>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*"/>
@@ -157,7 +157,7 @@
                                         <RadioButton Content="Square Root" Grid.Column="3" Grid.Row="0" GroupName="NormalizationRadioButton"/>
                                         <ComboBox  Grid.Column="1" Height="25" ItemsSource="{Binding Path=SelectedFieldToRender.Field.Feature.Fields.FieldName}" Margin="0,0,0,25" Grid.Row="1" />
                                     </Grid>
-                                </GroupBox>
+                                </GroupBox>-->
                             </Grid>
                         </TabItem>
                         <TabItem Header="Classification" Name="classification">

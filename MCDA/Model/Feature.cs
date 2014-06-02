@@ -155,6 +155,14 @@ namespace MCDA.Model
                 Fields.Add(newField);
         }
 
+        public void SetToolField(IField field)
+        {
+            var foundField = Fields.FirstOrDefault(f => f.ESRIField == field);
+
+            if (foundField != null)
+                foundField.IsToolField = true;
+        }
+
         private IEnumerable<Field> GetFields()
         {
             var fields = _featureLayer.FeatureClass.Fields;

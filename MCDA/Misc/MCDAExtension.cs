@@ -142,7 +142,7 @@ namespace MCDA
         #region events
 
         private bool EventsBeforeCloseDocument()
-        {
+        { //TODO is this even called?
             // Return true to stop document from closing
             IMessageDialog msgBox = new MessageDialogClass();
             return msgBox.DoModal("BeforeCloseDocument Event", "Abort closing?", "Yes", "No", ArcMap.Application.hWnd);
@@ -219,7 +219,7 @@ namespace MCDA
 
             foreach (Feature currentAvailableLayer in AvailableFeatures.Where(l => l.IsSelected))
             {
-                foreach (Field currentField in currentAvailableLayer.Fields.Where(f => f.IsSelected && f.IsNumeric))
+                foreach (Field currentField in currentAvailableLayer.Fields.Where(f => f.IsSelected))
                     toolParameter.Add(new ToolParameter(currentField.FieldName));
             }
 
@@ -313,7 +313,7 @@ namespace MCDA
             int expectedNumbersOfRow = 0;
             foreach (Field currentField in listOfFields)
             {
-                IList<double> column = GetValuesOfField(currentField);
+                IList<double> column = currentField.GetFieldData().ToList();
                 tableData.Add(column);
 
                 //each column has the data of all rows in the column
@@ -354,33 +354,6 @@ namespace MCDA
             return dataTable;
         }
 
-        //TODO part of field?
-        public IList<double> GetValuesOfField(Field field)
-        {
-            IList<double> listOfValuesFromField = new List<double>();
-
-            //this should be always the case, as we have only fields from feature feature
-            IFeatureLayer2 featureLayer = field.Feature.FeatureLayer;
-
-            using (var comReleaser = new ComReleaser())
-            {
-                IFeatureCursor featureCursor = featureLayer.FeatureClass.Search(null, true);
-
-                comReleaser.ManageLifetime(featureCursor);
-
-                int fieldIndex = featureLayer.FeatureClass.FindField(field.FieldName);
-
-                IFeature currentFeature;
-                while ((currentFeature = featureCursor.NextFeature()) != null)
-                {
-                    //we have to cast explicitly ... https://connect.microsoft.com/VisualStudio/feedback/details/534288/ilist-dynamic-cannot-call-a-method-add-without-casting
-                    listOfValuesFromField.Add(Convert.ToDouble(currentFeature.get_Value(fieldIndex)));
-                }
-            }
-
-            return listOfValuesFromField;
-        }
-
         public IList<IField> GetListOfFieldsFromFeatureClass(IFeatureClass featureClass)
         {
             IList<IField> fieldsList = new List<IField>();
@@ -389,8 +362,8 @@ namespace MCDA
 
             for (int i = 0; i <= fields.FieldCount - 1; i++)
             {
-                if (fields.get_Field(i).Type <= esriFieldType.esriFieldTypeDouble)
-                    fieldsList.Add(fields.get_Field(i));
+                if (fields.Field[i].Type <= esriFieldType.esriFieldTypeDouble)
+                    fieldsList.Add(fields.Field[i]);
             }
 
             return fieldsList;
@@ -431,9 +404,7 @@ namespace MCDA
             IFeatureClass copiedFeatureClass = CopyFeatureClassIntoNewWorkspace(featureClass, _shadowWorkspace,
                 tool + CreateTimeStamp());
 
-            var newFeatureLayer = new FeatureLayerClass();
-
-            newFeatureLayer.Name = CreateLayerName(tool);
+            var newFeatureLayer = new FeatureLayerClass { Name = CreateLayerName(tool) };
 
             var feature = new Feature(copiedFeatureClass, newFeatureLayer);
 
@@ -479,6 +450,7 @@ namespace MCDA
                 featureClass.AddField(newField);
 
                 feature.UpdateFieldsProperty();
+                feature.SetToolField(newField);
             }
 
             using (var comReleaser = new ComReleaser())
@@ -489,19 +461,19 @@ namespace MCDA
 
                 var esriFeature = featureCursor.NextFeature();
 
-                var fieldIndex = featureClass.FindField(tool.DefaultResultColumnName);
+                var fieldIndex = featureClass.FindField(feature.Fields.First(f => f.IsToolField).FieldName);
 
                 var oidIndex = featureClass.FindField(featureClass.OIDFieldName);
 
                 while (esriFeature != null)
                 {
-                    var oid = Convert.ToInt32(esriFeature.get_Value(oidIndex));
+                    var oid = Convert.ToInt32(esriFeature.Value[oidIndex]);
 
                     var dataRows = dataTable.AsEnumerable().Where(dr => dr.Field<FieldTypeOID>(featureClass.OIDFieldName).OID == oid);
 
                     DataRow dRow = dataRows.FirstOrDefault();
 
-                    esriFeature.set_Value(fieldIndex, dRow[tool.DefaultResultColumnName]);
+                    if (dRow != null) esriFeature.Value[fieldIndex] = dRow[tool.DefaultResultColumnName];
 
                     esriFeature.Store();
 
@@ -594,52 +566,6 @@ namespace MCDA
 
             return listOfFields;
         }
-
-        /// <summary>
-        ///     If the user adds or removes items from the TOC the method removes or add the changed items to the available feature
-        ///     list.
-        /// </summary>
-        /// <param name="activeView"></param>
-        //private void RefreshAvailableLayerListAfterAddOrDelete(IActiveView activeView)
-        //{
-        //    if (listOfAvailableFeatures.Any())
-        //        return;
-
-        //    IList<Feature> layerList = new List<Feature>();
-
-        //    IMap map = activeView.FocusMap;
-
-        //    // Get the number of layers
-        //    int numberOfLayers = map.LayerCount;
-
-        //    IList<ILayer> newLayerList = new List<ILayer>();
-
-        //    // Loop through the layers and get the correct feature index
-        //    for (int i = 0; i < numberOfLayers; i++)
-        //    {
-        //        newLayerList.Add(map.get_Layer(i));
-        //    }
-
-        //    //remove
-        //    for (int i = listOfAvailableFeatures.Count - 1; i >= 0; i--)
-        //    {
-        //        if (!newLayerList.Any(l => l == listOfAvailableFeatures[i].ESRILayer))
-        //            listOfAvailableFeatures.RemoveAt(i);
-        //    }
-
-        //    //add
-        //    foreach (ILayer currentNewLayer in newLayerList)
-        //    {
-        //        //is the new feature part in the mcda feature list?
-        //        if (!listOfAvailableFeatures.Any(l => l.ESRILayer == currentNewLayer))
-        //            listOfAvailableFeatures.Add(new Feature(currentNewLayer));
-        //    }
-
-        //    //and do not forget to register the new feature
-        //    RegisterListenerForEveryMemberOfListOfAvailableLayer();
-
-        //    PropertyChanged.Notify(() => AvailableFeatures);
-        //}
 
         private IWorkspace CreateInMemoryWorkspace()
         {

@@ -98,6 +98,8 @@ namespace MCDA
 
                     if (!field.IsSuitableForMCDA)
                         currentContainer.Focusable = false;
+                    if (field.IsToolField)
+                        currentContainer.Background = new SolidColorBrush(Colors.LightGreen);
                 }
 
             }

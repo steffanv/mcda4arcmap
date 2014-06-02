@@ -55,16 +55,19 @@ namespace MCDA.Model
                     return "Field contains NULL values.";
                 if (!HasDifferentNumericValues)
                     return "Field has no distinct values.";
+                if (IsOID)
+                    return "Field is OID.";
 
                 return string.Empty;
             }
         }
         /// <summary>
-        /// Returns true if the Field is numeric, does not have NULL values and has different numeric values.
+        /// Returns true if the Field is numeric, does not have NULL values and has different numeric values and is not OID.
+        /// The ToolField is always suitable for MCDA.
         /// </summary>
         public bool IsSuitableForMCDA
         {
-            get { return IsNumeric && !ContainsNullValues && HasDifferentNumericValues; }
+            get { return IsToolField || (IsNumeric && !ContainsNullValues && HasDifferentNumericValues && !IsOID); }
         }
 
         public bool ContainsNullValues
@@ -74,7 +77,7 @@ namespace MCDA.Model
                 if (_containsNullValue.HasValue)
                     return _containsNullValue.Value;
 
-                _containsNullValue = ContainsNullValueMethod();
+                _containsNullValue = ContainsDBNullValueMethod();
 
                 return _containsNullValue.Value;
             }
@@ -114,6 +117,8 @@ namespace MCDA.Model
             get { return _isNumber; }
         }
 
+        public bool IsToolField { get; set; }
+
         public Feature Feature { get; private set; }
 
         public bool IsOID
@@ -121,7 +126,7 @@ namespace MCDA.Model
             get { return _isOid; }
         }
 
-        private bool ContainsNullValueMethod()
+        private bool ContainsDBNullValueMethod()
         {
             using (var comReleaser = new ComReleaser())
             {
@@ -188,7 +193,7 @@ namespace MCDA.Model
         /// <returns></returns>
         public IEnumerable<double> GetFieldData()
         {
-            if (!IsNumeric)
+            if (!IsNumeric && !IsOID)
                 return Enumerable.Empty<double>();
 
             IList<double> data = new List<double>();
@@ -201,7 +206,7 @@ namespace MCDA.Model
 
                 var fieldIndex = Feature.FeatureClass.FindField(FieldName);
 
-                var currentFeature = featureCursor.NextFeature();
+                IFeature currentFeature;
 
                 while ((currentFeature = featureCursor.NextFeature()) != null)
                 {

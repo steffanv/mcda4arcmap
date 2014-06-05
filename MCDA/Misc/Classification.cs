@@ -54,8 +54,9 @@ namespace MCDA.Model
             //add bin middles values
            for (int i = 0; i < bins; i++)
            {
-               double binMiddle = min + (i * binSize) + (binSize / 2);
-               histo[i] = Tuple.Create<double, int>(binMiddle, histo[i].Item2);
+               //double binMiddle = min + (i * binSize) + (binSize / 2);
+               double binRight = min + ((i + 1) * binSize);
+               histo[i] = Tuple.Create<double, int>(binRight, histo[i].Item2);
            }
 
            return histo;

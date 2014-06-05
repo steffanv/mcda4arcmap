@@ -104,7 +104,7 @@ namespace MCDA.ViewModel
 
         public IList<string> HistogramActualLabels { get; private set; }
 
-        public IList<double> HistogramBreaks { get; private set; }
+        public ObservableCollection<double> HistogramBreaks { get; private set; }
 
         public int Bins
         {
@@ -125,16 +125,29 @@ namespace MCDA.ViewModel
 
             HistogramActualLabels = new List<string>();
             HistogramLabels = new List<string>();
+            HistogramBreaks = new ObservableCollection<double>();
 
             IList<ColumnItem> columnItems = new List<ColumnItem>();
 
             Tuple<double,int> [] histo = Classification.Histogram(SelectedFieldToRender.Field, Bins);
 
-            foreach (var currentValue in histo)
+            double[] breaks = Classification.Classify(SelectedClassificationMethod, SelectedFieldToRender.Field.Feature.FeatureClass, SelectedFieldToRender.Field.ESRIField, SelectedNumberOfClasses);
+
+            int breakIndex = 0;
+
+            for(int i = 0; i < histo.Length; i++)
             {
-                columnItems.Add(new ColumnItem(currentValue.Item2));
-                HistogramActualLabels.Add(currentValue.Item1.ToString("0.00"));
-                HistogramLabels.Add(currentValue.Item1.ToString("0.00"));
+                columnItems.Add(new ColumnItem(histo[i].Item2));
+                //HistogramActualLabels.Add(currentValue.Item1.ToString("0.00"));
+                HistogramLabels.Add(histo[i].Item1.ToString("0.00"));
+
+                if (breaks[breakIndex] <= histo[i].Item1 && i < histo.Length-1 && !(breaks[breakIndex] > histo[i+1].Item1))
+                {
+                    HistogramBreaks.Add(i);
+                    if (breakIndex < breaks.Count()-1)
+                        breakIndex++;
+                }
+
             }
 
             HistogramData = columnItems;
@@ -142,10 +155,8 @@ namespace MCDA.ViewModel
             //we want always 5 Labels
             HistogramMajorStep = (int) Math.Ceiling(histo.Count() / 5d);
 
-            //HistogramData = System.Array.ConvertAll<int, long>(Classification.NormalizeHistogramData(data, freq), Convert.ToInt64);
-
-            HistogramBreaks = Classification.Classify(SelectedClassificationMethod, SelectedFieldToRender.Field.Feature.FeatureClass, SelectedFieldToRender.Field.ESRIField, SelectedNumberOfClasses).ToList();
-
+            //HistogramBreaks = new ObservableCollection<double>(Classification.Classify(SelectedClassificationMethod, SelectedFieldToRender.Field.Feature.FeatureClass, SelectedFieldToRender.Field.ESRIField, SelectedNumberOfClasses).ToList());
+                
             PropertyChanged.Notify(() => HistogramLabels);
             PropertyChanged.Notify(() => HistogramMajorStep);
 

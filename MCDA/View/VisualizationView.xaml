@@ -164,6 +164,7 @@
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="10"/>
+                                    <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>
@@ -174,23 +175,32 @@
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="*"/>
                                 </Grid.RowDefinitions>
-                                <Label  Content="Classification Method" Grid.Column="1" Grid.Row="0" />
-                                <Label  Content="Classes" Grid.Column="2" Grid.Row="0" />
-                                <Label  Content="Bins" Grid.Column="3" Grid.Row="0" />
-                                <ComboBox HorizontalAlignment="Left" Width="120" ItemsSource="{Binding Path=ListOfClassificationMethod, Mode=OneWay}" DisplayMemberPath="MethodName" SelectedValue="{Binding Path=SelectedClassificationMethod, UpdateSourceTrigger=PropertyChanged}"  Name="classificationComboBox" Grid.Column="1" Grid.Row="1"/>
-                                <ComboBox HorizontalAlignment="Left" Width="50" ItemsSource="{Binding Path=NumberOfClasses, Mode=OneWay}" SelectedValue="{Binding Path=SelectedNumberOfClasses, UpdateSourceTrigger=PropertyChanged}" Name="classesComboBox" Grid.Column="2" Grid.Row="1"/>
-                                <xctk:DoubleUpDown HorizontalAlignment="Right" Value="{Binding Path=Bins}" Maximum="1000" Minimum="5" Increment="1" Width="50" Grid.Column="3" Grid.Row="1" ToolTip="Bins are used to group the data."/>
-                                <GroupBox Name="HistogramGroupBox" Header="Histogram" Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3">
-                                    <oxy:Plot>
+                                <Label  Content="Classification Method" HorizontalAlignment="Center" Grid.Column="1" Grid.Row="0" />
+                                <Label  Content="Classes" HorizontalAlignment="Center" Grid.Column="2" Grid.Row="0" />
+                                <Label  Content="Bins" Grid.Column="4" Grid.Row="0" />
+                                <ComboBox HorizontalAlignment="Center" Width="120" ItemsSource="{Binding Path=ListOfClassificationMethod, Mode=OneWay}" DisplayMemberPath="MethodName" SelectedValue="{Binding Path=SelectedClassificationMethod, UpdateSourceTrigger=PropertyChanged}"  Name="classificationComboBox" Grid.Column="1" Grid.Row="1"/>
+                                <ComboBox HorizontalAlignment="Center" Width="50" ItemsSource="{Binding Path=NumberOfClasses, Mode=OneWay}" SelectedValue="{Binding Path=SelectedNumberOfClasses, UpdateSourceTrigger=PropertyChanged}" Name="classesComboBox" Grid.Column="2" Grid.Row="1"/>
+                                <xctk:DoubleUpDown HorizontalAlignment="Right" Value="{Binding Path=Bins}" Maximum="1000" Minimum="5" Increment="1" Width="50" Grid.Column="4" Grid.Row="1" ToolTip="Bins are used to group the data."/>
+                                <Button Grid.Column="3" Grid.Row="1" Width="25"  ToolTip="Shows the breaks values." MouseEnter="Button_MouseEnter">
+                                    <StackPanel>
+                                        <Image Source="../Images/VisualizationGraphics/Breaks.png" />                                       
+                                    </StackPanel>
+                                </Button>
+                                <Popup x:Name="BreaksPopup" PopupAnimation="Fade" AllowsTransparency="True" Placement="MousePoint">
+                                    <TextBlock x:Name="BreaksPopupTextBlock">
+                                        
+                                    </TextBlock>
+                                </Popup>
+                                <GroupBox Name="HistogramGroupBox" Header="Histogram" Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="4">
+                                    <oxy:Plot x:Name="Histogram">
                                         <oxy:Plot.Series>
                                             <oxy:ColumnSeries  ItemsSource="{Binding HistogramData}" FillColor="Gray"/>
                                         </oxy:Plot.Series>
-                                        <oxy:Plot.Annotations>
-                                            <oxy:LineAnnotation Type="Vertical" X="{Binding HistogramBreaks}" Color="Red" />
-                                        </oxy:Plot.Annotations>
                                         <oxy:Plot.Axes>
                                             <oxy:LinearAxis Position="Left" TickStyle="Crossing"/>
-                                            <oxy:CategoryAxis Position="Bottom" TickStyle="Crossing" GapWidth="0" MajorStep="{Binding HistogramMajorStep}" Labels="{Binding HistogramLabels}" />
+                                            <oxy:CategoryAxis Position="Bottom"  GapWidth="0"  IsAxisVisible="False"/>
+                                            <!--TickStyle="Crossing"-->
+                                            <!--MajorStep="{Binding HistogramMajorStep}" Labels="{Binding HistogramLabels}"-->
                                         </oxy:Plot.Axes>
                                     </oxy:Plot>
                                     <!--<externalCustomControl:HistogramControl Data="{Binding Path=HistogramData}" Breaks="{Binding Path=HistogramBreaks}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>-->

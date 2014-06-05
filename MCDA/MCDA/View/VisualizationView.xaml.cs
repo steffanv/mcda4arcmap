@@ -27,9 +27,11 @@ namespace MCDA
 {
     public partial class VisualizationView : Window
     {
+
+        private VisualizationViewModel visualizationViewModel = new VisualizationViewModel();
+
         public VisualizationView()
         {
-
             //WORKAROUND to load the assemblys before XAML comes into play
             new OxyPlot.Wpf.BarSeries();
             new OxyPlot.Xps.XpsExporter();
@@ -37,7 +39,7 @@ namespace MCDA
 
             InitializeComponent();
 
-            DataContext = new VisualizationViewModel();
+            DataContext = visualizationViewModel;
 
             //To make sure that the neutral color consists only of gray scale values
             ObservableCollection<ColorItem> greyScaleColors = new ObservableCollection<ColorItem>();
@@ -47,7 +49,26 @@ namespace MCDA
 
             BiPolarRendererNeutralColor.AvailableColors = greyScaleColors;
 
-            
+            visualizationViewModel.RegisterPropertyHandler(p => p.HistogramBreaks, HistogramBreaksChanged);
+
+        }
+
+        private void HistogramBreaksChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            Histogram.Annotations.Clear();
+
+            foreach (var item in visualizationViewModel.HistogramBreaks)
+            {
+                double histogramBreak = (double)item;
+
+                LineAnnotation annotation = new LineAnnotation();
+                annotation.X = histogramBreak;
+                annotation.Type = OxyPlot.Annotations.LineAnnotationType.Vertical;
+                annotation.Color = Colors.Red;
+                annotation.Text = histogramBreak.ToString();
+
+                Histogram.Annotations.Add(annotation);
+            }
         }
 
         private void SwitchList(object sender, EventArgs e)
@@ -59,13 +80,13 @@ namespace MCDA
         {
 
             Field selectedField = e.NewValue as Field;
-            
+
             if (selectedField != null)
-            {    
+            {
                 VisualizationViewModel visualizationViewModel = DataContext as VisualizationViewModel;
 
                 visualizationViewModel.SelectedFieldToRender = selectedField.RenderContainer;
-                
+
             }
 
         }
@@ -98,11 +119,20 @@ namespace MCDA
 
                     if (!field.IsSuitableForMCDA)
                         currentContainer.Focusable = false;
+                    //if (!field.IsToolField)
+                    //    currentContainer.Visibility = Visibility.Collapsed;
                     if (field.IsToolField)
                         currentContainer.Background = new SolidColorBrush(Colors.LightGreen);
                 }
 
             }
+        }
+
+        private void Button_MouseEnter(object sender, MouseEventArgs e)
+        {
+            BreaksPopup.IsOpen = true;
+
+            BreaksPopupTextBlock.Text = "sdfasfdsfd \n sadfasdf \n asdfasfd \n sadfsafd";
         }
 
     }

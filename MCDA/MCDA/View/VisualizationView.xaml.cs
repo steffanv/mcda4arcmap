@@ -59,13 +59,13 @@ namespace MCDA
 
             foreach (var item in visualizationViewModel.HistogramBreaks)
             {
-                double histogramBreak = (double)item;
+                double histogramBreak = item.Item1;
 
                 LineAnnotation annotation = new LineAnnotation();
                 annotation.X = histogramBreak;
                 annotation.Type = OxyPlot.Annotations.LineAnnotationType.Vertical;
                 annotation.Color = Colors.Red;
-                annotation.Text = histogramBreak.ToString();
+                annotation.Text = item.Item2.ToString();
 
                 Histogram.Annotations.Add(annotation);
             }
@@ -132,7 +132,11 @@ namespace MCDA
         {
             BreaksPopup.IsOpen = true;
 
-            BreaksPopupTextBlock.Text = "sdfasfdsfd \n sadfasdf \n asdfasfd \n sadfsafd";
+            StringBuilder breaks = new StringBuilder();
+            foreach (var item in visualizationViewModel.HistogramBreaks)
+		        breaks.Append(item.Item2).AppendLine();
+
+            BreaksPopupTextBlock.Text = breaks.ToString();
         }
 
     }

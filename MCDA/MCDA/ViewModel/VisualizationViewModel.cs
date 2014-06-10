@@ -62,7 +62,7 @@ namespace MCDA.ViewModel
             ToolFieldsList = new ObservableCollection<MCDA.Model.Feature>(_mcdaExtension.FeaturesFromInMemoryWorkspace.Where(x => x.Fields.Any(f => f.IsSuitableForMCDA)).ToList());
 
             Bins = 5;
-            HistogramMajorStep = 5;
+            //HistogramMajorStep = 5;
 
             PropertyChanged.Notify(() => ToolFieldsList);
             PropertyChanged.Notify(() => AllFieldsList);
@@ -104,7 +104,7 @@ namespace MCDA.ViewModel
 
         public IList<string> HistogramActualLabels { get; private set; }
 
-        public ObservableCollection<double> HistogramBreaks { get; private set; }
+        public ObservableCollection<Tuple<double, double>> HistogramBreaks { get; private set; }
 
         public int Bins
         {
@@ -116,7 +116,7 @@ namespace MCDA.ViewModel
             }
         }
 
-        public int HistogramMajorStep { get; private set; }
+        //public int HistogramMajorStep { get; private set; }
 
         private void UpdateHistogramControl()
         {
@@ -125,7 +125,7 @@ namespace MCDA.ViewModel
 
             HistogramActualLabels = new List<string>();
             HistogramLabels = new List<string>();
-            HistogramBreaks = new ObservableCollection<double>();
+            HistogramBreaks = new ObservableCollection<Tuple<double, double>>();
 
             IList<ColumnItem> columnItems = new List<ColumnItem>();
 
@@ -143,7 +143,7 @@ namespace MCDA.ViewModel
 
                 if (breaks[breakIndex] <= histo[i].Item1 && i < histo.Length-1 && !(breaks[breakIndex] > histo[i+1].Item1))
                 {
-                    HistogramBreaks.Add(i);
+                    HistogramBreaks.Add(Tuple.Create(i-0.5d, breaks[breakIndex]));
                     if (breakIndex < breaks.Count()-1)
                         breakIndex++;
                 }
@@ -153,12 +153,12 @@ namespace MCDA.ViewModel
             HistogramData = columnItems;
 
             //we want always 5 Labels
-            HistogramMajorStep = (int) Math.Ceiling(histo.Count() / 5d);
+            //HistogramMajorStep = (int) Math.Ceiling(histo.Count() / 5d);
 
             //HistogramBreaks = new ObservableCollection<double>(Classification.Classify(SelectedClassificationMethod, SelectedFieldToRender.Field.Feature.FeatureClass, SelectedFieldToRender.Field.ESRIField, SelectedNumberOfClasses).ToList());
                 
             PropertyChanged.Notify(() => HistogramLabels);
-            PropertyChanged.Notify(() => HistogramMajorStep);
+            //PropertyChanged.Notify(() => HistogramMajorStep);
 
             PropertyChanged.Notify(() => HistogramData);
             PropertyChanged.Notify(() => HistogramBreaks);

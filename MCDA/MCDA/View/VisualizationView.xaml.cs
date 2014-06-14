@@ -50,6 +50,7 @@ namespace MCDA
             BiPolarRendererNeutralColor.AvailableColors = greyScaleColors;
 
             visualizationViewModel.RegisterPropertyHandler(p => p.HistogramBreaks, HistogramBreaksChanged);
+            visualizationViewModel.RegisterPropertyHandler(p => p.HistogramBreaks, NumberOfClassesChanged);
 
         }
 
@@ -65,10 +66,23 @@ namespace MCDA
                 annotation.X = histogramBreak;
                 annotation.Type = OxyPlot.Annotations.LineAnnotationType.Vertical;
                 annotation.Color = Colors.Red;
-                annotation.Text = item.Item2.ToString();
+                annotation.Text = item.Item2;
 
                 Histogram.Annotations.Add(annotation);
+
+                Histogram.InvalidatePlot(true);
             }
+        }
+
+        private void NumberOfClassesChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (!BreaksPopup.IsOpen)
+                return;
+
+            if (visualizationViewModel.HistogramBreaks == null)
+                BreaksPopupTextBlock.Text = "Not available.";
+
+            BreaksPopupTextBlock.Text = string.Join(Environment.NewLine, visualizationViewModel.HistogramBreaks.Select(t => t.Item2));
         }
 
         private void SwitchList(object sender, EventArgs e)
@@ -128,16 +142,20 @@ namespace MCDA
             }
         }
 
-        private void Button_MouseEnter(object sender, MouseEventArgs e)
+        private void ToggleButton_Checked(object sender, RoutedEventArgs e)
         {
             BreaksPopup.IsOpen = true;
 
-            StringBuilder breaks = new StringBuilder();
-            foreach (var item in visualizationViewModel.HistogramBreaks)
-		        breaks.Append(item.Item2).AppendLine();
+            if (visualizationViewModel.HistogramBreaks == null)
+                BreaksPopupTextBlock.Text = "Not available.";
 
-            BreaksPopupTextBlock.Text = breaks.ToString();
+            else
+                BreaksPopupTextBlock.Text = string.Join(Environment.NewLine, visualizationViewModel.HistogramBreaks.Select(t => t.Item2));
         }
 
+        private void ToggleButton_Unchecked(object sender, RoutedEventArgs e)
+        {
+            BreaksPopup.IsOpen = false;          
+        }
     }
 }

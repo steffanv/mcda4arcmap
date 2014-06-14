@@ -3498,6 +3498,165 @@
             Gets or sets Data
             </summary>
         </member>
+        <member name="T:OxyPlot.Wpf.ScatterSeries`1">
+            <summary>
+            Provides a base class for scatter series.
+            </summary>
+            <typeparam name="T">The type of the points.</typeparam>
+        </member>
+        <member name="F:OxyPlot.Wpf.ScatterSeries`1.BinSizeProperty">
+            <summary>
+            Identifies the <see cref="P:OxyPlot.Wpf.ScatterSeries`1.BinSize"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:OxyPlot.Wpf.ScatterSeries`1.DataFieldSizeProperty">
+            <summary>
+            Identifies the <see cref="P:OxyPlot.Wpf.ScatterSeries`1.DataFieldSize"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:OxyPlot.Wpf.ScatterSeries`1.DataFieldTagProperty">
+            <summary>
+            Identifies the <see cref="P:OxyPlot.Wpf.ScatterSeries`1.DataFieldTag"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:OxyPlot.Wpf.ScatterSeries`1.DataFieldValueProperty">
+            <summary>
+            Identifies the <see cref="P:OxyPlot.Wpf.ScatterSeries`1.DataFieldValue"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:OxyPlot.Wpf.ScatterSeries`1.DataFieldXProperty">
+            <summary>
+            Identifies the <see cref="P:OxyPlot.Wpf.ScatterSeries`1.DataFieldX"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:OxyPlot.Wpf.ScatterSeries`1.DataFieldYProperty">
+            <summary>
+            Identifies the <see cref="P:OxyPlot.Wpf.ScatterSeries`1.DataFieldY"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:OxyPlot.Wpf.ScatterSeries`1.MappingProperty">
+            <summary>
+            Identifies the <see cref="P:OxyPlot.Wpf.ScatterSeries`1.Mapping"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:OxyPlot.Wpf.ScatterSeries`1.MarkerFillProperty">
+            <summary>
+            Identifies the <see cref="P:OxyPlot.Wpf.ScatterSeries`1.MarkerFill"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:OxyPlot.Wpf.ScatterSeries`1.MarkerOutlineProperty">
+            <summary>
+            Identifies the <see cref="P:OxyPlot.Wpf.ScatterSeries`1.MarkerOutline"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:OxyPlot.Wpf.ScatterSeries`1.MarkerSizeProperty">
+            <summary>
+            Identifies the <see cref="P:OxyPlot.Wpf.ScatterSeries`1.MarkerSize"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:OxyPlot.Wpf.ScatterSeries`1.MarkerStrokeProperty">
+            <summary>
+            Identifies the <see cref="P:OxyPlot.Wpf.ScatterSeries`1.MarkerStroke"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:OxyPlot.Wpf.ScatterSeries`1.MarkerStrokeThicknessProperty">
+            <summary>
+            Identifies the <see cref="P:OxyPlot.Wpf.ScatterSeries`1.MarkerStrokeThickness"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:OxyPlot.Wpf.ScatterSeries`1.MarkerTypeProperty">
+            <summary>
+            Identifies the <see cref="P:OxyPlot.Wpf.ScatterSeries`1.MarkerType"/> dependency property.
+            </summary>
+        </member>
+        <member name="M:OxyPlot.Wpf.ScatterSeries`1.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:OxyPlot.Wpf.ScatterSeries`1"/> class.
+            </summary>
+        </member>
+        <member name="M:OxyPlot.Wpf.ScatterSeries`1.CreateModel">
+            <summary>
+            Creates the internal series.
+            </summary>
+            <returns>The series.</returns>
+        </member>
+        <member name="M:OxyPlot.Wpf.ScatterSeries`1.SynchronizeProperties(OxyPlot.Series.Series)">
+            <summary>
+            Synchronizes the properties.
+            </summary>
+            <param name="series">The series.</param>
+        </member>
+        <member name="P:OxyPlot.Wpf.ScatterSeries`1.BinSize">
+            <summary>
+            Gets or sets bin size.
+            </summary>
+        </member>
+        <member name="P:OxyPlot.Wpf.ScatterSeries`1.DataFieldSize">
+            <summary>
+            Gets or sets size data field.
+            </summary>
+        </member>
+        <member name="P:OxyPlot.Wpf.ScatterSeries`1.DataFieldTag">
+            <summary>
+            Gets or sets tag data field.
+            </summary>
+        </member>
+        <member name="P:OxyPlot.Wpf.ScatterSeries`1.DataFieldValue">
+            <summary>
+            Gets or sets value (color) data field.
+            </summary>
+        </member>
+        <member name="P:OxyPlot.Wpf.ScatterSeries`1.DataFieldX">
+            <summary>
+            Gets or sets X data field.
+            </summary>
+        </member>
+        <member name="P:OxyPlot.Wpf.ScatterSeries`1.DataFieldY">
+            <summary>
+            Gets or sets Y data field.
+            </summary>
+        </member>
+        <member name="P:OxyPlot.Wpf.ScatterSeries`1.Mapping">
+            <summary>
+            Gets or sets mapping function.
+            </summary>
+        </member>
+        <member name="P:OxyPlot.Wpf.ScatterSeries`1.MarkerFill">
+            <summary>
+            Gets or sets fill color of the markers.
+            </summary>
+        </member>
+        <member name="P:OxyPlot.Wpf.ScatterSeries`1.MarkerOutline">
+            <summary>
+            Gets or sets custom outline of the markers.
+            </summary>
+        </member>
+        <member name="P:OxyPlot.Wpf.ScatterSeries`1.MarkerSize">
+            <summary>
+            Gets or sets the size of the markers.
+            </summary>
+        </member>
+        <member name="P:OxyPlot.Wpf.ScatterSeries`1.MarkerStroke">
+            <summary>
+            Gets or sets color of the marker strokes.
+            </summary>
+        </member>
+        <member name="P:OxyPlot.Wpf.ScatterSeries`1.MarkerStrokeThickness">
+            <summary>
+            Gets or sets thickness of the marker strokes.
+            </summary>
+        </member>
+        <member name="P:OxyPlot.Wpf.ScatterSeries`1.MarkerType">
+            <summary>
+            Gets or sets type of the markers.
+            </summary>
+        </member>
+        <member name="P:OxyPlot.Wpf.ScatterSeries`1.ColorAxisKey">
+            <summary>
+            Gets or sets the color axis key.
+            </summary>
+            <value>The color axis key.</value>
+        </member>
         <member name="T:OxyPlot.Wpf.StairStepSeries">
             <summary>
             This is a WPF wrapper of OxyPlot.StairStepSeries
@@ -3831,6 +3990,97 @@
             Gets or sets the line style of the vertical line segments.
             </summary>
             <value>The vertical line style.</value>
+        </member>
+        <member name="T:OxyPlot.Wpf.ScatterErrorSeries">
+            <summary>
+            This is a WPF wrapper of OxyPlot.ScatterErrorSeries
+            </summary>
+        </member>
+        <member name="F:OxyPlot.Wpf.ScatterErrorSeries.DataFieldErrorXProperty">
+            <summary>
+            Identifies the <see cref="P:OxyPlot.Wpf.ScatterErrorSeries.DataFieldErrorX"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:OxyPlot.Wpf.ScatterErrorSeries.DataFieldErrorYProperty">
+            <summary>
+            Identifies the <see cref="P:OxyPlot.Wpf.ScatterErrorSeries.DataFieldErrorY"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:OxyPlot.Wpf.ScatterErrorSeries.ErrorBarColorProperty">
+            <summary>
+            Identifies the <see cref="P:OxyPlot.Wpf.ScatterErrorSeries.ErrorBarColor"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:OxyPlot.Wpf.ScatterErrorSeries.ErrorBarStopWidthProperty">
+            <summary>
+            Identifies the <see cref="P:OxyPlot.Wpf.ScatterErrorSeries.ErrorBarStopWidth"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:OxyPlot.Wpf.ScatterErrorSeries.ErrorBarStrokeThicknessProperty">
+            <summary>
+            Identifies the <see cref="P:OxyPlot.Wpf.ScatterErrorSeries.ErrorBarStrokeThickness"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:OxyPlot.Wpf.ScatterErrorSeries.MinimumErrorSizeProperty">
+            <summary>
+            Identifies the <see cref="P:OxyPlot.Wpf.ScatterErrorSeries.MinimumErrorSize"/> dependency property.
+            </summary>
+        </member>
+        <member name="M:OxyPlot.Wpf.ScatterErrorSeries.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:OxyPlot.Wpf.ScatterErrorSeries"/> class.
+            </summary>
+        </member>
+        <member name="M:OxyPlot.Wpf.ScatterErrorSeries.SynchronizeProperties(OxyPlot.Series.Series)">
+            <summary>
+            Synchronizes the properties.
+            </summary>
+            <param name="series">The series.</param>
+        </member>
+        <member name="P:OxyPlot.Wpf.ScatterErrorSeries.DataFieldErrorX">
+            <summary>
+            Gets or sets the data field X error.
+            </summary>
+            <value>
+            The data field error.
+            </value>
+        </member>
+        <member name="P:OxyPlot.Wpf.ScatterErrorSeries.DataFieldErrorY">
+            <summary>
+            Gets or sets the data field Y error.
+            </summary>
+            <value>
+            The data field error.
+            </value>
+        </member>
+        <member name="P:OxyPlot.Wpf.ScatterErrorSeries.ErrorBarColor">
+            <summary>
+            Gets or sets the color of the error bar.
+            </summary>
+            <value>
+            The color of the error bar.
+            </value>
+        </member>
+        <member name="P:OxyPlot.Wpf.ScatterErrorSeries.ErrorBarStopWidth">
+            <summary>
+            Gets or sets the width of the error bar stop.
+            </summary>
+            <value>
+            The width of the error bar stop.
+            </value>
+        </member>
+        <member name="P:OxyPlot.Wpf.ScatterErrorSeries.ErrorBarStrokeThickness">
+            <summary>
+            Gets or sets the error bar stroke thickness.
+            </summary>
+            <value>
+            The error bar stroke thickness.
+            </value>
+        </member>
+        <member name="P:OxyPlot.Wpf.ScatterErrorSeries.MinimumErrorSize">
+            <summary>
+            Gets or sets the minimum size (relative to <see cref="P:OxyPlot.Wpf.ScatterSeries`1.MarkerSize"/>) of the error bars to be shown. 
+            </summary>
         </member>
         <member name="T:OxyPlot.Wpf.RenderingEventListener">
             <summary>
@@ -4359,159 +4609,6 @@
             <summary>
             This is a WPF wrapper of OxyPlot.ScatterSeries
             </summary>
-        </member>
-        <member name="F:OxyPlot.Wpf.ScatterSeries.BinSizeProperty">
-            <summary>
-            Identifies the <see cref="P:OxyPlot.Wpf.ScatterSeries.BinSize"/> dependency property.
-            </summary>
-        </member>
-        <member name="F:OxyPlot.Wpf.ScatterSeries.DataFieldSizeProperty">
-            <summary>
-            Identifies the <see cref="P:OxyPlot.Wpf.ScatterSeries.DataFieldSize"/> dependency property.
-            </summary>
-        </member>
-        <member name="F:OxyPlot.Wpf.ScatterSeries.DataFieldTagProperty">
-            <summary>
-            Identifies the <see cref="P:OxyPlot.Wpf.ScatterSeries.DataFieldTag"/> dependency property.
-            </summary>
-        </member>
-        <member name="F:OxyPlot.Wpf.ScatterSeries.DataFieldValueProperty">
-            <summary>
-            Identifies the <see cref="P:OxyPlot.Wpf.ScatterSeries.DataFieldValue"/> dependency property.
-            </summary>
-        </member>
-        <member name="F:OxyPlot.Wpf.ScatterSeries.DataFieldXProperty">
-            <summary>
-            Identifies the <see cref="P:OxyPlot.Wpf.ScatterSeries.DataFieldX"/> dependency property.
-            </summary>
-        </member>
-        <member name="F:OxyPlot.Wpf.ScatterSeries.DataFieldYProperty">
-            <summary>
-            Identifies the <see cref="P:OxyPlot.Wpf.ScatterSeries.DataFieldY"/> dependency property.
-            </summary>
-        </member>
-        <member name="F:OxyPlot.Wpf.ScatterSeries.MappingProperty">
-            <summary>
-            Identifies the <see cref="P:OxyPlot.Wpf.ScatterSeries.Mapping"/> dependency property.
-            </summary>
-        </member>
-        <member name="F:OxyPlot.Wpf.ScatterSeries.MarkerFillProperty">
-            <summary>
-            Identifies the <see cref="P:OxyPlot.Wpf.ScatterSeries.MarkerFill"/> dependency property.
-            </summary>
-        </member>
-        <member name="F:OxyPlot.Wpf.ScatterSeries.MarkerOutlineProperty">
-            <summary>
-            Identifies the <see cref="P:OxyPlot.Wpf.ScatterSeries.MarkerOutline"/> dependency property.
-            </summary>
-        </member>
-        <member name="F:OxyPlot.Wpf.ScatterSeries.MarkerSizeProperty">
-            <summary>
-            Identifies the <see cref="P:OxyPlot.Wpf.ScatterSeries.MarkerSize"/> dependency property.
-            </summary>
-        </member>
-        <member name="F:OxyPlot.Wpf.ScatterSeries.MarkerStrokeProperty">
-            <summary>
-            Identifies the <see cref="P:OxyPlot.Wpf.ScatterSeries.MarkerStroke"/> dependency property.
-            </summary>
-        </member>
-        <member name="F:OxyPlot.Wpf.ScatterSeries.MarkerStrokeThicknessProperty">
-            <summary>
-            Identifies the <see cref="P:OxyPlot.Wpf.ScatterSeries.MarkerStrokeThickness"/> dependency property.
-            </summary>
-        </member>
-        <member name="F:OxyPlot.Wpf.ScatterSeries.MarkerTypeProperty">
-            <summary>
-            Identifies the <see cref="P:OxyPlot.Wpf.ScatterSeries.MarkerType"/> dependency property.
-            </summary>
-        </member>
-        <member name="M:OxyPlot.Wpf.ScatterSeries.#ctor">
-            <summary>
-            Initializes a new instance of the <see cref="T:OxyPlot.Wpf.ScatterSeries"/> class.
-            </summary>
-        </member>
-        <member name="M:OxyPlot.Wpf.ScatterSeries.CreateModel">
-            <summary>
-            Creates the internal series.
-            </summary>
-            <returns>The series.</returns>
-        </member>
-        <member name="M:OxyPlot.Wpf.ScatterSeries.SynchronizeProperties(OxyPlot.Series.Series)">
-            <summary>
-            Synchronizes the properties.
-            </summary>
-            <param name="series">The series.</param>
-        </member>
-        <member name="P:OxyPlot.Wpf.ScatterSeries.BinSize">
-            <summary>
-            Gets or sets BinSize.
-            </summary>
-        </member>
-        <member name="P:OxyPlot.Wpf.ScatterSeries.DataFieldSize">
-            <summary>
-            Gets or sets DataFieldSize.
-            </summary>
-        </member>
-        <member name="P:OxyPlot.Wpf.ScatterSeries.DataFieldTag">
-            <summary>
-            Gets or sets DataFieldTag.
-            </summary>
-        </member>
-        <member name="P:OxyPlot.Wpf.ScatterSeries.DataFieldValue">
-            <summary>
-            Gets or sets DataFieldValue.
-            </summary>
-        </member>
-        <member name="P:OxyPlot.Wpf.ScatterSeries.DataFieldX">
-            <summary>
-            Gets or sets DataFieldX.
-            </summary>
-        </member>
-        <member name="P:OxyPlot.Wpf.ScatterSeries.DataFieldY">
-            <summary>
-            Gets or sets DataFieldY.
-            </summary>
-        </member>
-        <member name="P:OxyPlot.Wpf.ScatterSeries.Mapping">
-            <summary>
-            Gets or sets Mapping.
-            </summary>
-        </member>
-        <member name="P:OxyPlot.Wpf.ScatterSeries.MarkerFill">
-            <summary>
-            Gets or sets MarkerFill.
-            </summary>
-        </member>
-        <member name="P:OxyPlot.Wpf.ScatterSeries.MarkerOutline">
-            <summary>
-            Gets or sets MarkerOutline.
-            </summary>
-        </member>
-        <member name="P:OxyPlot.Wpf.ScatterSeries.MarkerSize">
-            <summary>
-            Gets or sets MarkerSize.
-            </summary>
-        </member>
-        <member name="P:OxyPlot.Wpf.ScatterSeries.MarkerStroke">
-            <summary>
-            Gets or sets MarkerStroke.
-            </summary>
-        </member>
-        <member name="P:OxyPlot.Wpf.ScatterSeries.MarkerStrokeThickness">
-            <summary>
-            Gets or sets MarkerStrokeThickness.
-            </summary>
-        </member>
-        <member name="P:OxyPlot.Wpf.ScatterSeries.MarkerType">
-            <summary>
-            Gets or sets MarkerType.
-            </summary>
-        </member>
-        <member name="P:OxyPlot.Wpf.ScatterSeries.ColorAxisKey">
-            <summary>
-            Gets or sets the color axis key.
-            </summary>
-            <value>The color axis key.</value>
         </member>
         <member name="T:OxyPlot.Wpf.TrackerControl">
             <summary>

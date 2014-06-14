@@ -17,7 +17,7 @@ namespace MCDA.Model
         private Color _startColor;
         private Color _endColor;
 
-        private IClassify _classificationMethod;
+        private IClassifyGEN _classificationMethod;
         private int _numberOfClasses;
 
         private IField _field;
@@ -36,7 +36,7 @@ namespace MCDA.Model
             set { PropertyChanged.ChangeAndNotify(ref _endColor, value, () => EndColor); }
         }
 
-        public IClassify ClassificationMethod
+        public IClassifyGEN ClassificationMethod
         {
             get { return _classificationMethod; }
             set { PropertyChanged.ChangeAndNotify(ref _classificationMethod, value, () => ClassificationMethod); }

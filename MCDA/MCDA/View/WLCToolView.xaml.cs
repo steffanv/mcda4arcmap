@@ -21,6 +21,7 @@ namespace MCDA
     /// </summary>
     public partial class WLCToolView : Window
     {
+       
         public WLCToolView()
         {
             InitializeComponent();
@@ -30,29 +31,20 @@ namespace MCDA
 
         protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
         {
-            //TODO warn user before closing (and in lwlc, owa.).
-            //ESRI.ArcGIS.Framework.IMessageDialog msgBox = new ESRI.ArcGIS.Framework.MessageDialogClass();
-            //bool userResult = msgBox.DoModal("Unlocking", "Unlocking also removes the existing in memory connection.", "Yes", "No", ArcMap.Application.hWnd);
+            ESRI.ArcGIS.Framework.IMessageDialog msgBox = new ESRI.ArcGIS.Framework.MessageDialogClass();
+            bool userResult = msgBox.DoModal("Closing", "When closing the tool you will lose your settings.", "Close", "Abort", ArcMap.Application.hWnd);
 
-            ////if the user hit no we have to set the lock state back to locked
-            //if (!userResult)
-            //{
-            //    _isLocked = !_isLocked;
-            //    return;
-            //}
-            //if (userResult)
-            //{
-            //    _isSendToInMemoryWorkspaceCommand = !_isSendToInMemoryWorkspaceCommand;
-            //    _mcdaExtension.RemoveLink(_wlcTool);
-            //    this.SelectedFeaturePropertyChanged(this, null);
+            if (userResult)
+            {
+                base.OnClosing(e);
+                WLCToolViewModel viewmodel = (WLCToolViewModel)DataContext;
+                viewmodel.ClosingCommand.Execute(null);
+            }
+            else
+            {
+                e.Cancel = true;
+            }
 
-            //    PropertyChanged.Notify(() => IsSendToInMemoryWorkspaceCommand);
-            //}
-
-
-            base.OnClosing(e);
-            WLCToolViewModel viewmodel = (WLCToolViewModel)DataContext;
-            viewmodel.ClosingCommand.Execute(null);
         }
 
         private void weightSlider_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)

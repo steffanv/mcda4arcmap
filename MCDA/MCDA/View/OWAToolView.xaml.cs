@@ -28,42 +28,22 @@ namespace MCDA
             DataContext = new OWAToolViewModel();
         }
 
-        /*
-        /// <summary>
-        /// Implementation class of the dockable window add-in. It is responsible for 
-        /// creating and disposing the user interface class of the dockable window.
-        /// </summary>
-        public class AddinImpl : ESRI.ArcGIS.Desktop.AddIns.DockableWindow
-        {
-            private System.Windows.Forms.Integration.ElementHost m_windowUI;
-
-            public AddinImpl()
-            {
-            }
-
-            protected override IntPtr OnCreateChild()
-            {
-                m_windowUI = new System.Windows.Forms.Integration.ElementHost();
-                m_windowUI.Child = new OWAToolView();
-                return m_windowUI.Handle;
-            }
-
-            protected override void Dispose(bool disposing)
-            {
-                if (m_windowUI != null)
-                    m_windowUI.Dispose();
-
-                base.Dispose(disposing);
-            }
-
-        }
-        */
-
         protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
         {
-            base.OnClosing(e);
-            OWAToolViewModel viewmodel = (OWAToolViewModel)DataContext;
-            viewmodel.ClosingCommand.Execute(null);
+            ESRI.ArcGIS.Framework.IMessageDialog msgBox = new ESRI.ArcGIS.Framework.MessageDialogClass();
+            bool userResult = msgBox.DoModal("Closing", "When closing the tool you will lose your settings.", "Close", "Abort", ArcMap.Application.hWnd);
+
+            if (userResult)
+            {
+                base.OnClosing(e);
+                OWAToolViewModel viewmodel = (OWAToolViewModel)DataContext;
+                viewmodel.ClosingCommand.Execute(null);
+            }
+            else
+            {
+                e.Cancel = true;
+            }
+
         }
 
         private void weightSlider_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)

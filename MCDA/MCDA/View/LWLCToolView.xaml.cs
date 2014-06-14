@@ -29,9 +29,20 @@ namespace MCDA
 
         protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
         {
-            base.OnClosing(e);
-            LWLCToolViewModel viewmodel = (LWLCToolViewModel)DataContext;
-            viewmodel.ClosingCommand.Execute(null);
+            ESRI.ArcGIS.Framework.IMessageDialog msgBox = new ESRI.ArcGIS.Framework.MessageDialogClass();
+            bool userResult = msgBox.DoModal("Closing", "When closing the tool you will lose your settings.", "Close", "Abort", ArcMap.Application.hWnd);
+
+            if (userResult)
+            {
+                base.OnClosing(e);
+                LWLCToolViewModel viewmodel = (LWLCToolViewModel)DataContext;
+                viewmodel.ClosingCommand.Execute(null);
+            }
+            else
+            {
+                e.Cancel = true;
+            }
+
         }
 
         private void weightSlider_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)

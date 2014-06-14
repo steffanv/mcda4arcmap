@@ -10,16 +10,24 @@ namespace MCDA.Model
 {
     internal static class Classification
     {
-        public static double[] Classify(IClassify method, IFeatureClass featureClass, IField field, int numberOfClasses)
+        /// <summary>
+        /// Returns breaks based on the given arguments.
+        /// </summary>
+        /// <param name="method">The classification method</param>
+        /// <param name="featureClass">The featureClass with the data</param>
+        /// <param name="field">The field to specify the data</param>
+        /// <param name="numberOfClasses">The number of classes</param>
+        /// <returns>An array of breaks. NOTE: the first value in the array is the smallest and not part of the breaks. Find more at: http://help.arcgis.com/en/sdk/10.0/arcobjects_net/componenthelp/index.html#/IClassifyGEN_Interface/0042000000m2000000/ </returns>
+        public static double[] Classify(IClassifyGEN method, IFeatureClass featureClass, IField field, int numberOfClasses)
         {
             double[] data;
             int[] freq;
 
+            int numberClasses = numberOfClasses;
+            
             Histogram(featureClass, field, out data, out freq);
 
-            method.SetHistogramData(data, freq);
-
-            method.Classify(numberOfClasses);
+            method.Classify(data, freq, numberOfClasses);
 
             return method.ClassBreaks as double[];
         }

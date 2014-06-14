@@ -7270,6 +7270,838 @@
             Gets the Courier font family.
             </summary>
         </member>
+        <member name="T:OxyPlot.Series.ScatterErrorPoint">
+            <summary>
+            Represents a point in a <see cref="T:OxyPlot.Series.ScatterErrorSeries"/>.
+            </summary>
+        </member>
+        <member name="T:OxyPlot.Series.ScatterPoint">
+            <summary>
+            Represents a point in a <see cref="T:OxyPlot.Series.ScatterSeries"/>.
+            </summary>
+        </member>
+        <member name="F:OxyPlot.Series.ScatterPoint.size">
+            <summary>
+            The size.
+            </summary>
+        </member>
+        <member name="F:OxyPlot.Series.ScatterPoint.tag">
+            <summary>
+            The tag.
+            </summary>
+        </member>
+        <member name="F:OxyPlot.Series.ScatterPoint.value">
+            <summary>
+            The value.
+            </summary>
+        </member>
+        <member name="F:OxyPlot.Series.ScatterPoint.x">
+            <summary>
+            The x.
+            </summary>
+        </member>
+        <member name="F:OxyPlot.Series.ScatterPoint.y">
+            <summary>
+            The y.
+            </summary>
+        </member>
+        <member name="M:OxyPlot.Series.ScatterPoint.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:OxyPlot.Series.ScatterPoint"/> class.
+            </summary>
+        </member>
+        <member name="M:OxyPlot.Series.ScatterPoint.#ctor(System.Double,System.Double,System.Double,System.Double,System.Object)">
+            <summary>
+            Initializes a new instance of the <see cref="T:OxyPlot.Series.ScatterPoint"/> class.
+            </summary>
+            <param name="x">The x.</param>
+            <param name="y">The y.</param>
+            <param name="size">The size.</param>
+            <param name="value">The value.</param>
+            <param name="tag">The tag.</param>
+        </member>
+        <member name="M:OxyPlot.Series.ScatterPoint.ToCode">
+            <summary>
+            Returns C# code that generates this instance.
+            </summary>
+            <returns>C# code.</returns>
+        </member>
+        <member name="M:OxyPlot.Series.ScatterPoint.ToString">
+            <summary>
+            Returns a <see cref="T:System.String"/> that represents this instance.
+            </summary>
+            <returns>A <see cref="T:System.String"/> that represents this instance.</returns>
+        </member>
+        <member name="P:OxyPlot.Series.ScatterPoint.Size">
+            <summary>
+            Gets or sets the size.
+            </summary>
+            <value>The size.</value>
+        </member>
+        <member name="P:OxyPlot.Series.ScatterPoint.Tag">
+            <summary>
+            Gets or sets the tag.
+            </summary>
+            <value>The tag.</value>
+        </member>
+        <member name="P:OxyPlot.Series.ScatterPoint.Value">
+            <summary>
+            Gets or sets the value.
+            </summary>
+            <value>The value.</value>
+        </member>
+        <member name="P:OxyPlot.Series.ScatterPoint.X">
+            <summary>
+            Gets or sets the X.
+            </summary>
+            <value>The X.</value>
+        </member>
+        <member name="P:OxyPlot.Series.ScatterPoint.Y">
+            <summary>
+            Gets or sets the Y.
+            </summary>
+            <value>The Y.</value>
+        </member>
+        <member name="M:OxyPlot.Series.ScatterErrorPoint.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:OxyPlot.Series.ScatterErrorPoint"/> class.
+            </summary>
+        </member>
+        <member name="M:OxyPlot.Series.ScatterErrorPoint.#ctor(System.Double,System.Double,System.Double,System.Double,System.Double,System.Double,System.Object)">
+            <summary>
+            Initializes a new instance of the <see cref="T:OxyPlot.Series.ScatterErrorPoint"/> class.
+            </summary>
+            <param name="x">The x.</param>
+            <param name="y">The y.</param>
+            <param name="errorX">The X error.</param>
+            <param name="errorY">The Y error.</param>
+            <param name="size">The size.</param>
+            <param name="value">The value.</param>
+            <param name="tag">The tag.</param>
+        </member>
+        <member name="P:OxyPlot.Series.ScatterErrorPoint.ErrorX">
+            <summary>
+            Gets or sets the error in X.
+            </summary>
+            <value>
+            The error.
+            </value>
+        </member>
+        <member name="P:OxyPlot.Series.ScatterErrorPoint.ErrorY">
+            <summary>
+            Gets or sets the error in Y.
+            </summary>
+            <value>
+            The error.
+            </value>
+        </member>
+        <member name="T:OxyPlot.Series.ScatterErrorSeries">
+            <summary>
+                Represents a series for scatter plots with the possibility to display error bars.
+            </summary>
+        </member>
+        <member name="T:OxyPlot.Series.ScatterSeries`1">
+            <summary>
+            Provides a base class for scatter series.
+            </summary>
+            <typeparam name="T">The type of the data points.</typeparam>
+        </member>
+        <member name="T:OxyPlot.Series.XYAxisSeries">
+            <summary>
+            Provides an abstract base class for series that are related to an X-axis and a Y-axis.
+            </summary>
+        </member>
+        <member name="T:OxyPlot.Series.ItemsSeries">
+            <summary>
+            Abstract base class for series that can contain items.
+            </summary>
+        </member>
+        <member name="T:OxyPlot.Series.Series">
+            <summary>
+            Provides an abstract base class for plot series.
+            </summary>
+            <remarks>This class contains internal methods that should be called only from the PlotModel.</remarks>
+        </member>
+        <member name="T:OxyPlot.Series.ITrackableSeries">
+            <summary>
+            Provides functionality to return data for a tracker control.
+            </summary>
+            <remarks>The plot view will show a tracker with the current value when moving the mouse over the data.</remarks>
+        </member>
+        <member name="M:OxyPlot.Series.ITrackableSeries.GetNearestPoint(OxyPlot.ScreenPoint,System.Boolean)">
+            <summary>
+            Gets the point on the series that is nearest the specified point.
+            </summary>
+            <param name="point">The point.</param>
+            <param name="interpolate">Interpolate the series if this flag is set to <c>true</c>.</param>
+            <returns>A TrackerHitResult for the current hit.</returns>
+        </member>
+        <member name="P:OxyPlot.Series.ITrackableSeries.TrackerFormatString">
+            <summary>
+            Gets a format string used for the tracker.
+            </summary>
+            <remarks>The fields that can be used in the format string depends on the series.</remarks>
+        </member>
+        <member name="P:OxyPlot.Series.ITrackableSeries.TrackerKey">
+            <summary>
+            Gets the tracker key.
+            </summary>
+        </member>
+        <member name="M:OxyPlot.Series.Series.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:OxyPlot.Series.Series"/> class.
+            </summary>
+        </member>
+        <member name="M:OxyPlot.Series.Series.GetNearestPoint(OxyPlot.ScreenPoint,System.Boolean)">
+            <summary>
+            Gets the point on the series that is nearest the specified point.
+            </summary>
+            <param name="point">The point.</param>
+            <param name="interpolate">Interpolate the series if this flag is set to <c>true</c>.</param>
+            <returns>A TrackerHitResult for the current hit.</returns>
+        </member>
+        <member name="M:OxyPlot.Series.Series.Render(OxyPlot.IRenderContext,OxyPlot.PlotModel)">
+            <summary>
+            Renders the series on the specified render context.
+            </summary>
+            <param name="rc">The rendering context.</param>
+            <param name="model">The model.</param>
+        </member>
+        <member name="M:OxyPlot.Series.Series.RenderLegend(OxyPlot.IRenderContext,OxyPlot.OxyRect)">
+            <summary>
+            Renders the legend symbol on the specified render context.
+            </summary>
+            <param name="rc">The rendering context.</param>
+            <param name="legendBox">The legend rectangle.</param>
+        </member>
+        <member name="M:OxyPlot.Series.Series.AreAxesRequired">
+            <summary>
+            Checks if this data series requires X/Y axes. (e.g. Pie series do not require axes)
+            </summary>
+            <returns><c>true</c> if axes are required.</returns>
+        </member>
+        <member name="M:OxyPlot.Series.Series.EnsureAxes">
+            <summary>
+            Ensures that the axes of the series are defined.
+            </summary>
+        </member>
+        <member name="M:OxyPlot.Series.Series.IsUsing(OxyPlot.Axes.Axis)">
+            <summary>
+            Checks if the data series is using the specified axis.
+            </summary>
+            <param name="axis">The axis that should be checked.</param>
+            <returns><c>true</c> if the axis is in use.</returns>
+        </member>
+        <member name="M:OxyPlot.Series.Series.SetDefaultValues(OxyPlot.PlotModel)">
+            <summary>
+            Sets the default values (colors, line style etc.) from the plot model.
+            </summary>
+            <param name="model">A plot model.</param>
+        </member>
+        <member name="M:OxyPlot.Series.Series.UpdateAxisMaxMin">
+            <summary>
+            Updates the maximum and minimum values of the axes used by this series.
+            </summary>
+        </member>
+        <member name="M:OxyPlot.Series.Series.UpdateData">
+            <summary>
+            Updates the data of the series.
+            </summary>
+        </member>
+        <member name="M:OxyPlot.Series.Series.UpdateValidData">
+            <summary>
+            Updates the valid data of the series.
+            </summary>
+        </member>
+        <member name="M:OxyPlot.Series.Series.UpdateMaxMin">
+            <summary>
+            Updates the maximum and minimum values of the series.
+            </summary>
+            <remarks>This method is called when the <see cref="T:OxyPlot.PlotModel"/> is updated with the <c>updateData</c> parameter set to <c>true</c>.</remarks>
+        </member>
+        <member name="M:OxyPlot.Series.Series.HitTestOverride(OxyPlot.HitTestArguments)">
+            <summary>
+            When overridden in a derived class, tests if the plot element is hit by the specified point.
+            </summary>
+            <param name="args">The hit test arguments.</param>
+            <returns>
+            The result of the hit test.
+            </returns>
+        </member>
+        <member name="P:OxyPlot.Series.Series.Background">
+            <summary>
+            Gets or sets the background color of the series.
+            </summary>
+            <remarks>This property defines the background color in the area defined by the x and y axes used by this series.</remarks>
+        </member>
+        <member name="P:OxyPlot.Series.Series.IsVisible">
+            <summary>
+            Gets or sets a value indicating whether this series is visible.
+            </summary>
+        </member>
+        <member name="P:OxyPlot.Series.Series.Title">
+            <summary>
+            Gets or sets the title of the series.
+            </summary>
+            <value>The title that is shown in the legend of the plot. The default value is <c>null</c>. When the value is <c>null</c>, this series will not be shown in the legend.</value>
+        </member>
+        <member name="P:OxyPlot.Series.Series.TrackerFormatString">
+            <summary>
+            Gets or sets a format string used for the tracker.
+            </summary>
+            <remarks>
+            The arguments for the format string may be different for each type of series. See the documentation.
+            </remarks>
+        </member>
+        <member name="P:OxyPlot.Series.Series.TrackerKey">
+            <summary>
+            Gets or sets the key for the tracker to use on this series.
+            </summary>
+            <remarks>
+            This key may be used by the plot view to show a custom tracker for the series.
+            </remarks>
+        </member>
+        <member name="M:OxyPlot.Series.ItemsSeries.UpdateValidData">
+            <summary>
+            Updates the valid items
+            </summary>
+        </member>
+        <member name="M:OxyPlot.Series.ItemsSeries.GetItem(System.Collections.IEnumerable,System.Int32)">
+            <summary>
+            Gets the item for the specified index.
+            </summary>
+            <param name="itemsSource">The items source.</param>
+            <param name="index">The index.</param>
+            <returns>The get item.</returns>
+            <remarks>Returns <c>null</c> if ItemsSource is not set, or the index is outside the boundaries.</remarks>
+        </member>
+        <member name="M:OxyPlot.Series.ItemsSeries.GetItem(System.Int32)">
+            <summary>
+            Gets the item at the specified index.
+            </summary>
+            <param name="i">The index of the item.</param>
+            <returns>The item of the index.</returns>
+        </member>
+        <member name="P:OxyPlot.Series.ItemsSeries.ItemsSource">
+            <summary>
+            Gets or sets the items source.
+            </summary>
+            <value>The items source.</value>
+        </member>
+        <member name="M:OxyPlot.Series.XYAxisSeries.GetScreenRectangle">
+            <summary>
+            Gets the rectangle the series uses on the screen (screen coordinates).
+            </summary>
+            <returns>The rectangle.</returns>
+        </member>
+        <member name="M:OxyPlot.Series.XYAxisSeries.RenderLegend(OxyPlot.IRenderContext,OxyPlot.OxyRect)">
+            <summary>
+            Renders the legend symbol on the specified rendering context.
+            </summary>
+            <param name="rc">The rendering context.</param>
+            <param name="legendBox">The legend rectangle.</param>
+        </member>
+        <member name="M:OxyPlot.Series.XYAxisSeries.InverseTransform(OxyPlot.ScreenPoint)">
+            <summary>
+            Transforms from a screen point to a data point by the axes of this series.
+            </summary>
+            <param name="p">The screen point.</param>
+            <returns>A data point.</returns>
+        </member>
+        <member name="M:OxyPlot.Series.XYAxisSeries.Transform(System.Double,System.Double)">
+            <summary>
+            Transforms the specified coordinates to a screen point by the axes of this series.
+            </summary>
+            <param name="x">The x coordinate.</param>
+            <param name="y">The y coordinate.</param>
+            <returns>A screen point.</returns>
+        </member>
+        <member name="M:OxyPlot.Series.XYAxisSeries.Transform(OxyPlot.DataPoint)">
+            <summary>
+            Transforms the specified data point to a screen point by the axes of this series.
+            </summary>
+            <param name="p">The point.</param>
+            <returns>A screen point.</returns>
+        </member>
+        <member name="M:OxyPlot.Series.XYAxisSeries.AreAxesRequired">
+            <summary>
+            Check if this data series requires X/Y axes. (e.g. Pie series do not require axes)
+            </summary>
+            <returns>The are axes required.</returns>
+        </member>
+        <member name="M:OxyPlot.Series.XYAxisSeries.EnsureAxes">
+            <summary>
+            Ensures that the axes of the series is defined.
+            </summary>
+        </member>
+        <member name="M:OxyPlot.Series.XYAxisSeries.IsUsing(OxyPlot.Axes.Axis)">
+            <summary>
+            Check if the data series is using the specified axis.
+            </summary>
+            <param name="axis">An axis.</param>
+            <returns>True if the axis is in use.</returns>
+        </member>
+        <member name="M:OxyPlot.Series.XYAxisSeries.SetDefaultValues(OxyPlot.PlotModel)">
+            <summary>
+            Sets default values from the plot model.
+            </summary>
+            <param name="model">The plot model.</param>
+        </member>
+        <member name="M:OxyPlot.Series.XYAxisSeries.UpdateAxisMaxMin">
+            <summary>
+            Updates the axes to include the max and min of this series.
+            </summary>
+        </member>
+        <member name="M:OxyPlot.Series.XYAxisSeries.UpdateData">
+            <summary>
+            Updates the data.
+            </summary>
+        </member>
+        <member name="M:OxyPlot.Series.XYAxisSeries.UpdateMaxMin">
+            <summary>
+            Updates the maximum and minimum values of the series.
+            </summary>
+        </member>
+        <member name="M:OxyPlot.Series.XYAxisSeries.GetClippingRect">
+            <summary>
+            Gets the clipping rectangle.
+            </summary>
+            <returns>The clipping rectangle.</returns>
+        </member>
+        <member name="M:OxyPlot.Series.XYAxisSeries.GetNearestInterpolatedPointInternal(System.Collections.Generic.List{OxyPlot.DataPoint},OxyPlot.ScreenPoint)">
+            <summary>
+            Gets the point on the curve that is nearest the specified point.
+            </summary>
+            <param name="points">The point list.</param>
+            <param name="point">The point.</param>
+            <returns>A tracker hit result if a point was found.</returns>
+        </member>
+        <member name="M:OxyPlot.Series.XYAxisSeries.GetNearestPointInternal(System.Collections.Generic.IEnumerable{OxyPlot.DataPoint},OxyPlot.ScreenPoint)">
+            <summary>
+            Gets the nearest point.
+            </summary>
+            <param name="points">The points (data coordinates).</param>
+            <param name="point">The point (screen coordinates).</param>
+            <returns>A <see cref="T:OxyPlot.TrackerHitResult"/> if a point was found, <c>null</c> otherwise.</returns>
+        </member>
+        <member name="M:OxyPlot.Series.XYAxisSeries.IsValidPoint(OxyPlot.DataPoint)">
+            <summary>
+            Determines whether the specified point is valid.
+            </summary>
+            <param name="pt">The point.</param>
+            <returns><c>true</c> if the point is valid; otherwise, <c>false</c> .</returns>
+        </member>
+        <member name="M:OxyPlot.Series.XYAxisSeries.IsValidPoint(System.Double,System.Double)">
+            <summary>
+            Determines whether the specified point is valid.
+            </summary>
+            <param name="x">The x coordinate.</param>
+            <param name="y">The y coordinate.</param>
+            <returns><c>true</c> if the point is valid; otherwise, <c>false</c> . </returns>
+        </member>
+        <member name="M:OxyPlot.Series.XYAxisSeries.InternalUpdateMaxMin(System.Collections.Generic.List{OxyPlot.DataPoint})">
+            <summary>
+            Updates the Max/Min limits from the specified <see cref="T:OxyPlot.DataPoint"/> list.
+            </summary>
+            <param name="points">The list of points.</param>
+        </member>
+        <member name="M:OxyPlot.Series.XYAxisSeries.InternalUpdateMaxMin``1(System.Collections.Generic.List{``0},System.Func{``0,System.Double},System.Func{``0,System.Double})">
+            <summary>
+            Updates the Max/Min limits from the specified list.
+            </summary>
+            <typeparam name="T">The type of the elements in the list.</typeparam>
+            <param name="items">The items.</param>
+            <param name="xf">A function that provides the x value for each item.</param>
+            <param name="yf">A function that provides the y value for each item.</param>
+            <exception cref="T:System.ArgumentNullException">The items argument cannot be null.</exception>
+        </member>
+        <member name="M:OxyPlot.Series.XYAxisSeries.InternalUpdateMaxMin``1(System.Collections.Generic.List{``0},System.Func{``0,System.Double},System.Func{``0,System.Double},System.Func{``0,System.Double},System.Func{``0,System.Double})">
+            <summary>
+            Updates the Max/Min limits from the specified collection.
+            </summary>
+            <typeparam name="T">The type of the items in the collection.</typeparam>
+            <param name="items">The items.</param>
+            <param name="xmin">A function that provides the x minimum for each item.</param>
+            <param name="xmax">A function that provides the x maximum for each item.</param>
+            <param name="ymin">A function that provides the y minimum for each item.</param>
+            <param name="ymax">A function that provides the y maximum for each item.</param>
+            <exception cref="T:System.ArgumentNullException">The items argument cannot be null.</exception>
+        </member>
+        <member name="M:OxyPlot.Series.XYAxisSeries.VerifyAxes">
+            <summary>
+            Verifies that both axes are defined.
+            </summary>
+        </member>
+        <member name="P:OxyPlot.Series.XYAxisSeries.MaxX">
+            <summary>
+            Gets or sets the maximum x-coordinate of the dataset.
+            </summary>
+            <value>The maximum x-coordinate.</value>
+        </member>
+        <member name="P:OxyPlot.Series.XYAxisSeries.MaxY">
+            <summary>
+            Gets or sets the maximum y-coordinate of the dataset.
+            </summary>
+            <value>The maximum y-coordinate.</value>
+        </member>
+        <member name="P:OxyPlot.Series.XYAxisSeries.MinX">
+            <summary>
+            Gets or sets the minimum x-coordinate of the dataset.
+            </summary>
+            <value>The minimum x-coordinate.</value>
+        </member>
+        <member name="P:OxyPlot.Series.XYAxisSeries.MinY">
+            <summary>
+            Gets or sets the minimum y-coordinate of the dataset.
+            </summary>
+            <value>The minimum y-coordinate.</value>
+        </member>
+        <member name="P:OxyPlot.Series.XYAxisSeries.XAxis">
+            <summary>
+            Gets the x-axis.
+            </summary>
+            <value>The x-axis.</value>
+        </member>
+        <member name="P:OxyPlot.Series.XYAxisSeries.XAxisKey">
+            <summary>
+            Gets or sets the x-axis key.
+            </summary>
+            <value>The x-axis key.</value>
+        </member>
+        <member name="P:OxyPlot.Series.XYAxisSeries.YAxis">
+            <summary>
+            Gets the y-axis.
+            </summary>
+            <value>The y-axis.</value>
+        </member>
+        <member name="P:OxyPlot.Series.XYAxisSeries.YAxisKey">
+            <summary>
+            Gets or sets the y-axis key.
+            </summary>
+            <value>The y-axis key.</value>
+        </member>
+        <member name="F:OxyPlot.Series.ScatterSeries`1.points">
+            <summary>
+            The list of data points.
+            </summary>
+        </member>
+        <member name="F:OxyPlot.Series.ScatterSeries`1.defaultMarkerFillColor">
+            <summary>
+            The default fill color.
+            </summary>
+        </member>
+        <member name="M:OxyPlot.Series.ScatterSeries`1.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:OxyPlot.Series.ScatterSeries`1"/> class.
+            </summary>
+        </member>
+        <member name="M:OxyPlot.Series.ScatterSeries`1.GetNearestPoint(OxyPlot.ScreenPoint,System.Boolean)">
+            <summary>
+            Gets the nearest point.
+            </summary>
+            <param name="point">The point.</param>
+            <param name="interpolate">interpolate if set to <c>true</c> .</param>
+            <returns>A TrackerHitResult for the current hit.</returns>
+        </member>
+        <member name="M:OxyPlot.Series.ScatterSeries`1.IsValidPoint(`0,OxyPlot.Axes.Axis,OxyPlot.Axes.Axis)">
+            <summary>
+            Determines whether the specified point is valid.
+            </summary>
+            <param name="pt">The point.</param>
+            <param name="xaxis">The x axis.</param>
+            <param name="yaxis">The y axis.</param>
+            <returns><c>true</c> if the point is valid; otherwise, <c>false</c> .</returns>
+        </member>
+        <member name="M:OxyPlot.Series.ScatterSeries`1.Render(OxyPlot.IRenderContext,OxyPlot.PlotModel)">
+            <summary>
+            Renders the series on the specified rendering context.
+            </summary>
+            <param name="rc">The rendering context.</param>
+            <param name="model">The owner plot model.</param>
+        </member>
+        <member name="M:OxyPlot.Series.ScatterSeries`1.RenderLegend(OxyPlot.IRenderContext,OxyPlot.OxyRect)">
+            <summary>
+            Renders the legend symbol for the line series on the specified rendering context.
+            </summary>
+            <param name="rc">The rendering context.</param>
+            <param name="legendBox">The bounding rectangle of the legend box.</param>
+        </member>
+        <member name="M:OxyPlot.Series.ScatterSeries`1.EnsureAxes">
+            <summary>
+            Ensures that the axes of the series is defined.
+            </summary>
+        </member>
+        <member name="M:OxyPlot.Series.ScatterSeries`1.SetDefaultValues(OxyPlot.PlotModel)">
+            <summary>
+            Sets the default values.
+            </summary>
+            <param name="model">The model.</param>
+        </member>
+        <member name="M:OxyPlot.Series.ScatterSeries`1.UpdateData">
+            <summary>
+            Updates the data.
+            </summary>
+        </member>
+        <member name="M:OxyPlot.Series.ScatterSeries`1.UpdateMaxMin">
+            <summary>
+            Updates the maximum and minimum values of the series.
+            </summary>
+        </member>
+        <member name="M:OxyPlot.Series.ScatterSeries`1.InternalUpdateMaxMinValue(System.Collections.Generic.List{`0})">
+            <summary>
+            Updates the Max/Min limits from the values in the specified point list.
+            </summary>
+            <param name="pts">The points.</param>
+        </member>
+        <member name="M:OxyPlot.Series.ScatterSeries`1.AddScatterPoints(System.Collections.Generic.IList{`0},System.Collections.IEnumerable,System.String,System.String,System.String,System.String,System.String)">
+            <summary>
+            Adds scatter points specified by a items source and data fields.
+            </summary>
+            <param name="target">The destination collection.</param>
+            <param name="itemsSource">The items source.</param>
+            <param name="dataFieldX">The data field x.</param>
+            <param name="dataFieldY">The data field y.</param>
+            <param name="dataFieldSize">The data field size.</param>
+            <param name="dataFieldValue">The data field value.</param>
+            <param name="dataFieldTag">The data field tag.</param>
+        </member>
+        <member name="M:OxyPlot.Series.ScatterSeries`1.InternalUpdateMaxMinValue(System.Collections.Generic.IList{OxyPlot.Series.ScatterPoint})">
+            <summary>
+            Updates the Max/Min limits from the values in the specified point list.
+            </summary>
+            <param name="pts">The points.</param>
+        </member>
+        <member name="M:OxyPlot.Series.ScatterSeries`1.ClearItemsSourcePoints">
+            <summary>
+            Clears or creates the <see cref="P:OxyPlot.Series.ScatterSeries`1.ItemsSourcePoints"/> list.
+            </summary>
+        </member>
+        <member name="M:OxyPlot.Series.ScatterSeries`1.DefineDataFields(OxyPlot.ListFiller{`0})">
+            <summary>
+            Defines the data fields used by the code that reflects on the <see cref="P:OxyPlot.Series.ItemsSeries.ItemsSource"/>.
+            </summary>
+            <param name="filler">The list filler.</param>
+        </member>
+        <member name="M:OxyPlot.Series.ScatterSeries`1.UpdateItemsSourcePoints">
+            <summary>
+            Updates the points from the <see cref="P:OxyPlot.Series.ItemsSeries.ItemsSource"/>.
+            </summary>
+        </member>
+        <member name="P:OxyPlot.Series.ScatterSeries`1.Points">
+            <summary>
+            Gets the list of points.
+            </summary>
+            <value>A list of <see cref="T:OxyPlot.Series.ScatterPoint"/>.</value>
+            <remarks>If the <see cref="P:OxyPlot.Series.ItemsSeries.ItemsSource"/> is specified, this list will not be used.</remarks>
+        </member>
+        <member name="P:OxyPlot.Series.ScatterSeries`1.Mapping">
+            <summary>
+            Gets or sets a function that maps from elements in the <see cref="P:OxyPlot.Series.ItemsSeries.ItemsSource"/> to <see cref="T:OxyPlot.Series.ScatterPoint"/> points to be rendered.
+            </summary>
+            <value>The mapping function. The default is <c>null</c>.</value>
+            <remarks>Example: series1.Mapping = item =&gt; new DataPoint(((MyType)item).Time,((MyType)item).Value);
+            </remarks>
+        </member>
+        <member name="P:OxyPlot.Series.ScatterSeries`1.BinSize">
+            <summary>
+            Gets or sets the size of the 'binning' feature. 
+            If this number is greater than 1, bins of the specified is created for both x and y directions. Only one point will be drawn in each bin.
+            </summary>
+            <value>
+            The size of the bins. The default is <c>0</c> - no binning.
+            </value>
+        </member>
+        <member name="P:OxyPlot.Series.ScatterSeries`1.ColorAxis">
+            <summary>
+            Gets the actual color axis.
+            </summary>
+            <value>A <see cref="T:OxyPlot.Axes.IColorAxis"/>.</value>
+            <remarks>This is used to map scatter point values to colors. Use the <see cref="P:OxyPlot.Series.ScatterSeries`1.ColorAxisKey"/> to specify a color axis. 
+            If the <see cref="P:OxyPlot.Series.ScatterSeries`1.ColorAxisKey"/> is not specified, the first <see cref="T:OxyPlot.Axes.IColorAxis"/> of the <see cref="T:OxyPlot.PlotModel"/> will be used.</remarks>
+        </member>
+        <member name="P:OxyPlot.Series.ScatterSeries`1.ColorAxisKey">
+            <summary>
+            Gets or sets the color axis key.
+            </summary>
+            <value>The color axis key. The default is <c>null</c>.</value>
+            <remarks>If set to <c>null</c>, the first <see cref="T:OxyPlot.Axes.IColorAxis"/> of the <see cref="T:OxyPlot.PlotModel"/> will be used. 
+            Make sure that the points contains values.
+            If your <see cref="T:OxyPlot.PlotModel"/> contains a <see cref="T:OxyPlot.Axes.IColorAxis"/>, but you don't want to use a color axis, set the value to <c>string.Empty</c> or some other key that is not in use.</remarks>
+        </member>
+        <member name="P:OxyPlot.Series.ScatterSeries`1.DataFieldX">
+            <summary>
+            Gets or sets the name of the property that specifies X coordinates in the <see cref="P:OxyPlot.Series.ItemsSeries.ItemsSource"/> elements.
+            </summary>
+            <value>The name of the property. The default is <c>null</c>.</value>
+        </member>
+        <member name="P:OxyPlot.Series.ScatterSeries`1.DataFieldY">
+            <summary>
+            Gets or sets the name of the property that specifies Y coordinates in the <see cref="P:OxyPlot.Series.ItemsSeries.ItemsSource"/> elements.
+            </summary>
+            <value>The name of the property. The default is <c>null</c>.</value>
+        </member>
+        <member name="P:OxyPlot.Series.ScatterSeries`1.DataFieldSize">
+            <summary>
+            Gets or sets the name of the property that specifies the size in the <see cref="P:OxyPlot.Series.ItemsSeries.ItemsSource"/> elements.
+            </summary>
+            <value>The name of the property. The default is <c>null</c>.</value>
+        </member>
+        <member name="P:OxyPlot.Series.ScatterSeries`1.DataFieldTag">
+            <summary>
+            Gets or sets the name of the property that specifies the tag in the <see cref="P:OxyPlot.Series.ItemsSeries.ItemsSource"/> elements.
+            </summary>
+            <value>The name of the property. The default is <c>null</c>.</value>
+        </member>
+        <member name="P:OxyPlot.Series.ScatterSeries`1.DataFieldValue">
+            <summary>
+            Gets or sets the name of the property that specifies the color value in the <see cref="P:OxyPlot.Series.ItemsSeries.ItemsSource"/> elements.
+            </summary>
+            <value>The name of the property. The default is <c>null</c>.</value>
+        </member>
+        <member name="P:OxyPlot.Series.ScatterSeries`1.MarkerFill">
+            <summary>
+            Gets or sets the marker fill color. If <c>null</c>, this color will be automatically set.
+            </summary>
+            <value>The fill color of the markers. The default is <see cref="F:OxyPlot.OxyColors.Automatic"/>.</value>
+        </member>
+        <member name="P:OxyPlot.Series.ScatterSeries`1.ActualMarkerFillColor">
+            <summary>
+            Gets the actual fill color.
+            </summary>
+            <value>The actual color.</value>
+        </member>
+        <member name="P:OxyPlot.Series.ScatterSeries`1.MarkerOutline">
+            <summary>
+            Gets or sets the custom marker outline polygon. Set <see cref="P:OxyPlot.Series.ScatterSeries`1.MarkerType"/> to <see cref="T:MarkerType.Custom"/> to use this.
+            </summary>
+            <value>The outline. The default is <c>null</c>.</value>
+        </member>
+        <member name="P:OxyPlot.Series.ScatterSeries`1.MarkerSize">
+            <summary>
+            Gets or sets the size of the marker (same size for all items).
+            </summary>
+            <value>The size of the markers. The default is <c>5</c>.</value>
+        </member>
+        <member name="P:OxyPlot.Series.ScatterSeries`1.MarkerStroke">
+            <summary>
+            Gets or sets the marker stroke.
+            </summary>
+            <value>The marker stroke. The default is <see cref="F:OxyPlot.OxyColors.Automatic"/>.</value>
+        </member>
+        <member name="P:OxyPlot.Series.ScatterSeries`1.MarkerStrokeThickness">
+            <summary>
+            Gets or sets thickness of the the marker strokes.
+            </summary>
+            <value>The thickness. The default is <c>1</c>.</value>
+        </member>
+        <member name="P:OxyPlot.Series.ScatterSeries`1.MarkerType">
+            <summary>
+            Gets or sets the type of the marker.
+            </summary>
+            <value>The type of the marker. The default is <see cref="T:MarkerType.Square"/>.</value>
+            <remarks>If <see cref="T:MarkerType.Custom"/> is used, the <see cref="P:OxyPlot.Series.ScatterSeries`1.MarkerOutline"/> property must be specified.</remarks>
+        </member>
+        <member name="P:OxyPlot.Series.ScatterSeries`1.MaxValue">
+            <summary>
+            Gets the maximum value of the points.
+            </summary>
+        </member>
+        <member name="P:OxyPlot.Series.ScatterSeries`1.MinValue">
+            <summary>
+            Gets the minimum value of the points.
+            </summary>
+        </member>
+        <member name="P:OxyPlot.Series.ScatterSeries`1.ActualPoints">
+            <summary>
+            Gets the list of points that should be rendered.
+            </summary>
+            <value>A list of <see cref="T:OxyPlot.DataPoint"/>.</value>
+        </member>
+        <member name="P:OxyPlot.Series.ScatterSeries`1.ItemsSourcePoints">
+            <summary>
+            Gets or sets the data points from the items source.
+            </summary>
+        </member>
+        <member name="P:OxyPlot.Series.ScatterSeries`1.OwnsItemsSourcePoints">
+            <summary>
+            Gets or sets a value indicating whether the <see cref="P:OxyPlot.Series.ScatterSeries`1.ItemsSourcePoints"/> list can be modified.
+            </summary>
+        </member>
+        <member name="M:OxyPlot.Series.ScatterErrorSeries.#ctor">
+            <summary>
+                Initializes a new instance of the <see cref="T:OxyPlot.Series.ScatterErrorSeries"/> class.
+            </summary>
+        </member>
+        <member name="M:OxyPlot.Series.ScatterErrorSeries.Render(OxyPlot.IRenderContext,OxyPlot.PlotModel)">
+            <summary>
+            Renders the series on the specified rendering context.
+            </summary>
+            <param name="rc">
+            The rendering context.
+            </param>
+            <param name="model">
+            The owner plot model.
+            </param>
+        </member>
+        <member name="M:OxyPlot.Series.ScatterErrorSeries.SelectAll(System.Func{OxyPlot.Series.ScatterErrorPoint,System.Boolean})">
+            <summary>
+            Selects all points for which the passed function returns true.
+            </summary>
+            <param name="func">
+            The function.
+            </param>
+        </member>
+        <member name="M:OxyPlot.Series.ScatterErrorSeries.DefineDataFields(OxyPlot.ListFiller{OxyPlot.Series.ScatterErrorPoint})">
+            <summary>
+            Defines the data fields used by the code that reflects on the <see cref="P:OxyPlot.Series.ItemsSeries.ItemsSource"/>.
+            </summary>
+            <param name="filler">The list filler.</param>
+        </member>
+        <member name="P:OxyPlot.Series.ScatterErrorSeries.DataFieldErrorX">
+            <summary>
+                Gets or sets the data field for the X error property.
+            </summary>
+            <value>
+                The data field.
+            </value>
+        </member>
+        <member name="P:OxyPlot.Series.ScatterErrorSeries.DataFieldErrorY">
+            <summary>
+                Gets or sets the data field for the Y error property.
+            </summary>
+            <value>
+                The data field.
+            </value>
+        </member>
+        <member name="P:OxyPlot.Series.ScatterErrorSeries.ErrorBarColor">
+            <summary>
+                Gets or sets the color of the error bar.
+            </summary>
+            <value>
+                The color of the error bar.
+            </value>
+        </member>
+        <member name="P:OxyPlot.Series.ScatterErrorSeries.ErrorBarStopWidth">
+            <summary>
+                Gets or sets the width of the error bar stop.
+            </summary>
+            <value>
+                The width of the error bar stop.
+            </value>
+        </member>
+        <member name="P:OxyPlot.Series.ScatterErrorSeries.ErrorBarStrokeThickness">
+            <summary>
+                Gets or sets the error bar stroke thickness.
+            </summary>
+            <value>
+                The error bar stroke thickness.
+            </value>
+        </member>
+        <member name="P:OxyPlot.Series.ScatterErrorSeries.MinimumErrorSize">
+            <summary>
+            Gets or sets the minimum size (relative to <see cref="P:OxyPlot.Series.ScatterSeries`1.MarkerSize"/>) of the error bars to be shown. 
+            </summary>
+        </member>
         <member name="T:OxyPlot.AxisUtilities">
             <summary>
             Provides utility methods for axes.
@@ -13135,380 +13967,6 @@
             Base class for series where the items are categorized.
             </summary>
         </member>
-        <member name="T:OxyPlot.Series.XYAxisSeries">
-            <summary>
-            Provides an abstract base class for series that are related to an X-axis and a Y-axis.
-            </summary>
-        </member>
-        <member name="T:OxyPlot.Series.ItemsSeries">
-            <summary>
-            Abstract base class for series that can contain items.
-            </summary>
-        </member>
-        <member name="T:OxyPlot.Series.Series">
-            <summary>
-            Provides an abstract base class for plot series.
-            </summary>
-            <remarks>This class contains internal methods that should be called only from the PlotModel.</remarks>
-        </member>
-        <member name="T:OxyPlot.Series.ITrackableSeries">
-            <summary>
-            Provides functionality to return data for a tracker control.
-            </summary>
-            <remarks>The plot view will show a tracker with the current value when moving the mouse over the data.</remarks>
-        </member>
-        <member name="M:OxyPlot.Series.ITrackableSeries.GetNearestPoint(OxyPlot.ScreenPoint,System.Boolean)">
-            <summary>
-            Gets the point on the series that is nearest the specified point.
-            </summary>
-            <param name="point">The point.</param>
-            <param name="interpolate">Interpolate the series if this flag is set to <c>true</c>.</param>
-            <returns>A TrackerHitResult for the current hit.</returns>
-        </member>
-        <member name="P:OxyPlot.Series.ITrackableSeries.TrackerFormatString">
-            <summary>
-            Gets a format string used for the tracker.
-            </summary>
-            <remarks>The fields that can be used in the format string depends on the series.</remarks>
-        </member>
-        <member name="P:OxyPlot.Series.ITrackableSeries.TrackerKey">
-            <summary>
-            Gets the tracker key.
-            </summary>
-        </member>
-        <member name="M:OxyPlot.Series.Series.#ctor">
-            <summary>
-            Initializes a new instance of the <see cref="T:OxyPlot.Series.Series"/> class.
-            </summary>
-        </member>
-        <member name="M:OxyPlot.Series.Series.GetNearestPoint(OxyPlot.ScreenPoint,System.Boolean)">
-            <summary>
-            Gets the point on the series that is nearest the specified point.
-            </summary>
-            <param name="point">The point.</param>
-            <param name="interpolate">Interpolate the series if this flag is set to <c>true</c>.</param>
-            <returns>A TrackerHitResult for the current hit.</returns>
-        </member>
-        <member name="M:OxyPlot.Series.Series.Render(OxyPlot.IRenderContext,OxyPlot.PlotModel)">
-            <summary>
-            Renders the series on the specified render context.
-            </summary>
-            <param name="rc">The rendering context.</param>
-            <param name="model">The model.</param>
-        </member>
-        <member name="M:OxyPlot.Series.Series.RenderLegend(OxyPlot.IRenderContext,OxyPlot.OxyRect)">
-            <summary>
-            Renders the legend symbol on the specified render context.
-            </summary>
-            <param name="rc">The rendering context.</param>
-            <param name="legendBox">The legend rectangle.</param>
-        </member>
-        <member name="M:OxyPlot.Series.Series.AreAxesRequired">
-            <summary>
-            Checks if this data series requires X/Y axes. (e.g. Pie series do not require axes)
-            </summary>
-            <returns><c>true</c> if axes are required.</returns>
-        </member>
-        <member name="M:OxyPlot.Series.Series.EnsureAxes">
-            <summary>
-            Ensures that the axes of the series are defined.
-            </summary>
-        </member>
-        <member name="M:OxyPlot.Series.Series.IsUsing(OxyPlot.Axes.Axis)">
-            <summary>
-            Checks if the data series is using the specified axis.
-            </summary>
-            <param name="axis">The axis that should be checked.</param>
-            <returns><c>true</c> if the axis is in use.</returns>
-        </member>
-        <member name="M:OxyPlot.Series.Series.SetDefaultValues(OxyPlot.PlotModel)">
-            <summary>
-            Sets the default values (colors, line style etc.) from the plot model.
-            </summary>
-            <param name="model">A plot model.</param>
-        </member>
-        <member name="M:OxyPlot.Series.Series.UpdateAxisMaxMin">
-            <summary>
-            Updates the maximum and minimum values of the axes used by this series.
-            </summary>
-        </member>
-        <member name="M:OxyPlot.Series.Series.UpdateData">
-            <summary>
-            Updates the data of the series.
-            </summary>
-        </member>
-        <member name="M:OxyPlot.Series.Series.UpdateValidData">
-            <summary>
-            Updates the valid data of the series.
-            </summary>
-        </member>
-        <member name="M:OxyPlot.Series.Series.UpdateMaxMin">
-            <summary>
-            Updates the maximum and minimum values of the series.
-            </summary>
-            <remarks>This method is called when the <see cref="T:OxyPlot.PlotModel"/> is updated with the <c>updateData</c> parameter set to <c>true</c>.</remarks>
-        </member>
-        <member name="M:OxyPlot.Series.Series.HitTestOverride(OxyPlot.HitTestArguments)">
-            <summary>
-            When overridden in a derived class, tests if the plot element is hit by the specified point.
-            </summary>
-            <param name="args">The hit test arguments.</param>
-            <returns>
-            The result of the hit test.
-            </returns>
-        </member>
-        <member name="P:OxyPlot.Series.Series.Background">
-            <summary>
-            Gets or sets the background color of the series.
-            </summary>
-            <remarks>This property defines the background color in the area defined by the x and y axes used by this series.</remarks>
-        </member>
-        <member name="P:OxyPlot.Series.Series.IsVisible">
-            <summary>
-            Gets or sets a value indicating whether this series is visible.
-            </summary>
-        </member>
-        <member name="P:OxyPlot.Series.Series.Title">
-            <summary>
-            Gets or sets the title of the series.
-            </summary>
-            <value>The title that is shown in the legend of the plot. The default value is <c>null</c>. When the value is <c>null</c>, this series will not be shown in the legend.</value>
-        </member>
-        <member name="P:OxyPlot.Series.Series.TrackerFormatString">
-            <summary>
-            Gets or sets a format string used for the tracker.
-            </summary>
-            <remarks>
-            The arguments for the format string may be different for each type of series. See the documentation.
-            </remarks>
-        </member>
-        <member name="P:OxyPlot.Series.Series.TrackerKey">
-            <summary>
-            Gets or sets the key for the tracker to use on this series.
-            </summary>
-            <remarks>
-            This key may be used by the plot view to show a custom tracker for the series.
-            </remarks>
-        </member>
-        <member name="M:OxyPlot.Series.ItemsSeries.UpdateValidData">
-            <summary>
-            Updates the valid items
-            </summary>
-        </member>
-        <member name="M:OxyPlot.Series.ItemsSeries.GetItem(System.Collections.IEnumerable,System.Int32)">
-            <summary>
-            Gets the item for the specified index.
-            </summary>
-            <param name="itemsSource">The items source.</param>
-            <param name="index">The index.</param>
-            <returns>The get item.</returns>
-            <remarks>Returns <c>null</c> if ItemsSource is not set, or the index is outside the boundaries.</remarks>
-        </member>
-        <member name="M:OxyPlot.Series.ItemsSeries.GetItem(System.Int32)">
-            <summary>
-            Gets the item at the specified index.
-            </summary>
-            <param name="i">The index of the item.</param>
-            <returns>The item of the index.</returns>
-        </member>
-        <member name="P:OxyPlot.Series.ItemsSeries.ItemsSource">
-            <summary>
-            Gets or sets the items source.
-            </summary>
-            <value>The items source.</value>
-        </member>
-        <member name="M:OxyPlot.Series.XYAxisSeries.GetScreenRectangle">
-            <summary>
-            Gets the rectangle the series uses on the screen (screen coordinates).
-            </summary>
-            <returns>The rectangle.</returns>
-        </member>
-        <member name="M:OxyPlot.Series.XYAxisSeries.RenderLegend(OxyPlot.IRenderContext,OxyPlot.OxyRect)">
-            <summary>
-            Renders the legend symbol on the specified rendering context.
-            </summary>
-            <param name="rc">The rendering context.</param>
-            <param name="legendBox">The legend rectangle.</param>
-        </member>
-        <member name="M:OxyPlot.Series.XYAxisSeries.InverseTransform(OxyPlot.ScreenPoint)">
-            <summary>
-            Transforms from a screen point to a data point by the axes of this series.
-            </summary>
-            <param name="p">The screen point.</param>
-            <returns>A data point.</returns>
-        </member>
-        <member name="M:OxyPlot.Series.XYAxisSeries.Transform(System.Double,System.Double)">
-            <summary>
-            Transforms the specified coordinates to a screen point by the axes of this series.
-            </summary>
-            <param name="x">The x coordinate.</param>
-            <param name="y">The y coordinate.</param>
-            <returns>A screen point.</returns>
-        </member>
-        <member name="M:OxyPlot.Series.XYAxisSeries.Transform(OxyPlot.DataPoint)">
-            <summary>
-            Transforms the specified data point to a screen point by the axes of this series.
-            </summary>
-            <param name="p">The point.</param>
-            <returns>A screen point.</returns>
-        </member>
-        <member name="M:OxyPlot.Series.XYAxisSeries.AreAxesRequired">
-            <summary>
-            Check if this data series requires X/Y axes. (e.g. Pie series do not require axes)
-            </summary>
-            <returns>The are axes required.</returns>
-        </member>
-        <member name="M:OxyPlot.Series.XYAxisSeries.EnsureAxes">
-            <summary>
-            Ensures that the axes of the series is defined.
-            </summary>
-        </member>
-        <member name="M:OxyPlot.Series.XYAxisSeries.IsUsing(OxyPlot.Axes.Axis)">
-            <summary>
-            Check if the data series is using the specified axis.
-            </summary>
-            <param name="axis">An axis.</param>
-            <returns>True if the axis is in use.</returns>
-        </member>
-        <member name="M:OxyPlot.Series.XYAxisSeries.SetDefaultValues(OxyPlot.PlotModel)">
-            <summary>
-            Sets default values from the plot model.
-            </summary>
-            <param name="model">The plot model.</param>
-        </member>
-        <member name="M:OxyPlot.Series.XYAxisSeries.UpdateAxisMaxMin">
-            <summary>
-            Updates the axes to include the max and min of this series.
-            </summary>
-        </member>
-        <member name="M:OxyPlot.Series.XYAxisSeries.UpdateData">
-            <summary>
-            Updates the data.
-            </summary>
-        </member>
-        <member name="M:OxyPlot.Series.XYAxisSeries.UpdateMaxMin">
-            <summary>
-            Updates the maximum and minimum values of the series.
-            </summary>
-        </member>
-        <member name="M:OxyPlot.Series.XYAxisSeries.GetClippingRect">
-            <summary>
-            Gets the clipping rectangle.
-            </summary>
-            <returns>The clipping rectangle.</returns>
-        </member>
-        <member name="M:OxyPlot.Series.XYAxisSeries.GetNearestInterpolatedPointInternal(System.Collections.Generic.List{OxyPlot.DataPoint},OxyPlot.ScreenPoint)">
-            <summary>
-            Gets the point on the curve that is nearest the specified point.
-            </summary>
-            <param name="points">The point list.</param>
-            <param name="point">The point.</param>
-            <returns>A tracker hit result if a point was found.</returns>
-        </member>
-        <member name="M:OxyPlot.Series.XYAxisSeries.GetNearestPointInternal(System.Collections.Generic.IEnumerable{OxyPlot.DataPoint},OxyPlot.ScreenPoint)">
-            <summary>
-            Gets the nearest point.
-            </summary>
-            <param name="points">The points (data coordinates).</param>
-            <param name="point">The point (screen coordinates).</param>
-            <returns>A <see cref="T:OxyPlot.TrackerHitResult"/> if a point was found, <c>null</c> otherwise.</returns>
-        </member>
-        <member name="M:OxyPlot.Series.XYAxisSeries.IsValidPoint(OxyPlot.DataPoint)">
-            <summary>
-            Determines whether the specified point is valid.
-            </summary>
-            <param name="pt">The point.</param>
-            <returns><c>true</c> if the point is valid; otherwise, <c>false</c> .</returns>
-        </member>
-        <member name="M:OxyPlot.Series.XYAxisSeries.IsValidPoint(System.Double,System.Double)">
-            <summary>
-            Determines whether the specified point is valid.
-            </summary>
-            <param name="x">The x coordinate.</param>
-            <param name="y">The y coordinate.</param>
-            <returns><c>true</c> if the point is valid; otherwise, <c>false</c> . </returns>
-        </member>
-        <member name="M:OxyPlot.Series.XYAxisSeries.InternalUpdateMaxMin(System.Collections.Generic.List{OxyPlot.DataPoint})">
-            <summary>
-            Updates the Max/Min limits from the specified <see cref="T:OxyPlot.DataPoint"/> list.
-            </summary>
-            <param name="points">The list of points.</param>
-        </member>
-        <member name="M:OxyPlot.Series.XYAxisSeries.InternalUpdateMaxMin``1(System.Collections.Generic.List{``0},System.Func{``0,System.Double},System.Func{``0,System.Double})">
-            <summary>
-            Updates the Max/Min limits from the specified list.
-            </summary>
-            <typeparam name="T">The type of the elements in the list.</typeparam>
-            <param name="items">The items.</param>
-            <param name="xf">A function that provides the x value for each item.</param>
-            <param name="yf">A function that provides the y value for each item.</param>
-            <exception cref="T:System.ArgumentNullException">The items argument cannot be null.</exception>
-        </member>
-        <member name="M:OxyPlot.Series.XYAxisSeries.InternalUpdateMaxMin``1(System.Collections.Generic.List{``0},System.Func{``0,System.Double},System.Func{``0,System.Double},System.Func{``0,System.Double},System.Func{``0,System.Double})">
-            <summary>
-            Updates the Max/Min limits from the specified collection.
-            </summary>
-            <typeparam name="T">The type of the items in the collection.</typeparam>
-            <param name="items">The items.</param>
-            <param name="xmin">A function that provides the x minimum for each item.</param>
-            <param name="xmax">A function that provides the x maximum for each item.</param>
-            <param name="ymin">A function that provides the y minimum for each item.</param>
-            <param name="ymax">A function that provides the y maximum for each item.</param>
-            <exception cref="T:System.ArgumentNullException">The items argument cannot be null.</exception>
-        </member>
-        <member name="M:OxyPlot.Series.XYAxisSeries.VerifyAxes">
-            <summary>
-            Verifies that both axes are defined.
-            </summary>
-        </member>
-        <member name="P:OxyPlot.Series.XYAxisSeries.MaxX">
-            <summary>
-            Gets or sets the maximum x-coordinate of the dataset.
-            </summary>
-            <value>The maximum x-coordinate.</value>
-        </member>
-        <member name="P:OxyPlot.Series.XYAxisSeries.MaxY">
-            <summary>
-            Gets or sets the maximum y-coordinate of the dataset.
-            </summary>
-            <value>The maximum y-coordinate.</value>
-        </member>
-        <member name="P:OxyPlot.Series.XYAxisSeries.MinX">
-            <summary>
-            Gets or sets the minimum x-coordinate of the dataset.
-            </summary>
-            <value>The minimum x-coordinate.</value>
-        </member>
-        <member name="P:OxyPlot.Series.XYAxisSeries.MinY">
-            <summary>
-            Gets or sets the minimum y-coordinate of the dataset.
-            </summary>
-            <value>The minimum y-coordinate.</value>
-        </member>
-        <member name="P:OxyPlot.Series.XYAxisSeries.XAxis">
-            <summary>
-            Gets the x-axis.
-            </summary>
-            <value>The x-axis.</value>
-        </member>
-        <member name="P:OxyPlot.Series.XYAxisSeries.XAxisKey">
-            <summary>
-            Gets or sets the x-axis key.
-            </summary>
-            <value>The x-axis key.</value>
-        </member>
-        <member name="P:OxyPlot.Series.XYAxisSeries.YAxis">
-            <summary>
-            Gets the y-axis.
-            </summary>
-            <value>The y-axis.</value>
-        </member>
-        <member name="P:OxyPlot.Series.XYAxisSeries.YAxisKey">
-            <summary>
-            Gets or sets the y-axis key.
-            </summary>
-            <value>The y-axis key.</value>
-        </member>
         <member name="M:OxyPlot.Series.CategorizedSeries.GetBarWidth">
             <summary>
             Gets or sets the width/height of the columns/bars (as a fraction of the available space).
@@ -18672,93 +19130,6 @@
             </summary>
             <value>The X value.</value>
         </member>
-        <member name="T:OxyPlot.Series.ScatterPoint">
-            <summary>
-            Represents a point in a <see cref="T:OxyPlot.Series.ScatterSeries"/>.
-            </summary>
-        </member>
-        <member name="F:OxyPlot.Series.ScatterPoint.size">
-            <summary>
-            The size.
-            </summary>
-        </member>
-        <member name="F:OxyPlot.Series.ScatterPoint.tag">
-            <summary>
-            The tag.
-            </summary>
-        </member>
-        <member name="F:OxyPlot.Series.ScatterPoint.value">
-            <summary>
-            The value.
-            </summary>
-        </member>
-        <member name="F:OxyPlot.Series.ScatterPoint.x">
-            <summary>
-            The x.
-            </summary>
-        </member>
-        <member name="F:OxyPlot.Series.ScatterPoint.y">
-            <summary>
-            The y.
-            </summary>
-        </member>
-        <member name="M:OxyPlot.Series.ScatterPoint.#ctor">
-            <summary>
-            Initializes a new instance of the <see cref="T:OxyPlot.Series.ScatterPoint"/> class.
-            </summary>
-        </member>
-        <member name="M:OxyPlot.Series.ScatterPoint.#ctor(System.Double,System.Double,System.Double,System.Double,System.Object)">
-            <summary>
-            Initializes a new instance of the <see cref="T:OxyPlot.Series.ScatterPoint"/> class.
-            </summary>
-            <param name="x">The x.</param>
-            <param name="y">The y.</param>
-            <param name="size">The size.</param>
-            <param name="value">The value.</param>
-            <param name="tag">The tag.</param>
-        </member>
-        <member name="M:OxyPlot.Series.ScatterPoint.ToCode">
-            <summary>
-            Returns C# code that generates this instance.
-            </summary>
-            <returns>C# code.</returns>
-        </member>
-        <member name="M:OxyPlot.Series.ScatterPoint.ToString">
-            <summary>
-            Returns a <see cref="T:System.String"/> that represents this instance.
-            </summary>
-            <returns>A <see cref="T:System.String"/> that represents this instance.</returns>
-        </member>
-        <member name="P:OxyPlot.Series.ScatterPoint.Size">
-            <summary>
-            Gets or sets the size.
-            </summary>
-            <value>The size.</value>
-        </member>
-        <member name="P:OxyPlot.Series.ScatterPoint.Tag">
-            <summary>
-            Gets or sets the tag.
-            </summary>
-            <value>The tag.</value>
-        </member>
-        <member name="P:OxyPlot.Series.ScatterPoint.Value">
-            <summary>
-            Gets or sets the value.
-            </summary>
-            <value>The value.</value>
-        </member>
-        <member name="P:OxyPlot.Series.ScatterPoint.X">
-            <summary>
-            Gets or sets the X.
-            </summary>
-            <value>The X.</value>
-        </member>
-        <member name="P:OxyPlot.Series.ScatterPoint.Y">
-            <summary>
-            Gets or sets the Y.
-            </summary>
-            <value>The Y.</value>
-        </member>
         <member name="T:OxyPlot.Series.StemSeries">
             <summary>
             Represents a series that plots discrete data in a stem plot.
@@ -18863,247 +19234,6 @@
             Represents a series for scatter plots.
             </summary>
             <remarks>See http://en.wikipedia.org/wiki/Scatter_plot</remarks>
-        </member>
-        <member name="F:OxyPlot.Series.ScatterSeries.points">
-            <summary>
-            The list of data points.
-            </summary>
-        </member>
-        <member name="F:OxyPlot.Series.ScatterSeries.itemsSourcePoints">
-            <summary>
-            The data points from the items source.
-            </summary>
-        </member>
-        <member name="F:OxyPlot.Series.ScatterSeries.ownsItemsSourcePoints">
-            <summary>
-            Specifies if the itemsSourcePoints list can be modified.
-            </summary>
-        </member>
-        <member name="F:OxyPlot.Series.ScatterSeries.defaultMarkerFillColor">
-            <summary>
-            The default fill color.
-            </summary>
-        </member>
-        <member name="M:OxyPlot.Series.ScatterSeries.#ctor">
-            <summary>
-            Initializes a new instance of the <see cref="T:OxyPlot.Series.ScatterSeries"/> class.
-            </summary>
-        </member>
-        <member name="M:OxyPlot.Series.ScatterSeries.GetNearestPoint(OxyPlot.ScreenPoint,System.Boolean)">
-            <summary>
-            Gets the nearest point.
-            </summary>
-            <param name="point">The point.</param>
-            <param name="interpolate">interpolate if set to <c>true</c> .</param>
-            <returns>A TrackerHitResult for the current hit.</returns>
-        </member>
-        <member name="M:OxyPlot.Series.ScatterSeries.IsValidPoint(OxyPlot.Series.ScatterPoint,OxyPlot.Axes.Axis,OxyPlot.Axes.Axis)">
-            <summary>
-            Determines whether the specified point is valid.
-            </summary>
-            <param name="pt">The point.</param>
-            <param name="xaxis">The x axis.</param>
-            <param name="yaxis">The y axis.</param>
-            <returns><c>true</c> if the point is valid; otherwise, <c>false</c> .</returns>
-        </member>
-        <member name="M:OxyPlot.Series.ScatterSeries.Render(OxyPlot.IRenderContext,OxyPlot.PlotModel)">
-            <summary>
-            Renders the series on the specified rendering context.
-            </summary>
-            <param name="rc">The rendering context.</param>
-            <param name="model">The owner plot model.</param>
-        </member>
-        <member name="M:OxyPlot.Series.ScatterSeries.RenderLegend(OxyPlot.IRenderContext,OxyPlot.OxyRect)">
-            <summary>
-            Renders the legend symbol for the line series on the specified rendering context.
-            </summary>
-            <param name="rc">The rendering context.</param>
-            <param name="legendBox">The bounding rectangle of the legend box.</param>
-        </member>
-        <member name="M:OxyPlot.Series.ScatterSeries.EnsureAxes">
-            <summary>
-            Ensures that the axes of the series is defined.
-            </summary>
-        </member>
-        <member name="M:OxyPlot.Series.ScatterSeries.SetDefaultValues(OxyPlot.PlotModel)">
-            <summary>
-            Sets the default values.
-            </summary>
-            <param name="model">The model.</param>
-        </member>
-        <member name="M:OxyPlot.Series.ScatterSeries.UpdateData">
-            <summary>
-            Updates the data.
-            </summary>
-        </member>
-        <member name="M:OxyPlot.Series.ScatterSeries.UpdateMaxMin">
-            <summary>
-            Updates the maximum and minimum values of the series.
-            </summary>
-        </member>
-        <member name="M:OxyPlot.Series.ScatterSeries.InternalUpdateMaxMinValue(System.Collections.Generic.List{OxyPlot.Series.ScatterPoint})">
-            <summary>
-            Updates the Max/Min limits from the values in the specified point list.
-            </summary>
-            <param name="pts">The points.</param>
-        </member>
-        <member name="M:OxyPlot.Series.ScatterSeries.AddScatterPoints(System.Collections.Generic.IList{OxyPlot.Series.ScatterPoint},System.Collections.IEnumerable,System.String,System.String,System.String,System.String,System.String)">
-            <summary>
-            Adds scatter points specified by a items source and data fields.
-            </summary>
-            <param name="target">The destination collection.</param>
-            <param name="itemsSource">The items source.</param>
-            <param name="dataFieldX">The data field x.</param>
-            <param name="dataFieldY">The data field y.</param>
-            <param name="dataFieldSize">The data field size.</param>
-            <param name="dataFieldValue">The data field value.</param>
-            <param name="dataFieldTag">The data field tag.</param>
-        </member>
-        <member name="M:OxyPlot.Series.ScatterSeries.InternalUpdateMaxMinValue(System.Collections.Generic.IList{OxyPlot.Series.ScatterPoint})">
-            <summary>
-            Updates the Max/Min limits from the values in the specified point list.
-            </summary>
-            <param name="pts">The points.</param>
-        </member>
-        <member name="M:OxyPlot.Series.ScatterSeries.ClearItemsSourcePoints">
-            <summary>
-            Clears or creates the <see cref="F:OxyPlot.Series.ScatterSeries.itemsSourcePoints"/> list.
-            </summary>
-        </member>
-        <member name="M:OxyPlot.Series.ScatterSeries.UpdateItemsSourcePoints">
-            <summary>
-            Updates the points from the <see cref="P:OxyPlot.Series.ItemsSeries.ItemsSource"/>.
-            </summary>
-        </member>
-        <member name="P:OxyPlot.Series.ScatterSeries.Points">
-            <summary>
-            Gets the list of points.
-            </summary>
-            <value>A list of <see cref="T:OxyPlot.Series.ScatterPoint"/>.</value>
-            <remarks>If the <see cref="P:OxyPlot.Series.ItemsSeries.ItemsSource"/> is specified, this list will not be used.</remarks>
-        </member>
-        <member name="P:OxyPlot.Series.ScatterSeries.Mapping">
-            <summary>
-            Gets or sets a function that maps from elements in the <see cref="P:OxyPlot.Series.ItemsSeries.ItemsSource"/> to <see cref="T:OxyPlot.Series.ScatterPoint"/> points to be rendered.
-            </summary>
-            <value>The mapping function. The default is <c>null</c>.</value>
-            <remarks>Example: series1.Mapping = item =&gt; new DataPoint(((MyType)item).Time,((MyType)item).Value);
-            </remarks>
-        </member>
-        <member name="P:OxyPlot.Series.ScatterSeries.BinSize">
-            <summary>
-            Gets or sets the size of the 'binning' feature. 
-            If this number is greater than 1, bins of the specified is created for both x and y directions. Only one point will be drawn in each bin.
-            </summary>
-            <value>
-            The size of the bins. The default is <c>0</c> - no binning.
-            </value>
-        </member>
-        <member name="P:OxyPlot.Series.ScatterSeries.ColorAxis">
-            <summary>
-            Gets the actual color axis.
-            </summary>
-            <value>A <see cref="T:OxyPlot.Axes.IColorAxis"/>.</value>
-            <remarks>This is used to map scatter point values to colors. Use the <see cref="P:OxyPlot.Series.ScatterSeries.ColorAxisKey"/> to specify a color axis. 
-            If the <see cref="P:OxyPlot.Series.ScatterSeries.ColorAxisKey"/> is not specified, the first <see cref="T:OxyPlot.Axes.IColorAxis"/> of the <see cref="T:OxyPlot.PlotModel"/> will be used.</remarks>
-        </member>
-        <member name="P:OxyPlot.Series.ScatterSeries.ColorAxisKey">
-            <summary>
-            Gets or sets the color axis key.
-            </summary>
-            <value>The color axis key. The default is <c>null</c>.</value>
-            <remarks>If set to <c>null</c>, the first <see cref="T:OxyPlot.Axes.IColorAxis"/> of the <see cref="T:OxyPlot.PlotModel"/> will be used. 
-            Make sure that the points contains values.
-            If your <see cref="T:OxyPlot.PlotModel"/> contains a <see cref="T:OxyPlot.Axes.IColorAxis"/>, but you don't want to use a color axis, set the value to <c>string.Empty</c> or some other key that is not in use.</remarks>
-        </member>
-        <member name="P:OxyPlot.Series.ScatterSeries.DataFieldX">
-            <summary>
-            Gets or sets the name of the property that specifies X coordinates in the <see cref="P:OxyPlot.Series.ItemsSeries.ItemsSource"/> elements.
-            </summary>
-            <value>The name of the property. The default is <c>null</c>.</value>
-        </member>
-        <member name="P:OxyPlot.Series.ScatterSeries.DataFieldY">
-            <summary>
-            Gets or sets the name of the property that specifies Y coordinates in the <see cref="P:OxyPlot.Series.ItemsSeries.ItemsSource"/> elements.
-            </summary>
-            <value>The name of the property. The default is <c>null</c>.</value>
-        </member>
-        <member name="P:OxyPlot.Series.ScatterSeries.DataFieldSize">
-            <summary>
-            Gets or sets the name of the property that specifies the size in the <see cref="P:OxyPlot.Series.ItemsSeries.ItemsSource"/> elements.
-            </summary>
-            <value>The name of the property. The default is <c>null</c>.</value>
-        </member>
-        <member name="P:OxyPlot.Series.ScatterSeries.DataFieldTag">
-            <summary>
-            Gets or sets the name of the property that specifies the tag in the <see cref="P:OxyPlot.Series.ItemsSeries.ItemsSource"/> elements.
-            </summary>
-            <value>The name of the property. The default is <c>null</c>.</value>
-        </member>
-        <member name="P:OxyPlot.Series.ScatterSeries.DataFieldValue">
-            <summary>
-            Gets or sets the name of the property that specifies the color value in the <see cref="P:OxyPlot.Series.ItemsSeries.ItemsSource"/> elements.
-            </summary>
-            <value>The name of the property. The default is <c>null</c>.</value>
-        </member>
-        <member name="P:OxyPlot.Series.ScatterSeries.MarkerFill">
-            <summary>
-            Gets or sets the marker fill color. If <c>null</c>, this color will be automatically set.
-            </summary>
-            <value>The fill color of the markers. The default is <see cref="F:OxyPlot.OxyColors.Automatic"/>.</value>
-        </member>
-        <member name="P:OxyPlot.Series.ScatterSeries.ActualMarkerFillColor">
-            <summary>
-            Gets the actual fill color.
-            </summary>
-            <value>The actual color.</value>
-        </member>
-        <member name="P:OxyPlot.Series.ScatterSeries.MarkerOutline">
-            <summary>
-            Gets or sets the custom marker outline polygon. Set <see cref="P:OxyPlot.Series.ScatterSeries.MarkerType"/> to <see cref="T:MarkerType.Custom"/> to use this.
-            </summary>
-            <value>The outline. The default is <c>null</c>.</value>
-        </member>
-        <member name="P:OxyPlot.Series.ScatterSeries.MarkerSize">
-            <summary>
-            Gets or sets the size of the marker (same size for all items).
-            </summary>
-            <value>The size of the markers. The default is <c>5</c>.</value>
-        </member>
-        <member name="P:OxyPlot.Series.ScatterSeries.MarkerStroke">
-            <summary>
-            Gets or sets the marker stroke.
-            </summary>
-            <value>The marker stroke. The default is <see cref="F:OxyPlot.OxyColors.Automatic"/>.</value>
-        </member>
-        <member name="P:OxyPlot.Series.ScatterSeries.MarkerStrokeThickness">
-            <summary>
-            Gets or sets thickness of the the marker strokes.
-            </summary>
-            <value>The thickness. The default is <c>1</c>.</value>
-        </member>
-        <member name="P:OxyPlot.Series.ScatterSeries.MarkerType">
-            <summary>
-            Gets or sets the type of the marker.
-            </summary>
-            <value>The type of the marker. The default is <see cref="T:MarkerType.Square"/>.</value>
-            <remarks>If <see cref="T:MarkerType.Custom"/> is used, the <see cref="P:OxyPlot.Series.ScatterSeries.MarkerOutline"/> property must be specified.</remarks>
-        </member>
-        <member name="P:OxyPlot.Series.ScatterSeries.MaxValue">
-            <summary>
-            Gets the maximum value of the points.
-            </summary>
-        </member>
-        <member name="P:OxyPlot.Series.ScatterSeries.MinValue">
-            <summary>
-            Gets the minimum value of the points.
-            </summary>
-        </member>
-        <member name="P:OxyPlot.Series.ScatterSeries.ActualPoints">
-            <summary>
-            Gets the list of points that should be rendered.
-            </summary>
-            <value>A list of <see cref="T:OxyPlot.DataPoint"/>.</value>
         </member>
         <member name="T:OxyPlot.Series.TwoColorLineSeries">
             <summary>

@@ -26,7 +26,7 @@ namespace MCDA.ViewModel
         private Color _classBreaksRendererStartColor, _classBreaksRendererEndColor;
 
         private int _selectedNumberOfClasses;
-        private IClassify _selectedClassificationMethod;
+        private IClassifyGEN _selectedClassificationMethod;
 
         private ClassBreaksRendererContainer _classBreaksRendererContainer = new ClassBreaksRendererContainer();
 
@@ -62,7 +62,6 @@ namespace MCDA.ViewModel
             ToolFieldsList = new ObservableCollection<MCDA.Model.Feature>(_mcdaExtension.FeaturesFromInMemoryWorkspace.Where(x => x.Fields.Any(f => f.IsSuitableForMCDA)).ToList());
 
             Bins = 5;
-            //HistogramMajorStep = 5;
 
             PropertyChanged.Notify(() => ToolFieldsList);
             PropertyChanged.Notify(() => AllFieldsList);
@@ -102,9 +101,7 @@ namespace MCDA.ViewModel
 
         public IList<string> HistogramLabels { get; private set; }
 
-        public IList<string> HistogramActualLabels { get; private set; }
-
-        public ObservableCollection<Tuple<double, double>> HistogramBreaks { get; private set; }
+        public ObservableCollection<Tuple<double, string>> HistogramBreaks { get; private set; }
 
         public int Bins
         {
@@ -116,16 +113,13 @@ namespace MCDA.ViewModel
             }
         }
 
-        //public int HistogramMajorStep { get; private set; }
-
         private void UpdateHistogramControl()
         {
             if (!IsFieldToRenderSelected)
                 return;
 
-            HistogramActualLabels = new List<string>();
             HistogramLabels = new List<string>();
-            HistogramBreaks = new ObservableCollection<Tuple<double, double>>();
+            HistogramBreaks = new ObservableCollection<Tuple<double, string>>();
 
             IList<ColumnItem> columnItems = new List<ColumnItem>();
 
@@ -133,33 +127,45 @@ namespace MCDA.ViewModel
 
             double[] breaks = Classification.Classify(SelectedClassificationMethod, SelectedFieldToRender.Field.Feature.FeatureClass, SelectedFieldToRender.Field.ESRIField, SelectedNumberOfClasses);
 
-            int breakIndex = 0;
+            //we have to skip the first one, for detailed information see Classify method
+            breaks = breaks.Skip(1).ToArray();
 
             for(int i = 0; i < histo.Length; i++)
             {
                 columnItems.Add(new ColumnItem(histo[i].Item2));
-                //HistogramActualLabels.Add(currentValue.Item1.ToString("0.00"));
+               
                 HistogramLabels.Add(histo[i].Item1.ToString("0.00"));
 
-                if (breaks[breakIndex] <= histo[i].Item1 && i < histo.Length-1 && !(breaks[breakIndex] > histo[i+1].Item1))
-                {
-                    HistogramBreaks.Add(Tuple.Create(i-0.5d, breaks[breakIndex]));
-                    if (breakIndex < breaks.Count()-1)
-                        breakIndex++;
-                }
+            }
 
+            for (int i = 0; i < breaks.Length; i++)
+            {
+                for (int j = 0; j < histo.Length; j++ )
+                {
+                    if (breaks[i] > histo[j].Item1)
+                        continue;
+                    else
+                    { 
+                        Tuple<double, string> existingBreak = HistogramBreaks.FirstOrDefault(t => t.Item1 == j - 0.5d);
+
+                        if (existingBreak != null)
+                        {
+                            HistogramBreaks.Remove(existingBreak);
+                            HistogramBreaks.Add(Tuple.Create(j - 0.5d, existingBreak.Item2 + "  [" + (breaks[i]).ToString("0.0000") + "]"));
+                        }
+                        else
+                            HistogramBreaks.Add(Tuple.Create(j - 0.5d, "[" + (breaks[i]).ToString("0.0000") + "]"));
+
+                        break;
+                    }
+
+                }            
             }
 
             HistogramData = columnItems;
 
-            //we want always 5 Labels
-            //HistogramMajorStep = (int) Math.Ceiling(histo.Count() / 5d);
-
-            //HistogramBreaks = new ObservableCollection<double>(Classification.Classify(SelectedClassificationMethod, SelectedFieldToRender.Field.Feature.FeatureClass, SelectedFieldToRender.Field.ESRIField, SelectedNumberOfClasses).ToList());
-                
             PropertyChanged.Notify(() => HistogramLabels);
-            //PropertyChanged.Notify(() => HistogramMajorStep);
-
+       
             PropertyChanged.Notify(() => HistogramData);
             PropertyChanged.Notify(() => HistogramBreaks);
         }
@@ -170,7 +176,7 @@ namespace MCDA.ViewModel
 
         public BindingList<int> NumberOfClasses { get; private set; }
 
-        public BindingList<IClassify> ListOfClassificationMethod { get; private set; }
+        public BindingList<IClassifyGEN> ListOfClassificationMethod { get; private set; }
 
 
         public int SelectedNumberOfClasses
@@ -185,7 +191,7 @@ namespace MCDA.ViewModel
             }
         }
 
-        public IClassify SelectedClassificationMethod
+        public IClassifyGEN SelectedClassificationMethod
         {
             get { return _selectedClassificationMethod; }
             set
@@ -276,7 +282,7 @@ namespace MCDA.ViewModel
 
             _selectedClassificationMethod = quantileClass;
 
-            ListOfClassificationMethod = new BindingList<IClassify>
+            ListOfClassificationMethod = new BindingList<IClassifyGEN>
             {
                 new NaturalBreaksClass(),
                 quantileClass,
@@ -359,8 +365,11 @@ namespace MCDA.ViewModel
         {
             if (!IsFieldToRenderSelected) return;
 
-            SelectedFieldToRender.BiPolarRendererContainer = GetBiPolarContainer();
-            Render();
+            if (SelectedFieldToRender.Field.IsSelectedFieldForRendering)
+            {
+                SelectedFieldToRender.BiPolarRendererContainer = GetBiPolarContainer();
+                Render();
+            }
         }
 
         public void ClassBreaksRendererValuesChanged()
@@ -369,8 +378,11 @@ namespace MCDA.ViewModel
 
             UpdateHistogramControl();
 
-            SelectedFieldToRender.ClassBreaksRendererContainer = GetClassBreaksRendererContainer();
-            Render();
+            if (SelectedFieldToRender.Field.IsSelectedFieldForRendering)
+            {
+                SelectedFieldToRender.ClassBreaksRendererContainer = GetClassBreaksRendererContainer();
+                Render();
+            }
         }
 
         #region commands

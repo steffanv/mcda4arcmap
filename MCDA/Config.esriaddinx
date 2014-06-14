@@ -13,11 +13,11 @@
 
     Finally, I thank Brad Carter for his implementation of LWLC, which was inspiring and helpful for the early LWLC implementation of this tool.
   </Description>
-  <Version>1.1</Version>
+  <Version>1.1A</Version>
   <Image>Images\MCDA Add-in.png</Image>
   <Author>Steffan Voss</Author>
   <Company>Steffan Voss</Company>
-  <Date>05/1/2014</Date>
+  <Date>06/13/2014</Date>
   <Targets>
     <Target name="Desktop" version="10.1" />
   </Targets>

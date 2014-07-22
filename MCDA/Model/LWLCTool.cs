@@ -19,7 +19,7 @@ namespace MCDA.Model
 {
    internal sealed class LWLCTool : AbstractToolTemplate
     {
-       private string _defaultResultColumnName = "LWLC Result";
+       private string _defaultResultColumnName = "LWLCResult";
        private ToolParameterContainer _toolParameterContainer;
        private NormalizationStrategy _tranformationStrategy;
        private IFeatureClass _featureClass;

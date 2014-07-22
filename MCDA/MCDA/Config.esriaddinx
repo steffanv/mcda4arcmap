@@ -17,9 +17,9 @@
   <Image>Images\MCDA Add-in.png</Image>
   <Author>Steffan Voss</Author>
   <Company>Steffan Voss</Company>
-  <Date>06/13/2014</Date>
+  <Date>7/22/2014</Date>
   <Targets>
-    <Target name="Desktop" version="10.1" />
+    <Target name="Desktop" version="10.2" />
   </Targets>
   <AddIn language="CLR4.5" library="MCDA.dll" namespace="MCDA">
     <ArcMap>

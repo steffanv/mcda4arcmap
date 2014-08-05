@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using MCDA.Extensions;
+using MCDA.Misc;
 
 namespace MCDA.Model
 {
@@ -12,8 +13,8 @@ namespace MCDA.Model
         protected double _weight = 0;
         protected string _columnName;
         protected bool _isOID = false;
-        protected bool _isWeightNotificationDisabled = false;
-
+        protected ToolParameterContainer _toolParameterContainer;
+       
         protected virtual void OnPropertyChanged(PropertyChangedEventArgs e)
         {
             PropertyChangedEventHandler handler = PropertyChanged;
@@ -22,6 +23,8 @@ namespace MCDA.Model
         }
 
         public abstract double Weight { get; set; }
+
+        public abstract bool IsActive { get; set; }
 
         public abstract IToolParameter LastWeightChangedToolParameter { get; set; }
 
@@ -55,6 +58,14 @@ namespace MCDA.Model
             get { return _columnName; }
             set { _columnName = value; }
         }
+
+        public ToolParameterContainer ToolParameterContainer
+        {
+            get { return _toolParameterContainer; }
+            set { _toolParameterContainer = value; }
+        }
+
+        public abstract Range<double> AcceptableWeightRange { get; }
 
         public abstract IToolParameter DeepClone();
     }

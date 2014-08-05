@@ -12,6 +12,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using MCDA.ViewModel;
+using MCDA.Model;
 
 namespace MCDA
 {
@@ -21,7 +22,7 @@ namespace MCDA
     /// </summary>
     public partial class WLCToolView : Window
     {
-       
+
         public WLCToolView()
         {
             InitializeComponent();
@@ -47,17 +48,47 @@ namespace MCDA
 
         }
 
-        private void weightSlider_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
-        {
-            WLCToolViewModel viewmodel = (WLCToolViewModel)DataContext;
-            viewmodel.UpdateAllowedEvent();     
-        }
-
-        private void weightSliderTextblock_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        private void WeightSliderDragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
         {
             WLCToolViewModel viewmodel = (WLCToolViewModel)DataContext;
             viewmodel.UpdateAllowedEvent();
-            viewmodel.Update();
+        }
+
+        private void WeightSliderTextblockKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == System.Windows.Input.Key.Enter)
+            {
+                TextBox weightSliderTextblock = sender as TextBox;
+                var bindingExpression = weightSliderTextblock.GetBindingExpression(TextBox.TextProperty);
+
+
+                IToolParameter toolParameter = bindingExpression.DataItem as ToolParameter;
+
+                double w;
+                if (Double.TryParse(weightSliderTextblock.Text, out w))
+                {
+                    if (toolParameter.AcceptableWeightRange.ContainsValue(w))
+                        bindingExpression.UpdateSource();
+                    else
+                        bindingExpression.UpdateTarget();
+                }
+            }
+        }
+
+        private void WeightSliderTextblockToolTipOpening(object sender, ToolTipEventArgs e)
+        {
+            var weightSliderTextblock = sender as TextBox;
+
+            var bindingExpression = weightSliderTextblock.GetBindingExpression(TextBox.TextProperty);
+
+            var toolParameter = bindingExpression.DataItem as ToolParameter;
+
+            double w;
+            if (Double.TryParse(weightSliderTextblock.Text, out w))
+            {
+                ToolTip toolTip = new System.Windows.Controls.ToolTip { Content = "Please enter a value in the following range: " + toolParameter.AcceptableWeightRange.ToString(3) + "." };
+                weightSliderTextblock.ToolTip = toolTip;
+            }
         }
     }
 }

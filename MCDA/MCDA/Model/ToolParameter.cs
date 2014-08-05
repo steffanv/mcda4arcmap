@@ -4,14 +4,16 @@ using System.Linq;
 using System.Text;
 using MCDA.Extensions;
 using System.ComponentModel;
+using MCDA.Misc;
 
 namespace MCDA.Model
 {
 
-   internal sealed class ToolParameter : AbstractToolParameter
-   {
-        
+    internal sealed class ToolParameter : AbstractToolParameter
+    {
+
         private static IToolParameter _lastWeightChangedToolParameter;
+        private bool _isActive;
 
         public ToolParameter(string columnName)
         {
@@ -20,23 +22,31 @@ namespace MCDA.Model
 
         public override IToolParameter LastWeightChangedToolParameter
         {
-            get { return _lastWeightChangedToolParameter;}
+            get { return _lastWeightChangedToolParameter; }
             set { _lastWeightChangedToolParameter = value; }
         }
 
         public override double Weight
         {
             get { return _weight; }
-            set { _lastWeightChangedToolParameter = this;
+            set
+            {             
+                _lastWeightChangedToolParameter = this;
 
-                if(value < 0)
-                    _weight = 0;
-                else if (value > 100)
-                    _weight = 100;
-                else
-                    _weight = value;
+                _weight = value;
 
-            OnPropertyChanged(new PropertyChangedEventArgs("Weight"));
+                OnPropertyChanged(new PropertyChangedEventArgs("Weight"));
+            }
+        }
+
+        public override bool IsActive
+        {
+            get { return _isActive; }
+            set
+            {
+                _isActive = value;
+
+                OnPropertyChanged(new PropertyChangedEventArgs("IsActive"));
             }
         }
 
@@ -51,5 +61,15 @@ namespace MCDA.Model
 
             return copy;
         }
-   }
+
+        public override Range<double> AcceptableWeightRange
+        {
+            get {
+
+                double sum = ToolParameterContainer.ToolParameter.Where(p => !p.IsLocked && p != this).Sum(p => p.Weight);
+
+                return new Range<double>() { Minimum = Math.Max(this.Weight - (100 - sum), 0), Maximum = this.Weight + sum };
+            }
+        }
+    }
 }

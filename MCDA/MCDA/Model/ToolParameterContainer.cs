@@ -24,7 +24,14 @@ namespace MCDA.Model
             this._listOfParameter = listOfParameter;
 
             foreach (var currentParameter in this._listOfParameter)
+            {
                 currentParameter.RegisterPropertyHandler(x => x.Weight, WeightPropertyChanged);
+                currentParameter.RegisterPropertyHandler(x => x.IsLocked, IsLockedPropertyChanged);
+
+                currentParameter.IsActive = true;
+
+                currentParameter.ToolParameterContainer = this;
+            }
 
         }
 
@@ -39,7 +46,45 @@ namespace MCDA.Model
                 _isLocked = false;
 
                 PropertyChanged.Notify(() => ToolParameter);
-            }    
+            }
+
+            if (_listOfParameter.Where(p => p.IsLocked).Sum(p => p.Weight) >= 100)
+            {
+                foreach (var item in _listOfParameter.Where(p => p.IsActive && !p.IsLocked))
+                    item.IsActive = false;
+                    
+                PropertyChanged.Notify(() => ToolParameter);                
+            }
+
+            if ((_listOfParameter.Where(p => p.IsLocked).Sum(p => p.Weight) < 100) && (_listOfParameter.Count(p => p.IsLocked) < _listOfParameter.Count - 1))
+            {
+                foreach (var item in _listOfParameter.Where(p => !p.IsActive && !p.IsLocked))
+                    item.IsActive = true;
+
+                PropertyChanged.Notify(() => ToolParameter);
+            }
+        }
+
+        void IsLockedPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if ((_listOfParameter.Count(p => p.IsLocked) >= _listOfParameter.Count - 1) || (_listOfParameter.Where(p => p.IsLocked).Sum(p => p.Weight) >= 100))
+            {
+                var parameter = _listOfParameter.FirstOrDefault(p => !p.IsLocked);
+
+                if(parameter != null)
+                {
+                   parameter.IsActive = false;
+                   PropertyChanged.Notify(() => ToolParameter);
+                }                
+            }
+
+            if ((_listOfParameter.Any(p => p.IsActive == false) && _listOfParameter.Count(p => p.IsLocked) < _listOfParameter.Count - 1) && (_listOfParameter.Where(p => p.IsLocked).Sum(p => p.Weight) < 100))
+            {
+                foreach (var item in _listOfParameter.Where(p => !p.IsActive))
+                        item.IsActive = true;
+
+                PropertyChanged.Notify(() => ToolParameter);
+            }
         }
 
         public IWeightDistributionStrategy WeightDistributionStrategy{

@@ -186,7 +186,7 @@ namespace MCDA.Model
                     uniqueValueRenderer.set_Symbol(label, (ISymbol) pSimpleFillColor);
             }
 
-            //'** If you didn't use a predefined color ramp
+            //'** If you didn'toolParameter use a predefined color ramp
             //'** in a style, use "Custom" here. Otherwise,
             //'** use the name of the color ramp you selected.
             uniqueValueRenderer.ColorScheme = "Custom";

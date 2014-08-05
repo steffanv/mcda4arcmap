@@ -12,6 +12,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using MCDA.ViewModel;
+using MCDA.Model;
 
 namespace MCDA
 {
@@ -45,7 +46,7 @@ namespace MCDA
 
         }
 
-        private void weightSlider_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
+        private void WeightSliderDragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
         {
             LWLCToolViewModel viewmodel = (LWLCToolViewModel)DataContext;
             viewmodel.UpdateAllowedEvent(true);
@@ -53,18 +54,48 @@ namespace MCDA
             viewmodel.Update();
         }
 
-        private void weightSlider_DragStarted(object sender, System.Windows.Controls.Primitives.DragStartedEventArgs e)
+        //private void weightSlider_DragStarted(object sender, System.Windows.Controls.Primitives.DragStartedEventArgs e)
+        //{
+        //    LWLCToolViewModel viewmodel = (LWLCToolViewModel)DataContext;
+        //    viewmodel.UpdateAllowedEvent(false);
+        //}
+
+
+        private void WeightSliderTextblockKeyDown(object sender, KeyEventArgs e)
         {
-            LWLCToolViewModel viewmodel = (LWLCToolViewModel)DataContext;
-            viewmodel.UpdateAllowedEvent(false);
+            if (e.Key == System.Windows.Input.Key.Enter)
+            {
+                TextBox weightSliderTextblock = sender as TextBox;
+                var bindingExpression = weightSliderTextblock.GetBindingExpression(TextBox.TextProperty);
+
+
+                IToolParameter toolParameter = bindingExpression.DataItem as ToolParameter;
+
+                double w;
+                if (Double.TryParse(weightSliderTextblock.Text, out w))
+                {
+                    if (toolParameter.AcceptableWeightRange.ContainsValue(w))
+                        bindingExpression.UpdateSource();
+                    else
+                        bindingExpression.UpdateTarget();
+                }
+            }
         }
 
-
-        private void weightSliderTextblock_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        private void WeightSliderTextblockToolTipOpening(object sender, ToolTipEventArgs e)
         {
-            LWLCToolViewModel viewmodel = (LWLCToolViewModel)DataContext;
-            viewmodel.UpdateAllowedEvent(true);
-            //viewmodel.Update();
+            var weightSliderTextblock = sender as TextBox;
+
+            var bindingExpression = weightSliderTextblock.GetBindingExpression(TextBox.TextProperty);
+
+            var toolParameter = bindingExpression.DataItem as ToolParameter;
+
+            double w;
+            if (Double.TryParse(weightSliderTextblock.Text, out w))
+            {
+                ToolTip toolTip = new System.Windows.Controls.ToolTip { Content = "Please enter a value in the following range: " + toolParameter.AcceptableWeightRange.ToString(3) + "." };
+                weightSliderTextblock.ToolTip = toolTip;
+            }
         }
     }
 }

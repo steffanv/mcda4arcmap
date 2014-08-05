@@ -74,7 +74,7 @@
                                 <RowDefinition Height="25" />
                             </Grid.RowDefinitions>
                             <RadioButton Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" GroupName="NeighborhoodOption" IsChecked="{Binding Path=NeighborhoodOption, Converter={StaticResource enumToBooleanConverter}, ConverterParameter={x:Static viewModel:NeighborhoodOptions.Automatic}}" Content="Automatic (Extends neighborhood)" ToolTip="Add neighboor polygons until LWLC can be calculated."  />
-                            <ComboBox Grid.Row="2" Grid.Column="2" Height="23" HorizontalAlignment="Center"  Name="comboBox2"  Width="50" ItemsSource="{Binding Path=NumberOfKNearestNeighbors, Mode=OneWay}" SelectedValue="{Binding Path=SelectedNumberOfKNearestNeighborsForAutomatic, Mode=TwoWay}" />
+                            <!--<ComboBox Grid.Row="2" Grid.Column="2" Height="23" HorizontalAlignment="Center"  Name="comboBox2"  Width="50" ItemsSource="{Binding Path=NumberOfKNearestNeighbors, Mode=OneWay}" SelectedValue="{Binding Path=SelectedNumberOfKNearestNeighborsForAutomatic, Mode=TwoWay}" />-->
                         </Grid>
                     </GroupBox>
                 </Grid>

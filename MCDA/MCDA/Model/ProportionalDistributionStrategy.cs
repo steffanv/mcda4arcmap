@@ -17,12 +17,12 @@ namespace MCDA.Model
 
             double difference = 100 - listOfToolParameter.Sum(t => t.Weight);
 
-            // all except one are locked => we can not change anything
-            if (listOfToolParameter.Where(t => t.IsLocked).Count() == listOfToolParameter.Count() - 1)
+            // all except one (last changed) are locked => we can not change anything
+            if ((listOfToolParameter.Where(toolParameter => toolParameter.IsLocked).Count() == listOfToolParameter.Count() - 1) && (!lastWeightChangedToolParameter.IsLocked))
                 lastWeightChangedToolParameter.Weight += difference;
 
             // this is also true if all are locked
-            else if (listOfToolParameter.Where(t => t.IsLocked).Count() == listOfToolParameter.Count())
+            if (listOfToolParameter.Where(t => t.IsLocked).Count() == listOfToolParameter.Count())
                 lastWeightChangedToolParameter.Weight += difference;
 
             else if (listOfToolParameter.Where(t => !t.IsLocked && t != lastWeightChangedToolParameter).Sum(t => t.Weight) == 0 && difference < 0)

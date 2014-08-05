@@ -261,7 +261,7 @@ namespace MCDA.Model
 
                 for (int j = 0; j < centroidArray.GetLength(0); j++)
                 {
-                    //don't add the distance too itself
+                    //don'toolParameter add the distance too itself
                     if (i == j)
                         continue;
 

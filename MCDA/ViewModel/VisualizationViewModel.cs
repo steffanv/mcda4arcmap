@@ -329,7 +329,7 @@ namespace MCDA.ViewModel
 
             if (_selectedFieldToRender.Renderer == Renderer.ClassBreaksRenderer)
             {
-                _selectedClassificationMethod = _selectedFieldToRender.ClassBreaksRendererContainer.ClassificationMethod;
+                _selectedClassificationMethod = ListOfClassificationMethod.FirstOrDefault(m => m.MethodName.Equals(_selectedFieldToRender.ClassBreaksRendererContainer.ClassificationMethod.MethodName));
                 _selectedNumberOfClasses = _selectedFieldToRender.ClassBreaksRendererContainer.NumberOfClasses;
                 _classBreaksRendererStartColor = _selectedFieldToRender.ClassBreaksRendererContainer.StartColor;
                 _classBreaksRendererEndColor = _selectedFieldToRender.ClassBreaksRendererContainer.EndColor;

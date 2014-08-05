@@ -482,8 +482,18 @@ namespace MCDA
             }
 
             if (feature.SelectedFieldForRendering != null)
-                ProgressDialog.ShowProgressDialog("Creating Symbology", (Action<RendererContainer, IFeatureLayer2>)Render, feature.SelectedFieldForRendering.RenderContainer, feature.FeatureLayer);
-
+            {
+                switch (ConfigSingleton.Instance.SelectedRenderoption)
+                {
+                    case RenderOption.AfterSliderDrag:
+                        ProgressDialog.ShowProgressDialog("Creating Symbology", (Action<RendererContainer, IFeatureLayer2>)Render, feature.SelectedFieldForRendering.RenderContainer, feature.FeatureLayer);
+                        break;
+                    case RenderOption.AnimationLike: case RenderOption.Realtime: default:
+                        Render(feature.SelectedFieldForRendering.RenderContainer, feature.FeatureLayer);
+                        break;
+                }
+            }
+                
             PropertyChanged.Notify(() => LinkDictionary);
         }
 
@@ -513,19 +523,31 @@ namespace MCDA
                     break;
             }
 
-            PartialRefresh(renderContainer, featureLayer);
+            switch (ConfigSingleton.Instance.SelectedRenderoption)
+            {
+                case RenderOption.AfterSliderDrag:
+                    PartialRefresh(renderContainer, featureLayer);
+                    break;
+                case RenderOption.AnimationLike: case RenderOption.Realtime: default:
+                    PartialRefresh(renderContainer, featureLayer, false);
+                    break;
+            }
+            
         }
 
         /// <summary>
         ///     Performs a partial refresh on the feature feature in the in memory workspace.
         /// </summary>
         /// <param name="renderContainer"></param>
-        private void PartialRefresh(RendererContainer renderContainer, IFeatureLayer2 featureLayer)
+        private void PartialRefresh(RendererContainer renderContainer, IFeatureLayer2 featureLayer, bool updateTOC = true)
         {
             var activeView = (IActiveView) ArcMap.Document.FocusMap;
 
-            activeView.ContentsChanged();
-            ArcMap.Document.UpdateContents();
+            if (updateTOC)
+            {
+                activeView.ContentsChanged();
+                ArcMap.Document.UpdateContents();
+            }
 
             activeView.PartialRefresh(esriViewDrawPhase.esriViewGeography, featureLayer, null);
         }

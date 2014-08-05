@@ -193,8 +193,8 @@
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="*"/>
                                 </Grid.RowDefinitions>
-                                    <ComboBox HorizontalAlignment="Center" Width="120" ItemsSource="{Binding Path=ListOfClassificationMethod, Mode=OneWay}" DisplayMemberPath="MethodName" SelectedValue="{Binding Path=SelectedClassificationMethod, UpdateSourceTrigger=PropertyChanged}"  Name="classificationComboBox" Grid.Column="1" Grid.Row="1" ToolTip="Select a classification method."/>
-                                    <ComboBox HorizontalAlignment="Center" Width="50" ItemsSource="{Binding Path=NumberOfClasses, Mode=OneWay}" SelectedValue="{Binding Path=SelectedNumberOfClasses, UpdateSourceTrigger=PropertyChanged}" Name="classesComboBox" Grid.Column="2" Grid.Row="1" ToolTip="Select the number of classes."/>
+                                    <ComboBox HorizontalAlignment="Center" Width="120" ItemsSource="{Binding Path=ListOfClassificationMethod, Mode=TwoWay}" DisplayMemberPath="MethodName" SelectedValue="{Binding Path=SelectedClassificationMethod, UpdateSourceTrigger=PropertyChanged}"  Name="classificationComboBox" Grid.Column="1" Grid.Row="1" ToolTip="Select a classification method."/>
+                                    <ComboBox HorizontalAlignment="Center" Width="50" ItemsSource="{Binding Path=NumberOfClasses, Mode=TwoWay}" SelectedValue="{Binding Path=SelectedNumberOfClasses, UpdateSourceTrigger=PropertyChanged}" Name="classesComboBox" Grid.Column="2" Grid.Row="1" ToolTip="Select the number of classes."/>
                                     <xctk:DoubleUpDown HorizontalAlignment="Right" Value="{Binding Path=Bins}" Maximum="1000" Minimum="5" Increment="1" Width="50" Grid.Column="4" Grid.Row="1" ToolTip="Bins are used to group the data."/>
                                     <ToggleButton Grid.Column="3" Grid.Row="1" Width="25"  ToolTip="Shows the breaks values." Checked="ToggleButton_Checked" Unchecked="ToggleButton_Unchecked">
                                             <Image Source="..\Images\VisualizationGraphics\Breaks.png" />

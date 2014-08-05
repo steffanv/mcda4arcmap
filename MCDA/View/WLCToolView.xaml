@@ -1,6 +1,7 @@
 ﻿<Window x:Class="MCDA.WLCToolView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:MCDA.Model"
         Title="WLC Tool"
         WindowStyle="SingleBorderWindow"
         ShowInTaskbar="False"
@@ -118,7 +119,7 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <ListView Name="listView" ItemsSource="{Binding Path=WLCParameter}" DataContext="{Binding}" HorizontalContentAlignment="Stretch">
+                    <ListView Name="ListView" ItemsSource="{Binding Path=WLCParameter}" DataContext="{Binding}" HorizontalContentAlignment="Stretch">
                         <ListView.View>
                             <GridView>
                                 <GridViewColumn  Header="Name"  Width="120">
@@ -132,16 +133,24 @@
                                     <GridViewColumn.CellTemplate>
                                         <DataTemplate>
                                                  <StackPanel HorizontalAlignment="Stretch" Orientation="Horizontal">
-                                                <Slider Name="weightSlider" Value="{Binding Path=Weight, Mode=TwoWay}" Thumb.DragCompleted="weightSlider_DragCompleted" Width="130" HorizontalContentAlignment="Stretch" Minimum="0" Maximum="100" TickFrequency="0.1" />
-                                                     <TextBox Name="weightSliderTextblock" Width="40" Text="{Binding ElementName=weightSlider, Path=Value, StringFormat={}{0:0.##}}" PreviewTextInput="weightSliderTextblock_PreviewTextInput" />
-                                                </StackPanel>
+                                                <Slider Name="weightSlider" Value="{Binding Path=Weight, Mode=TwoWay}" Thumb.DragCompleted="WeightSliderDragCompleted" Width="130" HorizontalContentAlignment="Stretch" Minimum="0" Maximum="100" TickFrequency="0.1" IsEnabled="{Binding Path=IsActive, Mode=TwoWay}" />
+                                                <TextBox x:Name="WeightSliderTextblock" Width="40" KeyDown="WeightSliderTextblockKeyDown" IsEnabled="{Binding Path=IsActive, Mode=TwoWay}" ToolTip="Enter a weight." ToolTipService.IsEnabled="True" ToolTipService.ShowDuration="5000" ToolTipOpening="WeightSliderTextblockToolTipOpening" >                                                   
+                                                    <TextBox.Text>
+                                                        <Binding Path="Weight" Mode="TwoWay" NotifyOnValidationError="True"  UpdateSourceTrigger="LostFocus"  StringFormat="{}{0:0.##}">
+                                                            <Binding.ValidationRules>
+                                                                <local:WeightValidationRule Min="0" Max="100"/>
+                                                            </Binding.ValidationRules>
+                                                        </Binding>                                                       
+                                                    </TextBox.Text>                                                  
+                                                </TextBox>
+                                            </StackPanel>
                                         </DataTemplate>
                                     </GridViewColumn.CellTemplate>
                                 </GridViewColumn>
                                 <GridViewColumn  Header="Locked"  Width="Auto">
                                     <GridViewColumn.CellTemplate>
                                         <DataTemplate>
-                                            <CheckBox Name="benefitCriteriaCheckBox" IsChecked="{Binding Path=IsLocked, Mode=TwoWay}" Grid.Column="3"/>
+                                            <CheckBox Name="LockCheckBox" IsChecked="{Binding Path=IsLocked, Mode=TwoWay}" Grid.Column="3"/>
                                         </DataTemplate>
                                     </GridViewColumn.CellTemplate>
                                 </GridViewColumn>
@@ -158,7 +167,7 @@
                 </Grid>
             </TabItem>
             <TabItem Header="Result Table" Name="wlcResultTabItem">
-                <DataGrid Name="resultDataGrid" ItemsSource="{Binding Path=WLCResult, Mode=OneWay}" CanUserAddRows="False" />
+                <DataGrid Name="resultDataGrid" ItemsSource="{Binding Path=WLCResult, Mode=OneWay}" CanUserAddRows="False" IsReadOnly="True"/>
             </TabItem>
         </TabControl>
     </Grid>

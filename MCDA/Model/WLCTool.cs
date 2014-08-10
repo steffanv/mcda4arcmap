@@ -12,6 +12,7 @@ namespace MCDA.Model
 {
    internal sealed class WLCTool : AbstractToolTemplate
     {
+
         private DataTable workingDataTable, backupDataTable;
         private ToolParameterContainer toolParameterContainer;
         private NormalizationStrategy transformationStrategy;
@@ -91,36 +92,12 @@ namespace MCDA.Model
             //add result column
             workingDataTable.Columns.Add(new DataColumn(DefaultResultColumnName, typeof(double)));
 
-            //it makes sense to split the table to work parallel
-            //it is likely that it would make even more sense to split the table into 4 or even more sub tables, 
-            //however it have only 2 cores... and no idea about the required table size
-            if (workingDataTable.Rows.Count >= 500 && toolParameterContainer.ToolParameter.Count > 6)
-            {
-
-                DataTable tableOne = workingDataTable.Clone();
-                DataTable tableTwo = workingDataTable.Clone();
-
-                IEnumerable<DataRow> dataRowsOne = workingDataTable.Select().Take(workingDataTable.Rows.Count / 2);
-                IEnumerable<DataRow> dataRowsTwo = workingDataTable.Select().Skip(workingDataTable.Rows.Count / 2).Take(workingDataTable.Rows.Count);
-
-                dataRowsOne.CopyToDataTable(tableOne, LoadOption.OverwriteChanges);
-                dataRowsTwo.CopyToDataTable(tableTwo, LoadOption.OverwriteChanges);
-
-                Parallel.Invoke(() => RunWLC(tableOne), () => RunWLC(tableTwo));
-
-                DataTable targetSchema = workingDataTable.Clone();
-
-                targetSchema.Merge(tableOne);
-                targetSchema.Merge(tableTwo);
-
-                workingDataTable = targetSchema;
-            }
+            if (workingDataTable.Rows.Count >= 2000 && toolParameterContainer.ToolParameter.Count > 5)
+               workingDataTable = base.PerformAlgorithmInParallel(workingDataTable, RunWLC);
 
             else
-            {
                 RunWLC(workingDataTable);
-            }
-                  
+         
         }
 
         public override string ToString(){

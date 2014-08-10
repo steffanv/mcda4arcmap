@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Data;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace MCDA.Model
 {
@@ -140,36 +141,12 @@ namespace MCDA.Model
             //add result column
             _workingDataTable.Columns.Add(new DataColumn(DefaultResultColumnName, typeof(double)));
 
-            //it makes sense to split the table to work parallel
-            //it is likely that it would make even more sense to split the table into 4 or even more sub tables, 
-            //however it have only 2 cores... and no idea about the required table size
-            if (_workingDataTable.Rows.Count >= 500 && _toolParameterContainer.ToolParameter.Count > 6)
-            {
-
-                DataTable tableOne = _workingDataTable.Clone();
-                DataTable tableTwo = _workingDataTable.Clone();
-
-                IEnumerable<DataRow> dataRowsOne = _workingDataTable.Select().Take(_workingDataTable.Rows.Count / 2);
-                IEnumerable<DataRow> dataRowsTwo = _workingDataTable.Select().Skip(_workingDataTable.Rows.Count / 2).Take(_workingDataTable.Rows.Count);
-
-                dataRowsOne.CopyToDataTable(tableOne, LoadOption.OverwriteChanges);
-                dataRowsTwo.CopyToDataTable(tableTwo, LoadOption.OverwriteChanges);
-
-                Parallel.Invoke(() => RunOWA(tableOne), () => RunOWA(tableTwo));
-
-                DataTable targetSchema = _workingDataTable.Clone();
-
-                targetSchema.Merge(tableOne);
-                targetSchema.Merge(tableTwo);
-
-                _workingDataTable = targetSchema;
-            }
+          
+            if (_workingDataTable.Rows.Count >= 2000 && _toolParameterContainer.ToolParameter.Count > 5)
+                _workingDataTable = base.PerformAlgorithmInParallel(_workingDataTable, RunOWA);
 
             else
-            {
                 RunOWA(_workingDataTable);
-            }
-
         }
 
         public override string ToString()

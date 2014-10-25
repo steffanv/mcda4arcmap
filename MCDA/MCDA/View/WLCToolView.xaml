@@ -72,7 +72,7 @@
                     <Image Source="..\Images\toolbargraphics\Normalization.png" ToolTip="Choose another Normalization strategy."/>
                 </Button>
                 <Separator />
-                <Button Command="{Binding Path=SendToInMemoryWorkspaceCommand}" ToolTip="Send to in-memory workspace">
+                <Button Command="{Binding Path=SendToInMemoryWorkspaceCommand}" ToolTip="Add as managed layer.">
                     <Button.Style>
                         <Style TargetType="Button">
                             <Style.Triggers>
@@ -88,11 +88,11 @@
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding IsSendToInMemoryWorkspaceCommand}" Value="false">
                                         <Setter Property="Source" Value="..\Images\toolbargraphics\MapAdd.png" />
-                                        <Setter Property="ToolTip" Value="Send to in-memory workspace." />
+                                        <Setter Property="ToolTip" Value="Add as managed layer." />
                                     </DataTrigger>
                                     <DataTrigger Binding="{Binding IsSendToInMemoryWorkspaceCommand}" Value="true">
                                         <Setter Property="Source" Value="..\Images\toolbargraphics\MapDelete.png" />
-                                        <Setter Property="ToolTip" Value="Disconnect from in-memory workspace." />
+                                        <Setter Property="ToolTip" Value="Disconnect from the managed layer." />
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>

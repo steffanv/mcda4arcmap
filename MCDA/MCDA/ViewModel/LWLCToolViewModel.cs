@@ -290,7 +290,7 @@ namespace MCDA.ViewModel
             if (!_isLocked && _isSendToInMemoryWorkspaceCommand)
             {
                 ESRI.ArcGIS.Framework.IMessageDialog msgBox = new ESRI.ArcGIS.Framework.MessageDialogClass();
-                bool userResult = msgBox.DoModal("Unlocking", "Unlocking also removes the existing in memory connection.", "Unlock", "Abort", ArcMap.Application.hWnd);
+                bool userResult = msgBox.DoModal("Unlocking", "Unlocking also disconnects from the managed layer.", "Unlock", "Abort", ArcMap.Application.hWnd);
 
                 //if the user hit no we have to set the lock state back to locked
                 if (!userResult)

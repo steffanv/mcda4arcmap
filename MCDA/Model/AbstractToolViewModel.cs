@@ -109,6 +109,11 @@ namespace MCDA.ViewModel
 
        protected abstract void DoLockCommand();
        protected abstract void DoNormalizationSelectionCommand();
+
+        /// <summary>
+        /// Despite the name the method adds the current layer to the active document. This can include the lock command which created the in-memory workspace - if not created earlier.
+        /// Thus, the actual send to in-memory workspace functionality is implemented in DoLockCommand.
+        /// </summary>
        protected abstract void DoSendToInMemoryWorkspaceCommand();
        protected abstract void DoExportAsCSVCommand();
        protected abstract void DoDistributionCommand();

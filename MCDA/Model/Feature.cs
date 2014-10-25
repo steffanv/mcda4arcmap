@@ -134,7 +134,7 @@ namespace MCDA.Model
         }
 
         public bool HasAreaAndTopologicalOperator()
-        {
+        { //TODO LWLC test for ITopologicalOperator and the method name says the same, I think I have to add the test...
             switch (FeatureLayer.ShapeType)
             {
                 case ESRI.ArcGIS.Geometry.esriGeometryType.esriGeometryPolygon:

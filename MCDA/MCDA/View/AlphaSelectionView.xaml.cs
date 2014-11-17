@@ -15,9 +15,6 @@ using MCDA.ViewModel;
 
 namespace MCDA
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class AlphaSelectionView : Window
     {
         public AlphaSelectionView()
@@ -25,6 +22,21 @@ namespace MCDA
             InitializeComponent();
 
             DataContext = new AlphaSelectionViewModel();
+        }
+
+        private void AlphaTextBoxKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == System.Windows.Input.Key.Enter)
+            {
+                var alphaTextBox = sender as TextBox;
+                var bindingExpression = alphaTextBox.GetBindingExpression(TextBox.TextProperty);
+
+                double w;
+                if (Double.TryParse(alphaTextBox.Text, out w))
+                {
+                    bindingExpression.UpdateSource();
+                }
+            }
         }
     }
 }

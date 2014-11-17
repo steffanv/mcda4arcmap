@@ -27,7 +27,7 @@
                     <Slider Name="alphaSlider" Grid.Column="1" Grid.ColumnSpan="3" Grid.Row="0" Width="270" Value="{Binding Path=AlphaSliderValue, Mode=TwoWay}" Orientation="Horizontal" IsSnapToTickEnabled="True" Maximum="7" Minimum="1" TickPlacement="BottomRight" Ticks="1, 2, 3, 4, 5, 6, 7"/>
                     <Label Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="2" FontSize="10" Content="least One   Few         Some       Half         Many       Most        All" />
                     <Label Grid.Row="3" Grid.Column="1" FontSize="12" Content="alpha" />
-                    <TextBox Grid.Row="3" Grid.Column="2" HorizontalAlignment="Right" Name="alphaTextblock" Width="50" Height="20" Text="{Binding Path=Alpha, Mode=TwoWay, StringFormat={}{0:0.###}}"  />
+                    <TextBox Grid.Row="3" Grid.Column="2" HorizontalAlignment="Right" Name="AlphaTextBox" Width="50" Height="20" KeyDown="AlphaTextBoxKeyDown" Text="{Binding Path=Alpha, Mode=TwoWay, StringFormat={}{0:0.###}}"  />
                 </Grid>
             </TabItem>
         </TabControl>

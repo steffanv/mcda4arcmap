@@ -397,7 +397,7 @@ namespace MCDA
         }
 
         public void EstablishLink(AbstractToolTemplate tool)
-        {
+        {//TODO isn't the where and tolist pointless?
             IFeatureLayer2 featureLayer = AvailableFeatures.Where(l => l.IsSelected && l.IsSuitableForMCDA).ToList().First().FeatureLayer;
             IFeatureClass featureClass = featureLayer.FeatureClass;
 

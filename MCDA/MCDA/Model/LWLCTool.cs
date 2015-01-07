@@ -66,13 +66,13 @@ namespace MCDA.Model
             _resultDataTable = new DataTable();
 
             _resultDataTable.Columns.Add(_featureClass.OIDFieldName,typeof(FieldTypeOID));
-            _resultDataTable.Columns.Add("cluster ids", typeof(string));
+            _resultDataTable.Columns.Add("cluster ids:", typeof(string));
 
             foreach (IToolParameter _currentToolParameter in _toolParameterContainer.ToolParameter)
             {
-                _resultDataTable.Columns.Add("local range " +_currentToolParameter.ColumnName, typeof(double));
-                _resultDataTable.Columns.Add("scaled value " + _currentToolParameter.ColumnName, typeof(double));
-                _resultDataTable.Columns.Add("weight " + _currentToolParameter.ColumnName, typeof(double));
+                _resultDataTable.Columns.Add("local range: " +_currentToolParameter.ColumnName, typeof(double));
+                _resultDataTable.Columns.Add("nomralized value: " + _currentToolParameter.ColumnName, typeof(double));
+                _resultDataTable.Columns.Add("local weight: " + _currentToolParameter.ColumnName, typeof(double));
             }
 
             //result column
@@ -235,8 +235,10 @@ namespace MCDA.Model
                     int oid = Convert.ToInt32(currentFeature.get_Value(oidColumn));
                     centroidArray[centroidArrayIndex, 0] = oid;
 
-                    if(oid == 0)
+                    if (oid == 0)
+                    {
                         zeroOIDExist = true;
+                    }
 
                     IArea area = (IArea)currentFeature.Shape;
                     centroidArray[centroidArrayIndex, 1] = area.Centroid.X;
@@ -246,11 +248,13 @@ namespace MCDA.Model
                 }
 
                 // it is possible that the oid column starts at zero and the other program parts expect it at 1, thus we have to check if the name is FID and one oid is zero
-                  if(_featureClass.OIDFieldName.Equals("FID") && zeroOIDExist){
+                if(_featureClass.OIDFieldName.Equals("FID") && zeroOIDExist){
 
-                      for (int i = 0; i < centroidArray.GetLength(0); i++)
-                          centroidArray[i, 0]++;                     
-                  }
+                    for (int i = 0; i < centroidArray.GetLength(0); i++)
+                    {
+                        centroidArray[i, 0]++;
+                    }
+                }
             }
 
             IDictionary<int, List<Tuple<int, double>>> dictionaryOfDistances = new ConcurrentDictionary<int, List<Tuple<int, double>>>();
@@ -261,10 +265,11 @@ namespace MCDA.Model
 
                 for (int j = 0; j < centroidArray.GetLength(0); j++)
                 {
-                    //don'toolParameter add the distance too itself
+                    //do not add the distance too itself
                     if (i == j)
+                    {
                         continue;
-
+                    }
                     //create a distance matrix for each polygon and store in the data table
                     double distance = EuclidianDistance(centroidArray[i, 1], centroidArray[i, 2], centroidArray[j, 1], centroidArray[j, 2]);
                     int id = Convert.ToInt32(centroidArray[j, 0]);
@@ -315,7 +320,9 @@ namespace MCDA.Model
                     while(ID != -1)
                     {
                         if (ID != currentFeature.OID)
-                               neighborIDs.Add(ID);
+                        {
+                            neighborIDs.Add(ID);
+                        }
 
                         ID = enumIDs.Next();
                     }
@@ -323,13 +330,17 @@ namespace MCDA.Model
                     neighborDictionary.Add(currentFeature.OID, neighborIDs.ToList());
 
                     if (currentFeature.OID == 0)
+                    {
                         zeroOIDExist = true;
+                    }
                 }
 
                 // it is possible that the oid column starts at zero and the other program parts expect it at 1, thus we have to check if the name is FID and one oid is zero
                 if (_featureClass.OIDFieldName.Equals("FID") && zeroOIDExist)
+                {
                     // the easiest way is to build a new dictionary
-                    return neighborDictionary.ToDictionary(k => k.Key +1, v => v.Value);
+                    return neighborDictionary.ToDictionary(k => k.Key + 1, v => v.Value.Select(x => x + 1).ToList());
+                }
             }
 
             return neighborDictionary;
@@ -354,7 +365,9 @@ namespace MCDA.Model
                 while ((currentFeature = featureCursor.NextFeature()) != null)
                 {
                     if (currentFeature.OID == 0)
+                    {
                         zeroOIDExist = true;
+                    }
 
                     spatialFilter.Geometry = currentFeature.Shape;
                     spatialFilter.GeometryField = _featureClass.ShapeFieldName;
@@ -398,7 +411,9 @@ namespace MCDA.Model
 
                             // we have one or more polygons in common => add
                             if (polygonCollection.GeometryCount >= 1)
+                            {
                                 neighborIDs.Add(ID);
+                            }
                         }
 
                         ID = enumIDs.Next();
@@ -410,8 +425,10 @@ namespace MCDA.Model
 
             // it is possible that the oid column starts at zero and the other program parts expect it at 1, thus we have to check if the name is FID and one oid is zero
             if (_featureClass.OIDFieldName.Equals("FID") && zeroOIDExist)
+            {
                 // the easiest way is to build a new dictionary
-                return  neighborDictionary.ToDictionary(k => k.Key +1, v => v.Value);
+                return neighborDictionary.ToDictionary(k => k.Key + 1, v => v.Value.Select(x => x+1).ToList());
+            }
 
             return neighborDictionary;
         }

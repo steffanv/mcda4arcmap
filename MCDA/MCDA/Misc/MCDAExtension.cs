@@ -278,7 +278,9 @@ namespace MCDA
 
             //add columns
             foreach (Field currentField in listOfFields)
-                dataTable.Columns.Add(currentField.FieldName, typeof (double));
+            {
+                dataTable.Columns.Add(currentField.FieldName, typeof(double));
+            }
 
             //add the oid column
             Field oidField = GetOIDFieldFromSelectedFeature();
@@ -293,11 +295,13 @@ namespace MCDA
                 dataTableOIDOrdinal = dataTable.Columns.Add(oidField.FieldName, typeof (FieldTypeOID)).Ordinal;
 
                 //and to make it easier add the oidField to the rest of the fields
-                // it is important to take care of the order of the columns! later we depend if we add data
+                // it is important to take care of the order of the columns! later we depend on it if we add data
                 listOfFields.Insert(0, oidField);
 
                 if (oidField.FieldName.Equals("FID"))
+                {
                     isOIDFieldNameFID = true;
+                }
 
                 //make the oid column the first column
                 dataTable.Columns[dataTableOIDOrdinal].SetOrdinal(0);
@@ -320,7 +324,9 @@ namespace MCDA
                 expectedNumbersOfRow = column.Count;
 
                 if (currentField.IsOID && column.Contains(0d))
+                {
                     isOIDFieldStartsByZero = true;
+                }
             }
 
             // add rows

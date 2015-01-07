@@ -9,27 +9,27 @@ namespace MCDA.Model
 {
     internal sealed class Cluster
     {
-        private ToolParameterContainer _toolParameterContainer;
-        private DataTable _dataTable;
-        private int _featureID;
-        private IList<int> _clusterIDs;
-        private NormalizationStrategy _transformationStrategy;
+        private readonly ToolParameterContainer _toolParameterContainer;
+        private readonly DataTable _dataTable;
+        private readonly int _featureId;
+        private readonly IList<int> _clusterIDs;
+        private readonly NormalizationStrategy _transformationStrategy;
 
         private IList<Tuple<IToolParameter, double>> _globalRange;
         private IList<Tuple<IToolParameter, double>> _localRange;
         private IList<Tuple<IToolParameter, double?>> _scaledValues;
         private IList<Tuple<IToolParameter, double?>> _weights;
 
-        public Cluster(int featureID, IList<int> clusterIDs, DataTable dt, ToolParameterContainer toolParameterContainer, NormalizationStrategy transformationStrategy)
+        public Cluster(int featureId, IList<int> clusterIDs, DataTable dt, ToolParameterContainer toolParameterContainer, NormalizationStrategy transformationStrategy)
         {
-            _featureID = featureID;
+            _featureId = featureId;
             _clusterIDs = clusterIDs;
             _dataTable = dt;
             _toolParameterContainer = toolParameterContainer;
             _transformationStrategy = transformationStrategy;
 
             //the feature id is also part of the cluster!
-            _clusterIDs.Add(featureID);
+            _clusterIDs.Add(featureId);
         }
 
         private int GetOIDColumnIndex()
@@ -37,7 +37,9 @@ namespace MCDA.Model
             foreach (DataColumn currentDataColumn in _dataTable.Columns)
             {
                 if (currentDataColumn.DataType == typeof(FieldTypeOID))
+                {
                     return currentDataColumn.Ordinal;
+                }
             }
 
             return -1;
@@ -85,7 +87,7 @@ namespace MCDA.Model
 
                 IList<double> data = _dataTable.AsEnumerable().Where(x => _clusterIDs.Contains(x.Field<FieldTypeOID>(oidColumnIndex).OID)).Select(x => x.Field<double>(currentToolParameter.ColumnName)).Distinct().ToList();
 
-                double actualValue = _dataTable.AsEnumerable().Where(x => x.Field<FieldTypeOID>(oidColumnIndex).OID == _featureID).Select(x => x.Field<double>(currentToolParameter.ColumnName)).FirstOrDefault();
+                double actualValue = _dataTable.AsEnumerable().Where(x => x.Field<FieldTypeOID>(oidColumnIndex).OID == _featureId).Select(x => x.Field<double>(currentToolParameter.ColumnName)).FirstOrDefault();
 
                 double? result = NormalizationStrategyFactory.GetStrategy(_transformationStrategy).Transform(data, actualValue, currentToolParameter.IsBenefitCriterion);
 
@@ -99,7 +101,7 @@ namespace MCDA.Model
         {
             IList<Tuple<IToolParameter, double?>> listOfLocalWeightTupel = new List<Tuple<IToolParameter, double?>>();
 
-            double? dividend, divisor = 0;
+            double? divisor = 0;
 
             foreach (IToolParameter currentToolParameter2 in toolParameterContainer.ToolParameter)
             {
@@ -116,25 +118,34 @@ namespace MCDA.Model
             }
 
             if (divisor == 0)
+            {
                 divisor = null;
+            }
 
             foreach (IToolParameter currentToolParameter in toolParameterContainer.ToolParameter)
             {
                 double localRange = localRangeList.FirstOrDefault(x => x.Item1 == currentToolParameter).Item2;
                 double globalRange = globalRangeList.FirstOrDefault(x => x.Item1 == currentToolParameter).Item2;
 
+                double? dividend;
                 if (globalRange == 0)
+                {
                     dividend = null;
+                }
                 else
+                {
                     dividend = (currentToolParameter.ScaledWeight * localRange) / globalRange;
+                }
 
-                if(dividend.HasValue && divisor.HasValue)
+                if (dividend.HasValue && divisor.HasValue)
+                {
                     listOfLocalWeightTupel.Add(new Tuple<IToolParameter, double?>(currentToolParameter, dividend / divisor));
-
-                if(!dividend.HasValue || !divisor.HasValue)
-                    listOfLocalWeightTupel.Add(new Tuple<IToolParameter, double?>(currentToolParameter, null));               
+                }
+                else
+                {
+                    listOfLocalWeightTupel.Add(new Tuple<IToolParameter, double?>(currentToolParameter, null));
+                }
             }
-
             return listOfLocalWeightTupel;
         }
 
@@ -159,36 +170,39 @@ namespace MCDA.Model
                 if (!scaledValue.HasValue || !weight.HasValue)
                     return true;
             }
-
             return false;
         }
         
         // oid/fid, r1,s1, w1, r2, s2, w3, result
         public DataRow FillRowWithResults(DataRow row)
         {
-            row[0] = new FieldTypeOID(){ OID = _featureID};
+            row[0] = new FieldTypeOID(){ OID = _featureId};
 
-            StringBuilder sb = new StringBuilder();
+            StringBuilder stringBuilder = new StringBuilder();
 
-            foreach(int currentID in _clusterIDs){
+            foreach(int currentId in _clusterIDs){
 
-                if(sb.Length == 0)
-                    sb.Append(currentID);
+                if (stringBuilder.Length == 0)
+                {
+                    stringBuilder.Append(currentId);
+                }
                 else
-                    sb.Append("; " + currentID);
+                {
+                    stringBuilder.Append("; " + currentId);
+                }
             }
 
-            row[1] = sb.ToString();
+            row[1] = stringBuilder.ToString();
 
             int index = 2;
             double? result = 0;
 
             foreach (IToolParameter currentToolParameter in _toolParameterContainer.ToolParameter)
             {
-                double? scaledValue = _scaledValues.FirstOrDefault(x => x.Item1 == currentToolParameter).Item2;
-                double? weight = _weights.FirstOrDefault(x => x.Item1 == currentToolParameter).Item2;
+                double? scaledValue = _scaledValues.First(x => x.Item1 == currentToolParameter).Item2;
+                double? weight = _weights.First(x => x.Item1 == currentToolParameter).Item2;
 
-                row[index] = _localRange.FirstOrDefault(x => x.Item1 == currentToolParameter).Item2;
+                row[index] = _localRange.First(x => x.Item1 == currentToolParameter).Item2;
 
                 if (scaledValue.HasValue)
                     row[index + 1] = scaledValue;
@@ -201,17 +215,25 @@ namespace MCDA.Model
                     row[index + 2] = DBNull.Value;
 
                 if (scaledValue.HasValue && weight.HasValue && result.HasValue)
-                    result += scaledValue * weight;
+                {
+                    result += scaledValue*weight;
+                }
                 else
+                {
                     result = null;
+                }
 
                 index += 3;
             }
 
-            if(result.HasValue)
+            if (result.HasValue)
+            {
                 row.SetField(row.ItemArray.Length - 1, Math.Round(result.Value < 0 ? 0 : result.Value, 6));
+            }
             else
+            {
                 row.SetField(row.ItemArray.Length - 1, DBNull.Value);
+            }
 
             return row;
         }

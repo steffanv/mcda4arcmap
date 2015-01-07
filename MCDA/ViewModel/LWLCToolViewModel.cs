@@ -219,7 +219,7 @@ namespace MCDA.ViewModel
                 if (_isSendToInMemoryWorkspaceCommand)
                     _mcdaExtension.JoinToolResultByOID(_lwlcTool, _lwlcTool.Data);
 
-                //_isUpdateAllowed = false;
+                _isUpdateAllowed = false;
 
                 _toolParameterStorageForAnimationLikeUpdate.Clear();
             }

@@ -1,0 +1,185 @@
+﻿<Window x:Class="MCDA.LWLCToolView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:MCDA.Model"
+        Title="LWLC Tool"
+        WindowStyle="SingleBorderWindow"
+        ShowInTaskbar="False"
+        ResizeMode="CanResize"
+        WindowStartupLocation="CenterOwner"
+        Height="300" Width="500">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <ToolBarTray Grid.Column="0" Grid.Row="0">
+            <ToolBar Band="1" BandIndex="1">
+                <Button Name="lockButton" Command="{Binding Path=LockCommand}" ToolTip="Lock the LWLC Tool data.">
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Style.Triggers>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter Property="Opacity" Value="0.5" />
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                    <Image >
+                        <Image.Style>
+                            <Style TargetType="{x:Type Image}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsLocked}" Value="false">
+                                        <Setter Property="Source" Value="..\Images\toolbargraphics\LockOpen.png" />
+                                        <Setter Property="ToolTip" Value="Lock the LWLC Tool data." />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding IsLocked}" Value="true">
+                                        <Setter Property="Source" Value="..\Images\toolbargraphics\LockLocked.png" />
+                                        <Setter Property="ToolTip" Value="Unlock the LWLC Tool data." />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Image.Style>
+                    </Image>
+                </Button>
+                <Separator />
+                <Button Command="{Binding Path=DistributionCommand}" ToolTip="Distribute the weights.">
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Style.Triggers>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter Property="Opacity" Value="0.5" />
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                    <Image Source="..\Images\toolbargraphics\Distribution.png" ToolTip="Distribute the weights equally."/>
+                </Button>
+                <Button Command="{Binding Path=NormalizationSelectionCommand}" ToolTip="Choose another Normalization strategy.">
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Style.Triggers>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter Property="Opacity" Value="0.5" />
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                    <Image Source="..\Images\toolbargraphics\Normalization.png"/>
+                </Button>
+                <Button Command="{Binding Path=NeighborhoodSelectionCommand}" ToolTip="Choose another neighborhood definition.">
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Style.Triggers>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter Property="Opacity" Value="0.5" />
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                    <Image Source="..\Images\toolbargraphics\Neighborhood.png" Width="16" Height="16" ToolTip="Choose another neighborhood definition." />
+                </Button>
+                <Separator />
+                <Button Command="{Binding Path=SendToInMemoryWorkspaceCommand}" ToolTip="Add as managed layer.">
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Style.Triggers>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter Property="Opacity" Value="0.5" />
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                    <Image >
+                        <Image.Style>
+                            <Style TargetType="{x:Type Image}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsSendToInMemoryWorkspaceCommand}" Value="false">
+                                        <Setter Property="Source" Value="..\Images\toolbargraphics\MapAdd.png" />
+                                        <Setter Property="ToolTip" Value="Add as managed layer." />       
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding IsSendToInMemoryWorkspaceCommand}" Value="true">
+                                        <Setter Property="Source" Value="..\Images\toolbargraphics\MapDelete.png" />
+                                        <Setter Property="ToolTip" Value="Disconnect from the managed layer." />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Image.Style>
+                    </Image>
+                </Button>
+                <Button Command="{Binding Path=ExportAsCSVCommand}" ToolTip="Export result table and parameters as CSV.">
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Style.Triggers>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter Property="Opacity" Value="0.5" />
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                    <Image Source="..\Images\toolbargraphics\Export.png" ToolTip="Export the result table."/>
+                </Button>
+            </ToolBar>
+        </ToolBarTray>
+        <TabControl Name="tabControl1" Grid.Column="0" Grid.Row="1">
+            <TabItem Header="Criteria" Name="criteriaTabItem">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <ListView Name="listView" ItemsSource="{Binding Path=LWLCParameter}" DataContext="{Binding}" HorizontalContentAlignment="Stretch">
+                        <ListView.View>
+                            <GridView>
+                                <GridViewColumn  Header="Name"  Width="120">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Label Name="fieldLabel"  Content="{Binding Path=ColumnName, Mode=OneWay}"/>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                                <GridViewColumn  Header="Weight" Width="200">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <StackPanel HorizontalAlignment="Stretch" Orientation="Horizontal">
+                                                <Slider Name="weightSlider" Value="{Binding Path=Weight, Mode=TwoWay}" Thumb.DragCompleted="WeightSliderDragCompleted" Width="130" HorizontalContentAlignment="Stretch" Minimum="0" Maximum="100" TickFrequency="0.1" IsEnabled="{Binding Path=IsActive, Mode=TwoWay}" />
+                                                <TextBox x:Name="WeightSliderTextblock" Width="40" KeyDown="WeightSliderTextblockKeyDown" IsEnabled="{Binding Path=IsActive, Mode=TwoWay}" ToolTip="Enter a weight." ToolTipService.IsEnabled="True" ToolTipService.ShowDuration="5000" ToolTipOpening="WeightSliderTextblockToolTipOpening" >
+                                                    <TextBox.Text>
+                                                        <Binding Path="Weight" Mode="TwoWay" NotifyOnValidationError="True"  UpdateSourceTrigger="LostFocus"  StringFormat="{}{0:0.##}">
+                                                            <Binding.ValidationRules>
+                                                                <local:WeightValidationRule Min="0" Max="100"/>
+                                                            </Binding.ValidationRules>
+                                                        </Binding>
+                                                    </TextBox.Text>
+                                                </TextBox>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                                <GridViewColumn  Header="Locked"  Width="Auto">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <CheckBox Name="benefitCriteriaCheckBox" IsChecked="{Binding Path=IsLocked, Mode=TwoWay}" Grid.Column="3"/>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                                <GridViewColumn  Header="Benefit" Width="Auto">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <CheckBox Name="benefitCriteriaCheckBox" IsChecked="{Binding Path=IsBenefitCriterion, Mode=TwoWay}"/>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                            </GridView>
+                        </ListView.View>
+                    </ListView >
+                </Grid>
+            </TabItem>
+            <TabItem Header="Result Table" Name="lwlcResultTabItem">
+                <DataGrid Name="resultDataGrid" ItemsSource="{Binding Path=LWLCResult, Mode=OneWay}" CanUserAddRows="False" IsReadOnly="True"/>
+            </TabItem>
+        </TabControl>
+    </Grid>
+</Window>

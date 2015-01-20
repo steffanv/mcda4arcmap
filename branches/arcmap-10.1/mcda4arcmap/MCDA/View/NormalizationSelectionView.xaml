@@ -1,0 +1,38 @@
+﻿<Window x:Class="MCDA.NormalizationSelectionView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:MCDA.Model"
+        Title="Normalization"
+        WindowStyle="ToolWindow"
+        ShowInTaskbar="False"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner"
+    Height="240" Width="330">
+    <Grid Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
+        <TabControl VerticalAlignment="Stretch" Margin="5,5,5,40">
+            <TabItem Header="General" Height="22" VerticalAlignment="Bottom">
+                <Grid Background="White">
+                    <Grid.Resources>
+                        <local:EnumToBooleanConverter x:Key="enumToBooleanConverter" />
+                    </Grid.Resources>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="10" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="10" />
+                        <RowDefinition Height="20" />
+                        <RowDefinition Height="20" />
+                        <RowDefinition Height="20" />
+                    </Grid.RowDefinitions>
+                    <RadioButton Grid.Row="1" Grid.Column="1" IsChecked="{Binding SelectedTransformationStrategy, ConverterParameter={x:Static local:NormalizationStrategy.IdentityNormalizationStrategy}, Converter={StaticResource enumToBooleanConverter}}"  Content="Identity Normalization" ToolTip="Does not perform any kind of Normalization." />
+                    <RadioButton Grid.Row="2" Grid.Column="1" IsChecked="{Binding SelectedTransformationStrategy, ConverterParameter={x:Static local:NormalizationStrategy.MaximumScoreNormalizationStrategy}, Converter={StaticResource enumToBooleanConverter}}"  Content="Maximum Score Normalization" ToolTip="Produces values between 0 and 1, where cost criteria is anchored at 0 and benefit criteria at 1." />
+                    <RadioButton Grid.Row="3" Grid.Column="1" IsChecked="{Binding SelectedTransformationStrategy, ConverterParameter={x:Static local:NormalizationStrategy.ScoreRangeNormalizationStrategy}, Converter={StaticResource enumToBooleanConverter}}"  Content="Score Range Normalization" ToolTip="The lowest value will be zero and the highest 1. Does not preserve proportionality." />
+                </Grid>
+            </TabItem>
+        </TabControl>
+        <Button Content="Cancel"  Width="75"  HorizontalAlignment="Left" VerticalAlignment="Top" Command="{Binding Path=CancelCommand}" Margin="164,182,0,0" />
+        <Button Content="Apply"  Width="75"  HorizontalAlignment="Left" VerticalAlignment="Top" Command="{Binding Path=ApplyCommand}" Margin="244,182,0,0"  />
+        <Button Content="OK" Width="75" HorizontalAlignment="Left"  VerticalAlignment="Top"  Command="{Binding Path=OkayCommand}" Margin="84,182,0,0"/>
+    </Grid>
+</Window>

@@ -1,0 +1,63 @@
+﻿<ESRI.Configuration xmlns="http://schemas.esri.com/Desktop/AddIns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Name>MCDA Add-in</Name>
+  <AddInID>{f098ac0f-6cae-4e1b-81d0-d67452d3cf57}</AddInID>
+  <Description>
+    Add-in for MCDA analysis.
+    
+    I would like to thank Mark James for his awesome icon set:
+    http://www.famfamfam.com/lab/icons/silk/
+
+    Open Source components:
+    http://wpftoolkit.codeplex.com/
+    http://oxyplot.codeplex.com/
+
+    Finally, I thank Brad Carter for his implementation of LWLC, which was inspiring and helpful for the early LWLC implementation of this tool.
+  </Description>
+  <Version>1.1A</Version>
+  <Image>Images\MCDA Add-in.png</Image>
+  <Author>Steffan Voss</Author>
+  <Company>Steffan Voss</Company>
+  <Date>7/22/2014</Date>
+  <Targets>
+    <Target name="Desktop" version="10.2" />
+  </Targets>
+  <AddIn language="CLR4.5" library="MCDA.dll" namespace="MCDA">
+    <ArcMap>
+      <Commands>
+        <Button id="Ryerson_University_MCDA_AddDataBtn" class="AddDataButton" message="" caption="Add data" tip="Manage Critieria." category="MCDA Controls" image="Images\AddData.png" />
+        <Button id="Ryerson_University_MCDA_OWAToolBtn" class="OWAToolButton" message="" caption="OWA Tool" tip="Ordered Weighted Averaging Tool." category="Add-In Controls" image="Images\OWATool.png" />
+        <Button id="Ryerson_University_MCDA_WLCToolBtn" class="WLCToolButton" message="" caption="WLC Tool" tip="Weighted Linear Combination Tool." category="Add-In Controls" image="Images\WLCTool.png" />
+        <Button id="Ryerson_University_MCDA_LWLCToolBtn" class="LWLCToolButton" message="" caption="LWLC Tool" tip="Local Weighted Linear Combination Tool" category="Add-In Controls" image="Images\LWLCTool.png" />
+        <Button id="Ryerson_University_MCDA_ConfigBtn" class="ConfigButton" message="" caption="Configuration" tip="Configure the MCDA add-in." category="Add-In Controls" image="Images\Config.png" onDemand="false" />
+        <Button id="Ryerson_University_MCDA_VisualizationBtn" class="VisualizationButton" message="" caption="Visualization" tip="Visualization Options." category="Add-In Controls" image="Images\Visualization.png" onDemand="false" />      
+      </Commands>
+      <Extensions>
+        <Extension id="Ryerson_University_MCDA_MCDAExtension" class="MCDAExtension" autoLoad="true" showInExtensionDialog="false" />
+      </Extensions>
+      <DockableWindows>
+        <DockableWindow id="Ryerson_University_MCDA_AddDataView" class="AddDataView+AddinImpl" caption="Data Manager" image="Images\AddDataWindow.png">
+          <InitialPlacement height="500" width="300" state="unpinned" position="group"  />
+        </DockableWindow>      
+      </DockableWindows>
+      <Toolbars>
+        <Toolbar id="Ryerson_University_MCDA_MCDA_Toolbar" caption="MCDA" showInitially="true">
+          <Items>
+            <Button refID="Ryerson_University_MCDA_AddDataBtn" />
+            <Menu refID="Ryerson_University_MCDA_MCDA_Methods" />
+            <Button refID="Ryerson_University_MCDA_VisualizationBtn" />
+            <Button refID="Ryerson_University_MCDA_ConfigBtn" />
+          </Items>
+        </Toolbar>
+      </Toolbars>
+      <Menus>
+        <Menu id="Ryerson_University_MCDA_MCDA_Methods" caption="MCDA Methods" isRootMenu="true">
+          <Items>
+            <Button refID="Ryerson_University_MCDA_WLCToolBtn" />
+            <Button refID="Ryerson_University_MCDA_OWAToolBtn" />
+            <Button refID="Ryerson_University_MCDA_LWLCToolBtn" />
+          </Items>
+        </Menu>
+      </Menus>
+    </ArcMap>
+  </AddIn>
+</ESRI.Configuration>

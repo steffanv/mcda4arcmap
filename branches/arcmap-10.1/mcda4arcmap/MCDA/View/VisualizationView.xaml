@@ -1,0 +1,286 @@
+﻿<Window x:Class="MCDA.VisualizationView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"  
+    xmlns:local="clr-namespace:MCDA.Model"
+    xmlns:customControl="clr-namespace:MCDA.CustomControls"  
+    xmlns:oxy="http://oxyplot.codeplex.com"
+    xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+         Title="Visualization"
+        WindowStyle="ToolWindow"
+        ShowInTaskbar="False"
+        ResizeMode="CanResize"
+        WindowStartupLocation="CenterOwner" 
+        xmlns:model="clr-namespace:MCDA.Model"
+    Height="400" Width="700">
+    <Window.Resources>
+        <local:NullToFalseConverter x:Key="nullToFalseConverter" />
+    </Window.Resources>
+    <Grid Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="250"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="218*"/>
+            <ColumnDefinition Width="219*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="40"/>
+        </Grid.RowDefinitions>
+        <customControl:FlipControl x:Name="fc" Grid.Column="0" Grid.Row="0" HorizontalContentAlignment="Stretch">
+            <customControl:FlipControl.Front>
+                <TreeView ItemsSource="{Binding AllFieldsList}" SelectedItemChanged="TreeViewSelectedItemChanged" Loaded="TreeViewLoaded">
+                    <TreeView.ItemContainerStyle>
+                        <Style TargetType="{x:Type TreeViewItem}">
+                            <Setter Property="IsExpanded" Value="True" />
+                        </Style>
+                    </TreeView.ItemContainerStyle>
+                    <TreeView.Resources>
+                        <HierarchicalDataTemplate ItemsSource="{Binding Fields}" DataType="{x:Type model:Feature}">
+                            <Label Content="{Binding Path=FeatureName}"/>
+                        </HierarchicalDataTemplate>
+                        <DataTemplate DataType="{x:Type model:Field}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Label Grid.Column="0" Content="{Binding Path=FieldName}" IsEnabled="{Binding Path=IsSuitableForMCDA}" />
+                                <Label Grid.Column="1">
+                                    <Label.Style>
+                                        <Style TargetType="Label">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Path=IsSuitableForMCDA}" Value="false">
+                                                    <Setter Property="Content" Value="{Binding Path=NotSuitableForMCDAReason, Mode=OneWay}" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Label.Style>
+                                </Label>
+                            </Grid>
+                        </DataTemplate >
+                    </TreeView.Resources>
+                </TreeView>
+            </customControl:FlipControl.Front>
+            <customControl:FlipControl.Back>
+                <TreeView ItemsSource="{Binding ToolFieldsList}" SelectedItemChanged="TreeViewSelectedItemChanged" Loaded="TreeViewLoaded">
+                    <TreeView.ItemContainerStyle>
+                        <Style TargetType="{x:Type TreeViewItem}">
+                            <Setter Property="IsExpanded" Value="True" />
+                        </Style>
+                    </TreeView.ItemContainerStyle>
+                    <TreeView.Resources>
+                        <HierarchicalDataTemplate ItemsSource="{Binding Fields}" DataType="{x:Type model:Feature}">
+                            <Label Content="{Binding Path=FeatureName}"/>
+                        </HierarchicalDataTemplate>
+                        <DataTemplate DataType="{x:Type model:Field}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Label Grid.Column="0" Content="{Binding Path=FieldName}" IsEnabled="{Binding Path=IsSuitableForMCDA}" />
+                                <Label Grid.Column="1">
+                                    <Label.Style>
+                                        <Style TargetType="Label">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Path=IsSuitableForMCDA}" Value="false">
+                                                    <Setter Property="Content" Value="{Binding Path=NotSuitableForMCDAReason, Mode=OneWay}" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Label.Style>
+                                </Label>
+                            </Grid>
+                        </DataTemplate >
+                    </TreeView.Resources>
+                </TreeView>
+            </customControl:FlipControl.Back>
+        </customControl:FlipControl>
+        <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ResizeBehavior="PreviousAndNext" />
+        <TabControl   Name="visualizationMethodsTabControl"  Grid.Column="2" Grid.ColumnSpan="2" Grid.Row="0" Grid.RowSpan="2" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
+            <TabItem Header="Class-Breaks" Name="classBreaksRenderer" >
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="40"/>
+                    </Grid.RowDefinitions>
+                    <TabControl   Name="tabControl1" >
+                        <TabItem Header="Color Ramp" Name="colorRamp">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="10"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="10"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="50"/>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="70"/>
+                                </Grid.RowDefinitions>
+                                <GroupBox Header="Start Color" Grid.Column="1" Grid.Row="0" Height="50">
+                                    <DockPanel LastChildFill="True" Name="dockPanel1">
+                                        <xctk:ColorPicker SelectedColor="{Binding Path=ClassBreaksRendererStartColor}"/>
+                                    </DockPanel>
+                                </GroupBox>
+                                <GroupBox Header="End Color" Grid.Column="2" Grid.Row="0" Height="50">
+                                    <DockPanel LastChildFill="True" Name="dockPanel2">
+                                        <xctk:ColorPicker SelectedColor="{Binding Path=ClassBreaksRendererEndColor}"/>
+                                    </DockPanel>
+                                </GroupBox>
+                                <GroupBox Header="Linear Gradient" Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="2">
+                                    <Rectangle VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                                        <Rectangle.Fill>
+                                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                                <GradientStop Color="{Binding Path=ClassBreaksRendererStartColor}" Offset="0.0" />
+                                                <GradientStop Color="{Binding Path=ClassBreaksRendererEndColor}" Offset="1.0" />
+                                            </LinearGradientBrush>
+                                        </Rectangle.Fill>
+                                    </Rectangle>
+                                </GroupBox>
+                                <!--<GroupBox Header="Normalization" Grid.Column="1" Grid.Row="3" Grid.ColumnSpan="2">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="20"/>
+                                            <RowDefinition Height="50"/>
+                                        </Grid.RowDefinitions>
+                                        <RadioButton Content="None" Grid.Column="0" Grid.Row="0" GroupName="NormalizationRadioButton"/>
+                                        <RadioButton Content="Field" Grid.Column="1" Grid.Row="0" GroupName="NormalizationRadioButton"/>
+                                        <RadioButton Content="Logarithm" Grid.Column="2" Grid.Row="0" GroupName="NormalizationRadioButton"/>
+                                        <RadioButton Content="Square Root" Grid.Column="3" Grid.Row="0" GroupName="NormalizationRadioButton"/>
+                                        <ComboBox  Grid.Column="1" Height="25" ItemsSource="{Binding Path=SelectedFieldToRender.Field.Feature.Fields.FieldName}" Margin="0,0,0,25" Grid.Row="1" />
+                                    </Grid>
+                                </GroupBox>-->
+                            </Grid>
+                        </TabItem>
+                        <TabItem Header="Classification" Name="classification">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="10"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="10"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <GroupBox Name="ClassificationSettingsGroupBox" Header="Classification Settings" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="4">
+                                    <!--<Label  Content="Classification Method" HorizontalAlignment="Center" Grid.Column="1" Grid.Row="0" />
+                                <Label  Content="Classes" HorizontalAlignment="Center" Grid.Column="2" Grid.Row="0" />
+                                <Label  Content="Bins" Grid.Column="4" Grid.Row="0" />-->
+                                    <Grid>
+                                         <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="10"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="10"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                    <ComboBox HorizontalAlignment="Center" Width="120" ItemsSource="{Binding Path=ListOfClassificationMethod, Mode=TwoWay}" DisplayMemberPath="MethodName" SelectedValue="{Binding Path=SelectedClassificationMethod, UpdateSourceTrigger=PropertyChanged}"  Name="classificationComboBox" Grid.Column="1" Grid.Row="1" ToolTip="Select a classification method."/>
+                                    <ComboBox HorizontalAlignment="Center" Width="50" ItemsSource="{Binding Path=NumberOfClasses, Mode=TwoWay}" SelectedValue="{Binding Path=SelectedNumberOfClasses, UpdateSourceTrigger=PropertyChanged}" Name="classesComboBox" Grid.Column="2" Grid.Row="1" ToolTip="Select the number of classes."/>
+                                    <xctk:DoubleUpDown HorizontalAlignment="Right" Value="{Binding Path=Bins}" Maximum="1000" Minimum="5" Increment="1" Width="50" Grid.Column="4" Grid.Row="1" ToolTip="Bins are used to group the data."/>
+                                    <ToggleButton Grid.Column="3" Grid.Row="1" Width="25"  ToolTip="Shows the breaks values." Checked="ToggleButton_Checked" Unchecked="ToggleButton_Unchecked">
+                                            <Image Source="..\Images\VisualizationGraphics\Breaks.png" />
+                                        </ToggleButton>
+                                    <Popup x:Name="BreaksPopup" PopupAnimation="Slide" AllowsTransparency="True" Placement="Mouse">
+                                        <Border BorderBrush="Black" BorderThickness="1" Background="LightGray">
+                                            <TextBox x:Name="BreaksPopupTextBlock" IsReadOnly="True"/>
+                                        </Border>
+                                    </Popup>
+                                    </Grid>
+                                </GroupBox>
+                                <GroupBox Name="HistogramGroupBox" Header="Histogram" Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="4">
+                                    <oxy:Plot x:Name="Histogram">
+                                        <oxy:Plot.Series>
+                                            <oxy:ColumnSeries  ItemsSource="{Binding HistogramData}" FillColor="Gray"/>
+                                        </oxy:Plot.Series>
+                                        <oxy:Plot.Axes>
+                                            <oxy:LinearAxis Position="Left" TickStyle="Crossing"/>
+                                            <oxy:CategoryAxis Position="Bottom"  GapWidth="0"  IsAxisVisible="False" Labels="{Binding HistogramLabels}"/>
+                                        </oxy:Plot.Axes>
+                                    </oxy:Plot>                                 
+                                </GroupBox>
+                            </Grid>
+                        </TabItem>
+                    </TabControl>
+                    <Button Content="Remove"  Width="75" HorizontalAlignment="Right" VerticalAlignment="Bottom" Command="{Binding Path=RemoveClassBreaksRendererCommand}" Margin="0,0,80,10" Grid.Row="1" ToolTip="Remove the renderer from the layer." />
+                    <Button Content="Apply" Width="75" HorizontalAlignment="Right" VerticalAlignment="Bottom" Command="{Binding Path=ApplyClassBreaksRendererCommand}" Margin="0,0,0,10" Grid.Row="1" ToolTip="Apply the renderer to the layer." />
+                </Grid>
+            </TabItem>
+            <TabItem Header="Bi-Polar" Name="uniqueValueRenderer">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="40"/>
+                    </Grid.RowDefinitions>
+                    <Border BorderBrush="DarkGray" BorderThickness="1">
+                        <Grid Grid.Row="0" Background="White" >
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="10"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="10"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="50"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="40" />
+                            </Grid.RowDefinitions>
+                            <GroupBox Header="Start Color" Grid.Column="1" Grid.Row="0" Height="50">
+                                <DockPanel LastChildFill="True" Name="biPolarNegativColorDockPanel">
+                                    <xctk:ColorPicker SelectedColor="{Binding Path=BiPolarRendererStartColor}"/>
+                                </DockPanel>
+                            </GroupBox>
+                            <GroupBox Header="End Color" Grid.Column="2" Grid.Row="0" Height="50">
+                                <DockPanel LastChildFill="True" Name="biPolarPositivColorDockPanel">
+                                    <xctk:ColorPicker SelectedColor="{Binding Path=BiPolarRendererEndColor}"/>
+                                </DockPanel>
+                            </GroupBox>
+                            <GroupBox Header="Neutral Color" Grid.Column="1" Grid.Row="2" Height="50">
+                                <DockPanel LastChildFill="True" Name="biPolarNeutralColorDockPanel">
+                                    <xctk:ColorPicker Name="BiPolarRendererNeutralColor" ShowAdvancedButton="False" ShowStandardColors="False" ShowRecentColors="False" SelectedColor="{Binding Path=BiPolarRendererNeutralColor}" />
+                                </DockPanel>
+                            </GroupBox>
+                            <GroupBox Header="Linear Gradient" Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="3">
+                                <Rectangle VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                                    <Rectangle.Fill>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                            <GradientStop Color="{Binding Path=BiPolarRendererStartColor}" Offset="0.0" />
+                                            <GradientStop Color="{Binding Path=BiPolarRendererNeutralColor}" Offset="{Binding Path=BiPolarColorSliderValue}" />
+                                            <GradientStop Color="{Binding Path=BiPolarRendererEndColor}" Offset="1.0" />
+                                        </LinearGradientBrush>
+                                    </Rectangle.Fill>
+                                </Rectangle>
+                            </GroupBox>
+                            <Slider Name="biPolarColorSlider" Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="4" Height="30"  Value="{Binding Path=BiPolarColorSliderValue, Delay=250}" Orientation="Horizontal" Minimum="0" Maximum="1" />
+                        </Grid>
+                    </Border>
+                    <Button Content="Apply"  Width="75" HorizontalAlignment="Right" VerticalAlignment="Bottom" Command="{Binding ApplyBiPolarRendererCommand}" Margin="0,0,0,10" Grid.Row="1" ToolTip="Apply the renderer to the layer." />
+                    <Button Content="Remove" Width="75" HorizontalAlignment="Right" VerticalAlignment="Bottom" Command="{Binding RemoveBiPolarRendererCommand}" Margin="0,0,80,10" Grid.Row="1" ToolTip="Remove the renderer from the layer."  />
+                </Grid>
+            </TabItem>
+        </TabControl>
+        <Button Content="Switch" Margin="0,0,5,10" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="75" Grid.Row="1" Click="SwitchList" ToolTip="Switch between all layers and MCDA4ArcMap maintained layers."/>
+    </Grid>
+</Window>

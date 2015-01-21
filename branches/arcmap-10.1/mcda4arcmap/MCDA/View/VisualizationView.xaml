@@ -3,7 +3,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"  
     xmlns:local="clr-namespace:MCDA.Model"
     xmlns:customControl="clr-namespace:MCDA.CustomControls"  
-    xmlns:oxy="http://oxyplot.codeplex.com"
+    xmlns:oxy="clr-namespace:OxyPlot.Wpf;assembly=OxyPlot.Wpf"
     xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
          Title="Visualization"
         WindowStyle="ToolWindow"
@@ -273,7 +273,7 @@
                                     </Rectangle.Fill>
                                 </Rectangle>
                             </GroupBox>
-                            <Slider Name="biPolarColorSlider" Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="4" Height="30"  Value="{Binding Path=BiPolarColorSliderValue, Delay=250}" Orientation="Horizontal" Minimum="0" Maximum="1" />
+                            <Slider Name="biPolarColorSlider" Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="4" Height="30"  Value="{Binding Path=BiPolarColorSliderValue}" Orientation="Horizontal" Minimum="0" Maximum="1" />
                         </Grid>
                     </Border>
                     <Button Content="Apply"  Width="75" HorizontalAlignment="Right" VerticalAlignment="Bottom" Command="{Binding ApplyBiPolarRendererCommand}" Margin="0,0,0,10" Grid.Row="1" ToolTip="Apply the renderer to the layer." />

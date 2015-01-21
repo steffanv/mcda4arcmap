@@ -19,9 +19,9 @@
   <Company>Steffan Voss</Company>
   <Date>7/22/2014</Date>
   <Targets>
-    <Target name="Desktop" version="10.2" />
+    <Target name="Desktop" version="10.1" />
   </Targets>
-  <AddIn language="CLR4.5" library="MCDA.dll" namespace="MCDA">
+  <AddIn language="CLR4.0" library="MCDA.dll" namespace="MCDA">
     <ArcMap>
       <Commands>
         <Button id="Ryerson_University_MCDA_AddDataBtn" class="AddDataButton" message="" caption="Add data" tip="Manage Critieria." category="MCDA Controls" image="Images\AddData.png" />

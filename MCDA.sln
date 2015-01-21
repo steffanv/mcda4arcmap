@@ -1,9 +1,7 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Express 2012 for Windows Desktop
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MCDA", "MCDA\MCDA.csproj", "{6B4C0EC2-4865-4C29-8BBC-8A73FF9DCBA9}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MCDA.Test", "MCDA.Test\MCDA.Test.csproj", "{18F1EB09-2E54-4B41-B54A-ADA5407F2F88}"
 EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
@@ -37,16 +35,6 @@ Global
 		{6B4C0EC2-4865-4C29-8BBC-8A73FF9DCBA9}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{6B4C0EC2-4865-4C29-8BBC-8A73FF9DCBA9}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{6B4C0EC2-4865-4C29-8BBC-8A73FF9DCBA9}.Release|x86.ActiveCfg = Release|Any CPU
-		{18F1EB09-2E54-4B41-B54A-ADA5407F2F88}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{18F1EB09-2E54-4B41-B54A-ADA5407F2F88}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{18F1EB09-2E54-4B41-B54A-ADA5407F2F88}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{18F1EB09-2E54-4B41-B54A-ADA5407F2F88}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{18F1EB09-2E54-4B41-B54A-ADA5407F2F88}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{18F1EB09-2E54-4B41-B54A-ADA5407F2F88}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{18F1EB09-2E54-4B41-B54A-ADA5407F2F88}.Release|Any CPU.Build.0 = Release|Any CPU
-		{18F1EB09-2E54-4B41-B54A-ADA5407F2F88}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{18F1EB09-2E54-4B41-B54A-ADA5407F2F88}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{18F1EB09-2E54-4B41-B54A-ADA5407F2F88}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

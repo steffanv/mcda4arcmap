@@ -1,20 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using MCDA.Model;
 using ESRI.ArcGIS.Carto;
 using System.ComponentModel;
 using MCDA.Extensions;
-using ESRI.ArcGIS.Geodatabase;
-using ESRI.ArcGIS.Display;
 using ESRI.ArcGIS.esriSystem;
 using System.Windows.Media;
-using System.Windows;
 using System.Windows.Input;
-using System.Threading;
 using System.Collections.ObjectModel;
-using Feature = MCDA.Model.Feature;
 using OxyPlot.Series;
 
 namespace MCDA.ViewModel
@@ -125,7 +119,7 @@ namespace MCDA.ViewModel
 
             Tuple<double,int> [] histo = Classification.Histogram(SelectedFieldToRender.Field, Bins);
 
-            double[] breaks = Classification.Classify(SelectedClassificationMethod, SelectedFieldToRender.Field.Feature.FeatureClass, SelectedFieldToRender.Field.ESRIField, SelectedNumberOfClasses);
+            var breaks = Classification.Classify(SelectedClassificationMethod, SelectedFieldToRender.Field.Feature.FeatureClass, SelectedFieldToRender.Field.ESRIField, SelectedNumberOfClasses);
 
             //we have to skip the first one, for detailed information see Classify method
             breaks = breaks.Skip(1).ToArray();
@@ -135,7 +129,6 @@ namespace MCDA.ViewModel
                 columnItems.Add(new ColumnItem(histo[i].Item2));
                
                 HistogramLabels.Add(histo[i].Item1.ToString("0.00"));
-
             }
 
             for (int i = 0; i < breaks.Length; i++)
@@ -143,18 +136,23 @@ namespace MCDA.ViewModel
                 for (int j = 0; j < histo.Length; j++ )
                 {
                     if (breaks[i] > histo[j].Item1)
+                    {
                         continue;
+                    }
                     else
-                    { 
-                        Tuple<double, string> existingBreak = HistogramBreaks.FirstOrDefault(t => t.Item1 == j - 0.5d);
+                    {
+                        var existingBreak = HistogramBreaks.FirstOrDefault(t => t.Item1 == j - 0.5d);
 
                         if (existingBreak != null)
                         {
                             HistogramBreaks.Remove(existingBreak);
-                            HistogramBreaks.Add(Tuple.Create(j - 0.5d, existingBreak.Item2 + "  [" + (breaks[i]).ToString("0.0000") + "]"));
+                            HistogramBreaks.Add(Tuple.Create(j - 0.5d,
+                                existingBreak.Item2 + "  [" + (breaks[i]).ToString("0.0000") + "]"));
                         }
                         else
+                        {
                             HistogramBreaks.Add(Tuple.Create(j - 0.5d, "[" + (breaks[i]).ToString("0.0000") + "]"));
+                        }
 
                         break;
                     }
@@ -273,7 +271,11 @@ namespace MCDA.ViewModel
         private void Render()
         {
             if (IsFieldToRenderSelected)
-                ProgressDialog.ShowProgressDialog("Creating Symbology", (Action<RendererContainer, IFeatureLayer2>)_mcdaExtension.Render, _selectedFieldToRender, _selectedFieldToRender.Field.Feature.FeatureLayer);
+            {
+                ProgressDialog.ShowProgressDialog("Creating Symbology",
+                    (Action<RendererContainer, IFeatureLayer2>) _mcdaExtension.Render, _selectedFieldToRender,
+                    _selectedFieldToRender.Field.Feature.FeatureLayer);
+            }
         }
 
         private void InitializeClassificationArguments()
@@ -322,10 +324,15 @@ namespace MCDA.ViewModel
 
         private void RendererContainerToView()
         {
-            if (!IsFieldToRenderSelected) return;
+            if (!IsFieldToRenderSelected)
+            {
+                return;
+            }
 
             if (_selectedFieldToRender.Renderer == Renderer.None)
+            {
                 return;
+            }
 
             if (_selectedFieldToRender.Renderer == Renderer.ClassBreaksRenderer)
             {
@@ -363,7 +370,10 @@ namespace MCDA.ViewModel
 
         public void BiPolarRendererValuesChanged()
         {
-            if (!IsFieldToRenderSelected) return;
+            if (!IsFieldToRenderSelected)
+            {
+                return;
+            }
 
             if (SelectedFieldToRender.Field.IsSelectedFieldForRendering)
             {
@@ -374,7 +384,10 @@ namespace MCDA.ViewModel
 
         public void ClassBreaksRendererValuesChanged()
         {
-            if (!IsFieldToRenderSelected) return;
+            if (!IsFieldToRenderSelected)
+            {
+                return;
+            }
 
             UpdateHistogramControl();
 

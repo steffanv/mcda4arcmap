@@ -63,7 +63,7 @@ namespace MCDA
         /// <summary>
         ///     Gets all <see cref="MCDA.Model.Feature" /> from the in-memory workspace.
         /// </summary>
-        public IList<Feature> FeaturesFromInMemoryWorkspace
+        public IEnumerable<Feature> FeaturesFromInMemoryWorkspace
         {
             get { return _dictionaryOfLinks.Values.ToList(); }
         }
@@ -79,13 +79,15 @@ namespace MCDA
 
         public static MCDAExtension GetExtension()
         {
-            if (_extension == null)
+            if (_extension != null)
             {
-                UID id = new UIDClass();
-
-                id.Value = ThisAddIn.IDs.MCDAExtension;
-                ArcMap.Application.FindExtensionByCLSID(id);
+                return _extension;
             }
+
+            UID id = new UIDClass();
+
+            id.Value = ThisAddIn.IDs.MCDAExtension;
+            ArcMap.Application.FindExtensionByCLSID(id);
 
             return _extension;
         }
@@ -98,17 +100,14 @@ namespace MCDA
         }
 
         protected override void OnStartup()
-        {
-            //Assembly assembly = Assembly.LoadFrom("HistogramControl.dll");
-            //Assembly assembly2 = Assembly.LoadFrom("Xceed.Wpf.Toolkit.dll");
-            
+        {          
             _extension = this;
 
             _shadowWorkspace = CreateInMemoryWorkspace();
 
             AvailableFeatures.CollectionChanged += ListOfAvailableFeaturesChanged;
 
-            IMap map = ArcMap.Document.ActiveView.FocusMap;
+            var map = ArcMap.Document.ActiveView.FocusMap;
 
             _activeViewEvents = map as IActiveViewEvents_Event;
 
@@ -126,13 +125,18 @@ namespace MCDA
         void ListOfAvailableFeaturesChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             foreach (var currentFeature in AvailableFeatures)
+            {
                 currentFeature.UnRegisterPropertyHandler(_listOfpropertyChangedEventHandlersForFeatureIsSelected);
+            }
 
             foreach (var currentFeature in AvailableFeatures)
-                _listOfpropertyChangedEventHandlersForFeatureIsSelected.Add(currentFeature.RegisterPropertyHandler(f => f.IsSelected, IsSelectedChanged));
+            {
+                _listOfpropertyChangedEventHandlersForFeatureIsSelected.Add(
+                    currentFeature.RegisterPropertyHandler(f => f.IsSelected, IsSelectedChanged));
+            }
         }
 
-        public void IsSelectedChanged(object sender, PropertyChangedEventArgs e)
+        private void IsSelectedChanged(object sender, PropertyChangedEventArgs e)
         {
             PropertyChanged.Notify(() => SelectedFeature);
         }
@@ -141,26 +145,17 @@ namespace MCDA
 
         #region events
 
-        private bool EventsBeforeCloseDocument()
-        { //TODO is this even called?
-            // Return true to stop document from closing
-            IMessageDialog msgBox = new MessageDialogClass();
-            return msgBox.DoModal("BeforeCloseDocument Event", "Abort closing?", "Yes", "No", ArcMap.Application.hWnd);
-        }
-
         private void EventsNewDocument()
         {
             _activeViewEvents.ItemAdded -= ArcMapItemAdded;
             _activeViewEvents.ItemDeleted -= ArcMapItemDeleted;
 
-            IMap map = ArcMap.Document.ActiveView.FocusMap;
+            var map = ArcMap.Document.ActiveView.FocusMap;
 
             _activeViewEvents = map as IActiveViewEvents_Event;
 
             _activeViewEvents.ItemAdded += ArcMapItemAdded;
             _activeViewEvents.ItemDeleted += ArcMapItemDeleted;
-
-            //AvailableFeatures = new List<Feature>();
         }
 
         private void EventsOpenDocument()
@@ -168,24 +163,24 @@ namespace MCDA
             _activeViewEvents.ItemAdded -= ArcMapItemAdded;
             _activeViewEvents.ItemDeleted -= ArcMapItemDeleted;
 
-            IMap map = ArcMap.Document.ActiveView.FocusMap;
+            var map = ArcMap.Document.ActiveView.FocusMap;
 
             _activeViewEvents = map as IActiveViewEvents_Event;
 
             _activeViewEvents.ItemAdded += ArcMapItemAdded;
             _activeViewEvents.ItemDeleted += ArcMapItemDeleted;
-
-            //AvailableFeatures = new List<Feature>();
         }
 
         private void AddItemsOnStartup(ESRI.ArcGIS.Carto.IActiveView activeView)
         {
             ESRI.ArcGIS.Carto.IMap map = activeView.FocusMap;
 
-            int numberOfLayers = map.LayerCount;
+            var numberOfLayers = map.LayerCount;
 
-            for (int i = 0; i < numberOfLayers; i++)
+            for (var i = 0; i < numberOfLayers; i++)
+            {
                 ArcMapItemAdded(map.Layer[i]);
+            }
         }
 
         private void ArcMapItemDeleted(object item)
@@ -203,10 +198,12 @@ namespace MCDA
 
         private void ArcMapItemAdded(object item)
         {
-           ILayer2 newLayer = item as ILayer2;
+           var newLayer = item as ILayer2;
 
-           if (newLayer != null)
-               AvailableFeatures.Add(new Feature(newLayer));
+            if (newLayer != null)
+            {
+                AvailableFeatures.Add(new Feature(newLayer));
+            }
         }
 
         #endregion
@@ -217,10 +214,12 @@ namespace MCDA
         {
             IList<IToolParameter> toolParameter = new List<IToolParameter>();
 
-            foreach (Feature currentAvailableLayer in AvailableFeatures.Where(l => l.IsSelected))
+            foreach (var currentAvailableLayer in AvailableFeatures.Where(l => l.IsSelected))
             {
-                foreach (Field currentField in currentAvailableLayer.Fields.Where(f => f.IsSelected))
+                foreach (var currentField in currentAvailableLayer.Fields.Where(f => f.IsSelected))
+                {
                     toolParameter.Add(new ToolParameter(currentField.FieldName));
+                }
             }
 
             return new ToolParameterContainer(toolParameter);
@@ -231,9 +230,9 @@ namespace MCDA
         ///     or that no OID exists or both. In this the methods returns null.
         /// </summary>
         /// <returns></returns>
-        public Field GetOIDFieldFromSelectedFeature()
+        private Field GetOIDFieldFromSelectedFeature()
         {
-            Feature selectedFeature = AvailableFeatures.FirstOrDefault(f => f.IsSelected);
+            var selectedFeature = AvailableFeatures.FirstOrDefault(f => f.IsSelected);
 
             return selectedFeature == null ? null : selectedFeature.Fields.FirstOrDefault(f => f.IsOID);
         }
@@ -250,13 +249,15 @@ namespace MCDA
             if (SelectedFeature == null || !SelectedFeature.Fields.Any(f => f.FieldName.Equals(preferredName)))
                 return preferredName;
 
-            int extension = 0;
+            var extension = 0;
 
             while (SelectedFeature.Fields.Any(f => f.FieldName.Equals(preferredName)))
             {
                 //remove what we tried before
                 if (extension > 0)
+                {
                     preferredName = preferredName.Remove(preferredName.Length - (extension).ToString().Length);
+                }
 
                 extension++;
                 preferredName += extension;
@@ -265,28 +266,23 @@ namespace MCDA
             return preferredName;
         }
 
-        public IList<Field> GetFieldsFromSelectedLayerWhichAreNumeric(IList<Feature> layer)
+        public DataTable GetDataTableForParameterSet<T>(IEnumerable<T> toolParameter) where T : IToolParameter
         {
-            return layer.Where(l => l.IsSelected).SelectMany(currentLayer => currentLayer.Fields.Where(f => f.IsNumeric)).ToList();
-        }
-
-        public DataTable GetDataTableForParameterSet<T>(IList<T> toolParameter) where T : IToolParameter
-        {
-            IList<Field> listOfFields = GetListOfFieldsFromToolParameter(toolParameter);
+            var listOfFields = GetListOfFieldsFromToolParameter(toolParameter);
 
             var dataTable = new DataTable();
 
             //add columns
-            foreach (Field currentField in listOfFields)
+            foreach (var currentField in listOfFields)
             {
                 dataTable.Columns.Add(currentField.FieldName, typeof(double));
             }
 
             //add the oid column
-            Field oidField = GetOIDFieldFromSelectedFeature();
+            var oidField = GetOIDFieldFromSelectedFeature();
 
             //we have to take care about FID oid fields http://gis.stackexchange.com/questions/40833/arcobjects-bug-in-oid-field-duplication-while-duplicating-feature-class
-            bool isOIDFieldNameFID = false;
+            var isOIDFieldNameFID = false;
 
             int dataTableOIDOrdinal = 0;
             //in fact no feature can be selected, thus we have to take care about potential null
@@ -312,10 +308,10 @@ namespace MCDA
             //get data for rows and store it in a list of list like a table
             IList<IList<double>> tableData = new List<IList<double>>();
 
-            bool isOIDFieldStartsByZero = false;
+            var isOIDFieldStartsByZero = false;
 
-            int expectedNumbersOfRow = 0;
-            foreach (Field currentField in listOfFields)
+            var expectedNumbersOfRow = 0;
+            foreach (var currentField in listOfFields)
             {
                 IList<double> column = currentField.GetFieldData().ToList();
                 tableData.Add(column);
@@ -331,11 +327,11 @@ namespace MCDA
 
             // add rows
             // the table data list has the same order as the datatable columns!
-            for (int i = 0; i < expectedNumbersOfRow; i++)
+            for (var i = 0; i < expectedNumbersOfRow; i++)
             {
-                DataRow row = dataTable.NewRow();
+                var row = dataTable.NewRow();
 
-                for (int y = 0; y < tableData.Count; y++)
+                for (var y = 0; y < tableData.Count; y++)
                 {
                     //we have the oid column
                     if (y == dataTableOIDOrdinal)
@@ -360,21 +356,6 @@ namespace MCDA
             return dataTable;
         }
 
-        public IList<IField> GetListOfFieldsFromFeatureClass(IFeatureClass featureClass)
-        {
-            IList<IField> fieldsList = new List<IField>();
-
-            IFields fields = featureClass.Fields;
-
-            for (int i = 0; i <= fields.FieldCount - 1; i++)
-            {
-                if (fields.Field[i].Type <= esriFieldType.esriFieldTypeDouble)
-                    fieldsList.Add(fields.Field[i]);
-            }
-
-            return fieldsList;
-        }
-
         /// <summary>
         ///     In case the tool has a corresponding <see cref="IFeatureLayer2" /> in the in memory workspace it will be added
         ///     to the active view.
@@ -385,7 +366,9 @@ namespace MCDA
             Feature feature;
 
             if (!_dictionaryOfLinks.TryGetValue(tool, out feature))
+            {
                 return;
+            }
 
             ArcMap.Document.ActiveView.FocusMap.AddLayer((ILayer)feature.ESRILayer);
         }
@@ -395,7 +378,9 @@ namespace MCDA
             Feature mcdaWorkspaceContainer;
 
             if (!_dictionaryOfLinks.TryGetValue(tool, out mcdaWorkspaceContainer))
+            {
                 return;
+            }
 
             _dictionaryOfLinks.Remove(tool);
 
@@ -403,12 +388,11 @@ namespace MCDA
         }
 
         public void EstablishLink(AbstractToolTemplate tool)
-        {//TODO isn't the where and tolist pointless?
-            IFeatureLayer2 featureLayer = AvailableFeatures.Where(l => l.IsSelected && l.IsSuitableForMCDA).ToList().First().FeatureLayer;
-            IFeatureClass featureClass = featureLayer.FeatureClass;
+        {
+            var featureLayer = AvailableFeatures.First(l => l.IsSelected && l.IsSuitableForMCDA).FeatureLayer;
+            var featureClass = featureLayer.FeatureClass;
 
-            IFeatureClass copiedFeatureClass = CopyFeatureClassIntoNewWorkspace(featureClass, _shadowWorkspace,
-                tool + CreateTimeStamp());
+            var copiedFeatureClass = CopyFeatureClassIntoNewWorkspace(featureClass, _shadowWorkspace,tool + CreateTimeStamp());
 
             var newFeatureLayer = new FeatureLayerClass { Name = CreateLayerName(tool) };
 
@@ -420,12 +404,12 @@ namespace MCDA
 
         }
 
-        private String CreateLayerName(AbstractToolTemplate tool)
+        private static String CreateLayerName(AbstractToolTemplate tool)
         {
             return tool + DateTime.Now.ToString("ddHHmmssffff");
         }
 
-        private String CreateTimeStamp()
+        private static String CreateTimeStamp()
         {
             return DateTime.Now.ToString("ddHHmmssffff");
         }
@@ -441,7 +425,9 @@ namespace MCDA
         {
             Feature feature;
             if (!_dictionaryOfLinks.TryGetValue(tool, out feature))
+            {
                 return;
+            }
 
             var featureClass = feature.FeatureClass;
 
@@ -477,7 +463,7 @@ namespace MCDA
 
                     var dataRows = dataTable.AsEnumerable().Where(dr => dr.Field<FieldTypeOID>(featureClass.OIDFieldName).OID == oid);
 
-                    DataRow dRow = dataRows.FirstOrDefault();
+                    var dRow = dataRows.FirstOrDefault();
 
                     if (dRow != null) esriFeature.Value[fieldIndex] = dRow[tool.DefaultResultColumnName];
 
@@ -545,7 +531,9 @@ namespace MCDA
         ///     Performs a partial refresh on the feature feature in the in memory workspace.
         /// </summary>
         /// <param name="renderContainer"></param>
-        private void PartialRefresh(RendererContainer renderContainer, IFeatureLayer2 featureLayer, bool updateTOC = true)
+        /// <param name="featureLayer"></param>
+        /// <param name="updateTOC"></param>
+        private static void PartialRefresh(RendererContainer renderContainer, IFeatureLayer2 featureLayer, bool updateTOC = true)
         {
             var activeView = (IActiveView) ArcMap.Document.FocusMap;
 
@@ -564,31 +552,33 @@ namespace MCDA
         {
             IList<Feature> layerList = new List<Feature>();
 
-            IMap map = activeView.FocusMap;
+            var map = activeView.FocusMap;
 
             // Get the number of layers
-            int numberOfLayers = map.LayerCount;
+            var numberOfLayers = map.LayerCount;
 
             // Loop through the layers and get the correct feature index
-            for (int i = 0; i < numberOfLayers; i++)
-                layerList.Add(new Feature( (ILayer2) map.get_Layer(i)));
+            for (var i = 0; i < numberOfLayers; i++)
+            {
+                layerList.Add(new Feature((ILayer2) map.Layer[i]));
+            }
 
             return layerList;
         }
 
-        private IList<Field> GetListOfFieldsFromToolParameter<T>(IList<T> toolParameter) where T : IToolParameter
+        private IList<Field> GetListOfFieldsFromToolParameter<T>(IEnumerable<T> toolParameter) where T : IToolParameter
         {
             IList<Field> listOfFields = new List<Field>();
 
-            foreach (IToolParameter currentToolParameter in toolParameter)
+            foreach (var currentToolParameter in toolParameter)
             {
-                foreach (Feature currentAvailableLayer in AvailableFeatures.Where(l => l.IsSelected))
+                foreach (var currentAvailableLayer in AvailableFeatures.Where(l => l.IsSelected))
                 {
-                    foreach (
-                        Field currentField in
-                            currentAvailableLayer.Fields.Where(f => f.FieldName.Equals(currentToolParameter.ColumnName))
-                        )
+                    var parameter = currentToolParameter;
+                    foreach (var currentField in currentAvailableLayer.Fields.Where(f => f.FieldName.Equals(parameter.ColumnName)))
+                    {
                         listOfFields.Add(currentField);
+                    }
                 }
             }
 
@@ -597,8 +587,8 @@ namespace MCDA
 
         private IWorkspace CreateInMemoryWorkspace()
         {
-            IWorkspaceFactory newWorkspaceFactory = new InMemoryWorkspaceFactoryClass();
-            IWorkspaceName workspaceName = newWorkspaceFactory.Create("", "MCDAWorkspace", null, 0);
+            var newWorkspaceFactory = new InMemoryWorkspaceFactoryClass();
+            var workspaceName = newWorkspaceFactory.Create("", "MCDAWorkspace", null, 0);
             var name = (IName) workspaceName;
             var inMemoryWorkspace = (IWorkspace) name.Open();
 
@@ -611,7 +601,7 @@ namespace MCDA
             // get FeatureClassName for input
             var inDataset = inFeatureClass as IDataset;
             var inFeatureClassName = inDataset.FullName as IFeatureClassName;
-            IWorkspace inWorkspace = inDataset.Workspace;
+            var inWorkspace = inDataset.Workspace;
 
             // get WorkSpaceName for output
             var outDataset = outWorkspace as IDataset;
@@ -632,7 +622,7 @@ namespace MCDA
             fieldChecker.InputWorkspace = inWorkspace;
             fieldChecker.ValidateWorkspace = outWorkspace;
             fieldChecker.Validate(inFields, out enumFieldError, out outFields);
-            // Check enumFieldError for field naming confilcts
+            // Check enumFieldError for field naming conflicts
 
             //Convert the data.
             IFeatureDataConverter featureDataConverter = new FeatureDataConverterClass();

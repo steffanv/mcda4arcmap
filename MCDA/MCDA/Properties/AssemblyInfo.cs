@@ -11,7 +11,7 @@ using System.Windows;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Ryerson University; Steffan Voß")]
 [assembly: AssemblyProduct("MCDA")]
-[assembly: AssemblyCopyright("Copyright © Ryerson University 2012; Steffan Voß 2012 - 2014")]
+[assembly: AssemblyCopyright("Copyright © Ryerson University 2012; Steffan Voß 2012 - 2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

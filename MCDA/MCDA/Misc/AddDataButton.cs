@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.IO;
-using ESRI.ArcGIS.esriSystem;
+﻿using ESRI.ArcGIS.esriSystem;
 using ESRI.ArcGIS.Framework;
 
 namespace MCDA
@@ -14,7 +10,7 @@ namespace MCDA
              UID dockWinID = new UIDClass();
              dockWinID.Value = ThisAddIn.IDs.AddDataView;
 
-            IDockableWindow dockableWindow = ArcMap.DockableWindowManager.GetDockableWindow(dockWinID);
+            var dockableWindow = ArcMap.DockableWindowManager.GetDockableWindow(dockWinID);
             
             dockableWindow.Show(true);
             

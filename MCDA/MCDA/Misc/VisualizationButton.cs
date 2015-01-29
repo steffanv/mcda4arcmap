@@ -1,11 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.IO;
-using ESRI.ArcGIS.esriSystem;
-using ESRI.ArcGIS.Framework;
 using System.Windows.Interop;
-
 
 namespace MCDA
 {
@@ -15,11 +9,9 @@ namespace MCDA
         {
             var parentHandle = new IntPtr(ArcMap.Application.hWnd);
 
-            VisualizationView visualizationView = new VisualizationView();
+            var visualizationView = new VisualizationView();
 
-            var helper = new WindowInteropHelper(visualizationView);
-
-            helper.Owner = parentHandle;
+            var helper = new WindowInteropHelper(visualizationView) {Owner = parentHandle};
 
             visualizationView.ShowDialog();
         }

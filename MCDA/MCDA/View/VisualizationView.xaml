@@ -3,7 +3,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"  
     xmlns:local="clr-namespace:MCDA.Model"
     xmlns:customControl="clr-namespace:MCDA.CustomControls"  
-    xmlns:oxy="http://oxyplot.codeplex.com"
+    xmlns:oxy="clr-namespace:OxyPlot.Wpf;assembly=OxyPlot.Wpf"
     xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
          Title="Visualization"
         WindowStyle="ToolWindow"

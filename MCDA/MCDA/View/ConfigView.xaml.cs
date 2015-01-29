@@ -1,6 +1,4 @@
-﻿using System;
-using System.Windows.Controls;
-using MCDA.ViewModel;
+﻿using MCDA.ViewModel;
 using System.Windows;
 
 namespace MCDA
@@ -11,7 +9,7 @@ namespace MCDA
         {
             InitializeComponent();
 
-            ConfigViewModel configViewModel = new ConfigViewModel();
+            var configViewModel = new ConfigViewModel();
 
             configViewModel.RequestClose += (s, e) => this.Close();
 

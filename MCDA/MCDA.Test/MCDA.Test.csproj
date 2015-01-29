@@ -64,7 +64,6 @@
     <Compile Include="ObserveableCollectionTest.cs" />
     <Compile Include="ScoreRangeNormalizationTest.cs" />
     <Compile Include="MaximumScoreNormalizationTest.cs" />
-    <Compile Include="SmallestDifferenceTest.cs" />
     <Compile Include="TestUtil.cs" />
     <Compile Include="IdentityNormalizationTest.cs" />
     <Compile Include="FeatureTest.cs" />

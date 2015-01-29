@@ -15,12 +15,12 @@ namespace MCDA.Misc
         /// <summary>
         /// Minimum value of the range
         /// </summary>
-        public T Minimum { get; set; }
+        public T Minimum { private get; set; }
 
         /// <summary>
         /// Maximum value of the range
         /// </summary>
-        public T Maximum { get; set; }
+        public T Maximum { private get; set; }
 
         /// <summary>
         /// Presents the Range in readable format
@@ -34,7 +34,7 @@ namespace MCDA.Misc
         /// Determines if the range is valid
         /// </summary>
         /// <returns>True if range is valid, else false</returns>
-        public Boolean IsValid() { return Minimum.CompareTo(Maximum) <= 0; }
+        private Boolean IsValid() { return Minimum.CompareTo(Maximum) <= 0; }
 
         /// <summary>
         /// Determines if the provided value is inside the range
@@ -49,21 +49,21 @@ namespace MCDA.Misc
         /// <summary>
         /// Determines if this Range is inside the bounds of another range
         /// </summary>
-        /// <param name="Range">The parent range to test on</param>
+        /// <param name="range">The parent range to test on</param>
         /// <returns>True if range is inclusive, else false</returns>
-        public Boolean IsInsideRange(Range<T> Range)
+        public Boolean IsInsideRange(Range<T> range)
         {
-            return this.IsValid() && Range.IsValid() && Range.ContainsValue(this.Minimum) && Range.ContainsValue(this.Maximum);
+            return this.IsValid() && range.IsValid() && range.ContainsValue(this.Minimum) && range.ContainsValue(this.Maximum);
         }
 
         /// <summary>
         /// Determines if another range is inside the bounds of this range
         /// </summary>
-        /// <param name="Range">The child range to test</param>
+        /// <param name="range">The child range to test</param>
         /// <returns>True if range is inside, else false</returns>
-        public Boolean ContainsRange(Range<T> Range)
+        public Boolean ContainsRange(Range<T> range)
         {
-            return this.IsValid() && Range.IsValid() && this.ContainsValue(Range.Minimum) && this.ContainsValue(Range.Maximum);
+            return this.IsValid() && range.IsValid() && this.ContainsValue(range.Minimum) && this.ContainsValue(range.Maximum);
         }
     }
 }

@@ -1,27 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using ESRI.ArcGIS.Controls;
-using ESRI.ArcGIS.Display;
 using Xceed.Wpf.Toolkit;
 using MCDA.ViewModel;
 using MCDA.Model;
 using System.Collections.ObjectModel;
 using MCDA.Extensions;
-using OxyPlot;
 using OxyPlot.Wpf;
-using OxyPlot.Xps;
-using OxyPlot.Series;
 
 namespace MCDA
 {
@@ -32,7 +19,7 @@ namespace MCDA
 
         public VisualizationView()
         {
-            //WORKAROUND to load the assemblys before XAML comes into play
+            //WORKAROUND to load the assembly's before XAML comes into play
             new OxyPlot.Wpf.BarSeries();
             new OxyPlot.Xps.XpsExporter();
             new OxyPlot.Series.BarItem();
@@ -42,10 +29,12 @@ namespace MCDA
             DataContext = visualizationViewModel;
 
             //To make sure that the neutral color consists only of gray scale values
-            ObservableCollection<ColorItem> greyScaleColors = new ObservableCollection<ColorItem>();
+            var greyScaleColors = new ObservableCollection<ColorItem>();
 
             for (byte i = 0; i < 254; i += 2)
+            {
                 greyScaleColors.Add(new ColorItem(Color.FromRgb(i, i, i), "Grey"));
+            }
 
             BiPolarRendererNeutralColor.AvailableColors = greyScaleColors;
 
@@ -60,13 +49,15 @@ namespace MCDA
 
             foreach (var item in visualizationViewModel.HistogramBreaks)
             {
-                double histogramBreak = item.Item1;
+                var histogramBreak = item.Item1;
 
-                LineAnnotation annotation = new LineAnnotation();
-                annotation.X = histogramBreak;
-                annotation.Type = OxyPlot.Annotations.LineAnnotationType.Vertical;
-                annotation.Color = Colors.Red;
-                annotation.Text = item.Item2;
+                var annotation = new LineAnnotation
+                {
+                    X = histogramBreak,
+                    Type = OxyPlot.Annotations.LineAnnotationType.Vertical,
+                    Color = Colors.Red,
+                    Text = item.Item2
+                };
 
                 Histogram.Annotations.Add(annotation);
 
@@ -77,10 +68,14 @@ namespace MCDA
         private void NumberOfClassesChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (!BreaksPopup.IsOpen)
+            {
                 return;
+            }
 
             if (visualizationViewModel.HistogramBreaks == null)
+            {
                 BreaksPopupTextBlock.Text = "Not available.";
+            }
 
             BreaksPopupTextBlock.Text = string.Join(Environment.NewLine, visualizationViewModel.HistogramBreaks.Select(t => t.Item2));
         }
@@ -92,12 +87,11 @@ namespace MCDA
 
         private void TreeViewSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-
-            Field selectedField = e.NewValue as Field;
+            var selectedField = e.NewValue as Field;
 
             if (selectedField != null)
             {
-                VisualizationViewModel visualizationViewModel = DataContext as VisualizationViewModel;
+                var visualizationViewModel = DataContext as VisualizationViewModel;
 
                 visualizationViewModel.SelectedFieldToRender = selectedField.RenderContainer;
 
@@ -119,24 +113,29 @@ namespace MCDA
 
         private static void SetFocusable(ItemsControl parentContainer)
         {
-            foreach (Object item in parentContainer.Items)
+            foreach (var item in parentContainer.Items)
             {
-                TreeViewItem currentContainer = parentContainer.ItemContainerGenerator.ContainerFromItem(item) as TreeViewItem;
+                var currentContainer = parentContainer.ItemContainerGenerator.ContainerFromItem(item) as TreeViewItem;
 
                 if (currentContainer != null && currentContainer.Items.Count > 0)
+                {
                     SetFocusable(currentContainer);
+                }
 
-                Field field = currentContainer.Header as Field;
+                var field = currentContainer.Header as Field;
 
                 if (field != null)
                 {
 
                     if (!field.IsSuitableForMCDA)
+                    {
                         currentContainer.Focusable = false;
-                    //if (!field.IsToolField)
-                    //    currentContainer.Visibility = Visibility.Collapsed;
+                    }
+
                     if (field.IsToolField)
+                    {
                         currentContainer.Background = new SolidColorBrush(Colors.LightGreen);
+                    }
                 }
 
             }
@@ -147,10 +146,14 @@ namespace MCDA
             BreaksPopup.IsOpen = true;
 
             if (visualizationViewModel.HistogramBreaks == null)
+            {
                 BreaksPopupTextBlock.Text = "Not available.";
+            }
 
             else
+            {
                 BreaksPopupTextBlock.Text = string.Join(Environment.NewLine, visualizationViewModel.HistogramBreaks.Select(t => t.Item2));
+            }
         }
 
         private void ToggleButton_Unchecked(object sender, RoutedEventArgs e)

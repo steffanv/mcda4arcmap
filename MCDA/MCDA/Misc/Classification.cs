@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using ESRI.ArcGIS.esriSystem;
 using ESRI.ArcGIS.Geodatabase;
 using ESRI.ArcGIS.Carto;
@@ -23,7 +22,7 @@ namespace MCDA.Model
             double[] data;
             int[] freq;
 
-            int numberClasses = numberOfClasses;
+            var numberClasses = numberOfClasses;
             
             Histogram(featureClass, field, out data, out freq);
 
@@ -35,45 +34,49 @@ namespace MCDA.Model
         public static Tuple<double, int>[] Histogram(Field field, int bins)
         {
             if (bins < 1)
+            {
                 throw new ArgumentOutOfRangeException("bins cannot be < 1");
+            }
 
-           IEnumerable<double> data = field.GetFieldData();
+           var data = field.GetFieldData().ToList();
 
-           double min = data.Min();
-           double max = data.Max();
-           double range = max - min;
+           var min = data.Min();
+           var max = data.Max();
+           var range = max - min;
 
-           double binSize = range / bins;
+           var binSize = range / bins;
 
-           Tuple<double, int>[] histo = Enumerable.Repeat(Tuple.Create<double, int>(0d, 0), bins).ToArray();
+           var histo = Enumerable.Repeat(Tuple.Create<double, int>(0d, 0), bins).ToArray();
 
            foreach (double currentData in data)
            {
-               int index = (int) ((currentData - min) / binSize);
+               var index = (int) ((currentData - min) / binSize);
 
                //max fits into the last bin
-               if(index >= histo.Count())
-                index--;
+               if (index >= histo.Count())
+               {
+                   index--;
+               }
 
                //we add the binMiddle afterwards
                histo[index] = Tuple.Create<double, int>(0d, histo[index].Item2 + 1);
            }
 
             //add bin middles values
-           for (int i = 0; i < bins; i++)
+           for (var i = 0; i < bins; i++)
            {
                //double binMiddle = min + (i * binSize) + (binSize / 2);
-               double binRight = min + ((i + 1) * binSize);
+               var binRight = min + ((i + 1) * binSize);
                histo[i] = Tuple.Create<double, int>(binRight, histo[i].Item2);
            }
 
            return histo;
         }
 
-        public static void Histogram(IFeatureClass featureClass, IField field, out double[] data, out int[] freq)
+        private static void Histogram(IFeatureClass featureClass, IField field, out double[] data, out int[] freq)
         {
             ITableHistogram tableHistorgram = new BasicTableHistogramClass();
-            IBasicHistogram basicHistogram = tableHistorgram as IBasicHistogram;
+            var basicHistogram = tableHistorgram as IBasicHistogram;
 
             tableHistorgram.Table = (ITable)featureClass;
             tableHistorgram.Field = field.Name;
@@ -85,6 +88,5 @@ namespace MCDA.Model
             data = dataValues as double[];
             freq = dataFrequency as int[];
         }
- 
     }
 }

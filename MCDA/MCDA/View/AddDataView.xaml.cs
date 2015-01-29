@@ -1,19 +1,5 @@
-﻿using ESRI.ArcGIS.esriSystem;
-using ESRI.ArcGIS.Framework;
-using ESRI.ArcGIS.ArcMapUI;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Windows;
+﻿using System;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using MCDA.ViewModel;
 
 //we cant change the namespace its to deep in esri add in model - I can change it but the InitializeComponent() can not be found
@@ -60,8 +46,6 @@ namespace MCDA
                 base.Dispose(disposing);
             }
 
-        }
-
-      
+        }    
     }
 }

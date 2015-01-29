@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.ComponentModel;
+using MCDA.Misc;
 using MCDA.Model;
 using MCDA.Extensions;
 using System.Data;
 using System.Windows.Input;
-using ESRI.ArcGIS.esriSystem;
-using ESRI.ArcGIS.Framework;
 using System.Windows.Interop;
 using Microsoft.Win32;
 
@@ -87,21 +85,24 @@ namespace MCDA.ViewModel
         private void FieldPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (_isLocked)
+            {
                 return;
+            }
 
             _lwlcTool = ToolFactory.NewLWLCTool();
 
             _lwlcResultDataTable = _lwlcTool.Data;
 
-            if (_selectedFeature.Fields.Count(f => f.IsSelected) >= 1){
-
+            if (_selectedFeature.Fields.Count(f => f.IsSelected) >= 1)
+            {
                 _toolParameter = new BindingList<IToolParameter>(_lwlcTool.ToolParameterContainer.ToolParameter);
 
-                ProgressDialog.ShowProgressDialog("Running LWLC Tool", (Action)_lwlcTool.Run);
+                ProgressDialog.ShowProgressDialog("Running LWLC Tool", (Action) _lwlcTool.Run);
             }
             else
-
-            RegisterToolParameterEvents();
+            {
+                RegisterToolParameterEvents();
+            }
 
             PropertyChanged.Notify(() => LWLCParameter);
             PropertyChanged.Notify(() => LWLCResult);
@@ -127,7 +128,9 @@ namespace MCDA.ViewModel
         private void SelectedFeaturePropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (_isLocked)
+            {
                 return;
+            }
 
             _lwlcTool = ToolFactory.NewLWLCTool();
 
@@ -172,7 +175,9 @@ namespace MCDA.ViewModel
         protected override void UpdateDrag()
         {
             if (!_isUpdateAllowed)
+            {
                 return;
+            }
 
             ProgressDialog.ShowProgressDialog("Running LWLC Tool", (Action)_lwlcTool.Run);
             _lwlcResultDataTable = _lwlcTool.Data;
@@ -187,7 +192,7 @@ namespace MCDA.ViewModel
         {
             if (!_isUpdateAllowed)
             {
-                List<IToolParameter> tList = _toolParameter.Select(t => t.DeepClone()).ToList();
+                var tList = _toolParameter.Select(t => t.DeepClone()).ToList();
 
                 _toolParameterStorageForAnimationLikeUpdate.Add(tList);
             }
@@ -198,7 +203,7 @@ namespace MCDA.ViewModel
 
                 if (_toolParameterStorageForAnimationLikeUpdate.Count > 0)
                 {
-                    int steps = (int)Math.Sqrt(_toolParameterStorageForAnimationLikeUpdate.Count);
+                    var steps = (int)Math.Sqrt(_toolParameterStorageForAnimationLikeUpdate.Count);
                     //take several steps...
                     for (int i = 0; i < _toolParameterStorageForAnimationLikeUpdate.Count; i = i + steps)
                     {
@@ -207,7 +212,9 @@ namespace MCDA.ViewModel
                         _lwlcResultDataTable = _lwlcTool.Data;
 
                         if (_isSendToInMemoryWorkspaceCommand)
+                        {
                             _mcdaExtension.JoinToolResultByOID(_lwlcTool, _lwlcTool.Data);
+                        }
                     }
                 }
 
@@ -217,7 +224,9 @@ namespace MCDA.ViewModel
                 _lwlcResultDataTable = _lwlcTool.Data;
 
                 if (_isSendToInMemoryWorkspaceCommand)
+                {
                     _mcdaExtension.JoinToolResultByOID(_lwlcTool, _lwlcTool.Data);
+                }
 
                 _isUpdateAllowed = false;
 
@@ -231,7 +240,9 @@ namespace MCDA.ViewModel
             _lwlcResultDataTable = _lwlcTool.Data;
 
             if (_isSendToInMemoryWorkspaceCommand)
+            {
                 _mcdaExtension.JoinToolResultByOID(_lwlcTool, _lwlcTool.Data);
+            }
         }
 
         protected override void AfterUpdate()
@@ -263,12 +274,12 @@ namespace MCDA.ViewModel
 
         protected override void DoExportAsCSVCommand()
         {
-            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            var saveFileDialog = new SaveFileDialog();
             saveFileDialog.FileName = _lwlcTool.ToString();
             saveFileDialog.DefaultExt = ".csv";
             saveFileDialog.Filter = "Comma Separated Values (.csv)|*.csv";
 
-            Nullable<bool> result = saveFileDialog.ShowDialog();
+            bool? result = saveFileDialog.ShowDialog();
 
             if (result == true)
             {
@@ -290,7 +301,7 @@ namespace MCDA.ViewModel
             if (!_isLocked && _isSendToInMemoryWorkspaceCommand)
             {
                 ESRI.ArcGIS.Framework.IMessageDialog msgBox = new ESRI.ArcGIS.Framework.MessageDialogClass();
-                bool userResult = msgBox.DoModal("Unlocking", "Unlocking also disconnects from the managed layer.", "Unlock", "Abort", ArcMap.Application.hWnd);
+                var userResult = msgBox.DoModal("Unlocking", "Unlocking also disconnects from the managed layer.", "Unlock", "Abort", ArcMap.Application.hWnd);
 
                 //if the user hit no we have to set the lock state back to locked
                 if (!userResult)
@@ -338,8 +349,9 @@ namespace MCDA.ViewModel
             }
 
             if (!_isSendToInMemoryWorkspaceCommand)
-                //mcdaExtension.RemoveLink(_wlcTool);
+            {
                 DoLockCommand();
+            }
 
             PropertyChanged.Notify(() => IsSendToInMemoryWorkspaceCommand);
         }
@@ -398,13 +410,19 @@ namespace MCDA.ViewModel
         protected override void DoClosingCommand()
         {
             if (_isLocked || _isSendToInMemoryWorkspaceCommand)
+            {
                 _mcdaExtension.RemoveLink(_lwlcTool);
+            }
 
             _mcdaExtension.UnRegisterPropertyHandler(_selectedFeaturePropertyChangedEventHandler);
 
-            if(_selectedFeature != null)
-               foreach (var currentField in _selectedFeature.Fields) 
-                 currentField.UnRegisterPropertyHandler(_listOfpropertyChangedEventHandlersForFieldIsSelected);
+            if (_selectedFeature != null)
+            {
+                foreach (var currentField in _selectedFeature.Fields)
+                {
+                    currentField.UnRegisterPropertyHandler(_listOfpropertyChangedEventHandlersForFieldIsSelected);
+                }
+            }
 
             foreach (var currentToolParameter in _toolParameter)
             {
@@ -437,8 +455,7 @@ namespace MCDA.ViewModel
 
             _neighborhoodSelectionView.Closing += NeighborhoodSelectionViewClosing;
 
-            _neighborhoodSelectionView.ShowDialog();
-            
+            _neighborhoodSelectionView.ShowDialog();          
         }
 
         void NeighborhoodSelectionViewClosing(object sender, CancelEventArgs e)
@@ -460,23 +477,38 @@ namespace MCDA.ViewModel
 
         private void DoOkayNeighborhoodSelectionCommand()
         {
-            bool changed = false;
+            var changed = false;
 
             if (_neighborhoodSelectionViewModel.NeighborhoodOption != _lwlcTool.NeighborhoodOptions)
+            {
                 changed = true;
-                  
-            else {
-
-                if(_neighborhoodSelectionViewModel.NeighborhoodOption == NeighborhoodOptions.Automatic && _neighborhoodSelectionViewModel.SelectedNumberOfKNearestNeighborsForAutomatic != _lwlcTool.NumberOfKNearestNeighborsForAutomatic)
-                     changed = true;
-                if(_neighborhoodSelectionViewModel.NeighborhoodOption == NeighborhoodOptions.Threshold && _neighborhoodSelectionViewModel.Threshold != _lwlcTool.Threshold)
-                    changed = true;
-                if(_neighborhoodSelectionViewModel.NeighborhoodOption == NeighborhoodOptions.KNearestNeighbors && _neighborhoodSelectionViewModel.SelectedNumberOfKNearestNeighbors != _lwlcTool.NumberOfKNearestNeighbors)
-                    changed = true;
             }
 
-            if(changed)
+            else
+            {
+                if (_neighborhoodSelectionViewModel.NeighborhoodOption == NeighborhoodOptions.Automatic &&
+                    _neighborhoodSelectionViewModel.SelectedNumberOfKNearestNeighborsForAutomatic !=
+                    _lwlcTool.NumberOfKNearestNeighborsForAutomatic)
+                {
+                    changed = true;
+                }
+                if (_neighborhoodSelectionViewModel.NeighborhoodOption == NeighborhoodOptions.Threshold &&
+                    _neighborhoodSelectionViewModel.Threshold != _lwlcTool.Threshold)
+                {
+                    changed = true;
+                }
+                if (_neighborhoodSelectionViewModel.NeighborhoodOption == NeighborhoodOptions.KNearestNeighbors &&
+                    _neighborhoodSelectionViewModel.SelectedNumberOfKNearestNeighbors !=
+                    _lwlcTool.NumberOfKNearestNeighbors)
+                {
+                    changed = true;
+                }
+            }
+
+            if (changed)
+            {
                 DoApplyNeighborhoodSelectionCommand();
+            }
 
             _neighborhoodSelectionView.Closing -= NeighborhoodSelectionViewClosing;
             _neighborhoodSelectionView.Close();

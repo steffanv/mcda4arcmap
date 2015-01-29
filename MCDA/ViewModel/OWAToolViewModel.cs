@@ -1,15 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.ComponentModel;
+using MCDA.Misc;
 using MCDA.Model;
 using MCDA.Extensions;
 using System.Data;
 using Microsoft.Win32;
 using System.Windows.Interop;
 using System.Windows.Input;
-using System.Linq.Expressions;
 
 namespace MCDA.ViewModel
 {
@@ -82,7 +81,9 @@ namespace MCDA.ViewModel
         private void FieldPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (_isLocked)
+            {
                 return;
+            }
 
             _owaTool = ToolFactory.NewOWATool();
 
@@ -121,7 +122,9 @@ namespace MCDA.ViewModel
         private void SelectedFeaturePropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (_isLocked)
+            {
                 return;
+            }
 
             _owaTool = ToolFactory.NewOWATool();
 
@@ -129,9 +132,10 @@ namespace MCDA.ViewModel
 
             if (_selectedFeature != null)
             {
-
                 foreach (var currentField in _selectedFeature.Fields)
+                {
                     currentField.UnRegisterPropertyHandler(_listOfpropertyChangedEventHandlersForFieldIsSelected);
+                }
             }
 
             _selectedFeature = _mcdaExtension.SelectedFeature;
@@ -139,8 +143,10 @@ namespace MCDA.ViewModel
             if (_selectedFeature != null)
             {
                 foreach (var currentField in _selectedFeature.Fields)
+                {
                     _listOfpropertyChangedEventHandlersForFieldIsSelected.Add(
                         currentField.RegisterPropertyHandler(f => f.IsSelected, FieldPropertyChanged));
+                }
 
                 if (_selectedFeature.Fields.Count(f => f.IsSelected) >= 1)
                 {
@@ -167,13 +173,17 @@ namespace MCDA.ViewModel
         protected override void UpdateDrag()
         {
             if (!_isUpdateAllowed)
+            {
                 return;
+            }
 
             _owaTool.Run();
             _owaResultDataTable = _owaTool.Data;
 
             if (_isSendToInMemoryWorkspaceCommand)
+            {
                 _mcdaExtension.JoinToolResultByOID(_owaTool, _owaTool.Data);
+            }
 
             _isUpdateAllowed = false;
         }
@@ -184,34 +194,38 @@ namespace MCDA.ViewModel
             _owaResultDataTable = _owaTool.Data;
 
             if (_isSendToInMemoryWorkspaceCommand)
+            {
                 _mcdaExtension.JoinToolResultByOID(_owaTool, _owaTool.Data);
+            }
         }
 
         protected override void UpdateAnimation()
         {
             if (!_isUpdateAllowed)
             {
-                List<IToolParameter> tList = _toolParameter.Select(t => t.DeepClone()).ToList();
+                var tList = _toolParameter.Select(t => t.DeepClone()).ToList();
 
                 _toolParameterStorageForAnimationLikeUpdate.Add(tList);
             }
 
             else
             {
-                BindingList<IToolParameter> latestToolParameter = _toolParameter;
+                var latestToolParameter = _toolParameter;
 
                 if (_toolParameterStorageForAnimationLikeUpdate.Count > 0)
                 {
-                    int steps = (int)Math.Sqrt(_toolParameterStorageForAnimationLikeUpdate.Count);
+                    var steps = (int)Math.Sqrt(_toolParameterStorageForAnimationLikeUpdate.Count);
                     //take several steps...
-                    for (int i = 0; i < _toolParameterStorageForAnimationLikeUpdate.Count; i = i + steps)
+                    for (var i = 0; i < _toolParameterStorageForAnimationLikeUpdate.Count; i = i + steps)
                     {
                         _owaTool.ToolParameterContainer.ToolParameter = _toolParameterStorageForAnimationLikeUpdate[i];
                         _owaTool.Run();
                         _owaResultDataTable = _owaTool.Data;
 
                         if (_isSendToInMemoryWorkspaceCommand)
+                        {
                             _mcdaExtension.JoinToolResultByOID(_owaTool, _owaTool.Data);
+                        }
                     }
                 }
 
@@ -221,7 +235,9 @@ namespace MCDA.ViewModel
                 _owaResultDataTable = _owaTool.Data;
 
                 if (_isSendToInMemoryWorkspaceCommand)
+                {
                     _mcdaExtension.JoinToolResultByOID(_owaTool, _owaTool.Data);
+                }
 
                 _isUpdateAllowed = false;
 
@@ -258,15 +274,20 @@ namespace MCDA.ViewModel
 
         protected override void DoExportAsCSVCommand()
         {
-            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            var saveFileDialog = new SaveFileDialog();
             saveFileDialog.FileName = _owaTool.ToString();
             saveFileDialog.DefaultExt = ".csv";
             saveFileDialog.Filter = "Comma Separated Values (.csv)|*.csv";
 
-            Nullable<bool> result = saveFileDialog.ShowDialog();
+            bool? result = saveFileDialog.ShowDialog();
 
             if (result == true)
-                Export.ToCSV<IToolParameter>(_owaTool.Data, _owaTool.ToolParameterContainer.ToolParameter, saveFileDialog.FileName, Tuple.Create<string,object>(Util.GetPropertyName(() => _owaTool.Alpha), _owaTool.Alpha));
+            {
+
+                Export.ToCSV<IToolParameter>(_owaTool.Data, _owaTool.ToolParameterContainer.ToolParameter,
+                    saveFileDialog.FileName,
+                    Tuple.Create<string, object>(Util.GetPropertyName(() => _owaTool.Alpha), _owaTool.Alpha));
+            }
         }
 
         protected override void DoLockCommand()
@@ -276,7 +297,7 @@ namespace MCDA.ViewModel
             if (!_isLocked && _isSendToInMemoryWorkspaceCommand)
             {
                 ESRI.ArcGIS.Framework.IMessageDialog msgBox = new ESRI.ArcGIS.Framework.MessageDialogClass();
-                bool userResult = msgBox.DoModal("Unlocking", "Unlocking also disconnects from the managed layer.", "Unlock", "Abort", ArcMap.Application.hWnd);
+                var userResult = msgBox.DoModal("Unlocking", "Unlocking also disconnects from the managed layer.", "Unlock", "Abort", ArcMap.Application.hWnd);
 
                 //if the user hit no we have to set the lock state back to locked
                 if (!userResult)
@@ -295,7 +316,10 @@ namespace MCDA.ViewModel
             }
 
             if (_isLocked)
-                ProgressDialog.ShowProgressDialog("Creating In Memory Representation", (Action<AbstractToolTemplate>)_mcdaExtension.EstablishLink, _owaTool);
+            {
+                ProgressDialog.ShowProgressDialog("Creating In Memory Representation",
+                    (Action<AbstractToolTemplate>) _mcdaExtension.EstablishLink, _owaTool);
+            }
 
             if (!_isLocked && !_isSendToInMemoryWorkspaceCommand)
             {
@@ -311,7 +335,9 @@ namespace MCDA.ViewModel
             _isSendToInMemoryWorkspaceCommand = !_isSendToInMemoryWorkspaceCommand;
 
             if (_isSendToInMemoryWorkspaceCommand && !_isLocked)
+            {
                 DoLockCommand();
+            }
 
             if (_isSendToInMemoryWorkspaceCommand)
             {
@@ -321,7 +347,6 @@ namespace MCDA.ViewModel
 
             if (!_isSendToInMemoryWorkspaceCommand)
             {
-                //mcdaExtension.RemoveLink(_owaTool);
                 DoLockCommand();
             }
 
@@ -389,7 +414,6 @@ namespace MCDA.ViewModel
             _alphaSelectionView.ShowDialog();
 
             _alphaSelectionView.Closing += AlphaSelectionViewClosing;
-
         }
 
         void AlphaSelectionViewClosing(object sender, CancelEventArgs e)
@@ -469,13 +493,19 @@ namespace MCDA.ViewModel
         protected override void DoClosingCommand()
         {
             if (_isLocked || _isSendToInMemoryWorkspaceCommand)
+            {
                 _mcdaExtension.RemoveLink(_owaTool);
+            }
 
             _mcdaExtension.UnRegisterPropertyHandler(_selectedFeaturePropertyChangedEventHandler);
 
             if (_selectedFeature != null)
-             foreach (var currentField in _selectedFeature.Fields)
-                currentField.UnRegisterPropertyHandler(_listOfpropertyChangedEventHandlersForFieldIsSelected);
+            {
+                foreach (var currentField in _selectedFeature.Fields)
+                {
+                    currentField.UnRegisterPropertyHandler(_listOfpropertyChangedEventHandlersForFieldIsSelected);
+                }
+            }
 
             foreach (var currentToolParameter in _toolParameter)
             {

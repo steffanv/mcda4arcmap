@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Data;
 using MCDA.Extensions;
 
@@ -14,28 +13,38 @@ namespace MCDA.Model
             double localRange = data.Max() - data.Min();
 
             if (localRange == 0)
+            {
                 return null;
+            }
 
             if (benefitCriterion)
-                return (actualValue - data.Min()) / localRange;
+            {
+                return (actualValue - data.Min())/localRange;
+            }
             else
-                return (data.Max() - actualValue) / localRange;
+            {
+                return (data.Max() - actualValue)/localRange;
+            }
         }
 
         public void Transform(DataColumn column, bool benefitCriterion = true)
         {
             if (!column.IsNumeric() || column.Table.Rows.Count <= 0)
+            {
                 return;
+            }
 
             dynamic maxValue = column.Table.Compute("max(" + column.ColumnName + ")", String.Empty);
             dynamic minValue = column.Table.Compute("min(" + column.ColumnName + ")", String.Empty);
 
             dynamic range = maxValue - minValue;
-            
+
             if (range == 0)
+            {
                 return;
-            
-            int columnIndex = column.Ordinal;
+            }
+
+            var columnIndex = column.Ordinal;
 
             foreach (DataRow currentDataRow in column.Table.Rows)
             {

@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using MCDA.Extensions;
 using System.ComponentModel;
 using MCDA.Misc;
 
@@ -11,7 +8,6 @@ namespace MCDA.Model
 
     internal sealed class ToolParameter : AbstractToolParameter
     {
-
         private static IToolParameter _lastWeightChangedToolParameter;
         private bool _isActive;
 
@@ -52,12 +48,13 @@ namespace MCDA.Model
 
         public override IToolParameter DeepClone()
         {
-            ToolParameter copy = new ToolParameter(_columnName);
-
-            copy._isBenefitCriterion = _isBenefitCriterion;
-            copy._isLocked = _isLocked;
-            copy._isOID = _isOID;
-            copy._weight = _weight;
+            var copy = new ToolParameter(_columnName)
+            {
+                _isBenefitCriterion = _isBenefitCriterion,
+                _isLocked = _isLocked,
+                _isOID = _isOID,
+                _weight = _weight
+            };
 
             return copy;
         }
@@ -66,7 +63,7 @@ namespace MCDA.Model
         {
             get {
 
-                double sum = ToolParameterContainer.ToolParameter.Where(p => !p.IsLocked && p != this).Sum(p => p.Weight);
+                var sum = ToolParameterContainer.ToolParameter.Where(p => !p.IsLocked && p != this).Sum(p => p.Weight);
 
                 return new Range<double>() { Minimum = Math.Max(this.Weight - (100 - sum), 0), Maximum = this.Weight + sum };
             }

@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.ComponentModel;
 using MCDA.Extensions;
-using MCDA.Model;
 
 namespace MCDA.Model
 {  
@@ -15,7 +12,7 @@ namespace MCDA.Model
         private IList<IToolParameter> _listOfParameter;
         private IWeightDistributionStrategy _weightDistributionStrategy = WeightDistributionStrategyFactory.DefaultWeightDistributionStrategy();
 
-        private IList<PropertyChangedEventHandler> listOfpropertyChangedEventHandlersForToolParameterWeight = new List<PropertyChangedEventHandler>();
+        private readonly IList<PropertyChangedEventHandler> listOfpropertyChangedEventHandlersForToolParameterWeight = new List<PropertyChangedEventHandler>();
 
         private static bool _isLocked = false;
 
@@ -35,7 +32,7 @@ namespace MCDA.Model
 
         }
 
-        void WeightPropertyChanged(object sender, PropertyChangedEventArgs e)
+        private void WeightPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (!_isLocked)
             {
@@ -51,21 +48,25 @@ namespace MCDA.Model
             if (_listOfParameter.Where(p => p.IsLocked).Sum(p => p.Weight) >= 100)
             {
                 foreach (var item in _listOfParameter.Where(p => p.IsActive && !p.IsLocked))
+                {
                     item.IsActive = false;
-                    
+                }
+
                 PropertyChanged.Notify(() => ToolParameter);                
             }
 
             if ((_listOfParameter.Where(p => p.IsLocked).Sum(p => p.Weight) < 100) && (_listOfParameter.Count(p => p.IsLocked) < _listOfParameter.Count - 1))
             {
                 foreach (var item in _listOfParameter.Where(p => !p.IsActive && !p.IsLocked))
+                {
                     item.IsActive = true;
+                }
 
                 PropertyChanged.Notify(() => ToolParameter);
             }
         }
 
-        void IsLockedPropertyChanged(object sender, PropertyChangedEventArgs e)
+        private void IsLockedPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if ((_listOfParameter.Count(p => p.IsLocked) >= _listOfParameter.Count - 1) || (_listOfParameter.Where(p => p.IsLocked).Sum(p => p.Weight) >= 100))
             {
@@ -81,7 +82,9 @@ namespace MCDA.Model
             if ((_listOfParameter.Any(p => p.IsActive == false) && _listOfParameter.Count(p => p.IsLocked) < _listOfParameter.Count - 1) && (_listOfParameter.Where(p => p.IsLocked).Sum(p => p.Weight) < 100))
             {
                 foreach (var item in _listOfParameter.Where(p => !p.IsActive))
-                        item.IsActive = true;
+                {
+                    item.IsActive = true;
+                }
 
                 PropertyChanged.Notify(() => ToolParameter);
             }
@@ -95,12 +98,14 @@ namespace MCDA.Model
 
         public void DistributeEquallyToolParameterWeights()
         {
-            double weight = 100 / (double)_listOfParameter.Count;
+            var weight = 100 / (double)_listOfParameter.Count;
 
             _isLocked = true;
 
             foreach (var currentParameter in _listOfParameter)
+            {
                 currentParameter.Weight = weight;
+            }
 
             _isLocked = false;
 
@@ -113,12 +118,17 @@ namespace MCDA.Model
             set {
 
                 foreach (var currentParameter in _listOfParameter)
+                {
                     currentParameter.UnRegisterPropertyHandler(listOfpropertyChangedEventHandlersForToolParameterWeight);
+                }
 
                 PropertyChanged.ChangeAndNotify(ref _listOfParameter, value, () => ToolParameter);
 
                 foreach (var currentParameter in _listOfParameter)
-                    listOfpropertyChangedEventHandlersForToolParameterWeight.Add(currentParameter.RegisterPropertyHandler(w => w.Weight, WeightPropertyChanged));
+                {
+                    listOfpropertyChangedEventHandlersForToolParameterWeight.Add(
+                        currentParameter.RegisterPropertyHandler(w => w.Weight, WeightPropertyChanged));
+                }
             }
         }
     }

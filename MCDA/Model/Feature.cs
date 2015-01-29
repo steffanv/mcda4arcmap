@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
 using System.ComponentModel;
 using MCDA.Extensions;
 using ESRI.ArcGIS.Geodatabase;
-using System.Threading;
 using ESRI.ArcGIS.Carto;
 
 namespace MCDA.Model
@@ -110,7 +107,7 @@ namespace MCDA.Model
             set { PropertyChanged.ChangeAndNotify(ref _selectedFieldForRendering, value, () => SelectedFieldForRendering);}
         }
 
-        public bool IsFeatureLayer
+        private bool IsFeatureLayer
         {
             get { return _isFeatureLayer; }
             set { PropertyChanged.ChangeAndNotify(ref _isFeatureLayer, value, () => IsFeatureLayer);}
@@ -133,7 +130,7 @@ namespace MCDA.Model
             get { return _fields; }  
         }
 
-        public bool HasAreaAndTopologicalOperator()
+        private bool HasAreaAndTopologicalOperator()
         { //TODO LWLC test for ITopologicalOperator and the method name says the same, I think I have to add the test...
             switch (FeatureLayer.ShapeType)
             {
@@ -152,7 +149,9 @@ namespace MCDA.Model
             Fields.Clear();
 
             foreach (var newField in GetFields().OrderByDescending(f => f.IsSuitableForMCDA).ThenBy(l => l.FieldName))
+            {
                 Fields.Add(newField);
+            }
         }
 
         public void SetToolField(IField field)
@@ -160,7 +159,9 @@ namespace MCDA.Model
             var foundField = Fields.FirstOrDefault(f => f.ESRIField == field);
 
             if (foundField != null)
+            {
                 foundField.IsToolField = true;
+            }
         }
 
         private IEnumerable<Field> GetFields()
@@ -170,7 +171,9 @@ namespace MCDA.Model
             IList<Field> listOfFields = new List<Field>();
 
             for (int i = 0; i < fields.FieldCount; i++)
-                listOfFields.Add(new Field(fields.Field[i],this));
+            {
+                listOfFields.Add(new Field(fields.Field[i], this));
+            }
 
             return listOfFields;
         }

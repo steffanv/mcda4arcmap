@@ -1,16 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using MCDA.ViewModel;
 using MCDA.Model;
 
@@ -33,12 +24,12 @@ namespace MCDA
         protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
         {
             ESRI.ArcGIS.Framework.IMessageDialog msgBox = new ESRI.ArcGIS.Framework.MessageDialogClass();
-            bool userResult = msgBox.DoModal("Closing", "When closing the tool you will lose your settings.", "Close", "Abort", ArcMap.Application.hWnd);
+            var userResult = msgBox.DoModal("Closing", "When closing the tool you will lose your settings.", "Close", "Abort", ArcMap.Application.hWnd);
 
             if (userResult)
             {
                 base.OnClosing(e);
-                WLCToolViewModel viewmodel = (WLCToolViewModel)DataContext;
+                var viewmodel = (WLCToolViewModel)DataContext;
                 viewmodel.ClosingCommand.Execute(null);
             }
             else
@@ -50,7 +41,7 @@ namespace MCDA
 
         private void WeightSliderDragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
         {
-            WLCToolViewModel viewmodel = (WLCToolViewModel)DataContext;
+            var viewmodel = (WLCToolViewModel)DataContext;
             viewmodel.UpdateAllowedEvent();
         }
 
@@ -58,7 +49,7 @@ namespace MCDA
         {
             if (e.Key == System.Windows.Input.Key.Enter)
             {
-                TextBox weightSliderTextblock = sender as TextBox;
+                var weightSliderTextblock = sender as TextBox;
                 var bindingExpression = weightSliderTextblock.GetBindingExpression(TextBox.TextProperty);
 
 
@@ -68,9 +59,13 @@ namespace MCDA
                 if (Double.TryParse(weightSliderTextblock.Text, out w))
                 {
                     if (toolParameter.AcceptableWeightRange.ContainsValue(w))
+                    {
                         bindingExpression.UpdateSource();
+                    }
                     else
+                    {
                         bindingExpression.UpdateTarget();
+                    }
                 }
             }
         }
@@ -86,7 +81,7 @@ namespace MCDA
             double w;
             if (Double.TryParse(weightSliderTextblock.Text, out w))
             {
-                ToolTip toolTip = new System.Windows.Controls.ToolTip { Content = "Please enter a value in the following range: " + toolParameter.AcceptableWeightRange.ToString(3) + "." };
+                var toolTip = new System.Windows.Controls.ToolTip { Content = "Please enter a value in the following range: " + toolParameter.AcceptableWeightRange.ToString(3) + "." };
                 weightSliderTextblock.ToolTip = toolTip;
             }
         }

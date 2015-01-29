@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.ComponentModel;
-using ESRI.ArcGIS.Carto;
+﻿using System.ComponentModel;
 using MCDA.Extensions;
-using ESRI.ArcGIS.Geodatabase;
 
 
 namespace MCDA.Model
@@ -14,13 +8,12 @@ namespace MCDA.Model
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private Renderer renderer = Renderer.None;
-        private ClassBreaksRendererContainer classBreaksRendererContainer;
-        private BiPolarRendererContainer biPolarRendererContainer;
+        private Renderer _renderer = Renderer.None;
+        private ClassBreaksRendererContainer _classBreaksRendererContainer;
+        private BiPolarRendererContainer _biPolarRendererContainer;
 
         public RendererContainer(Field field)
         {
-
             Field = field;
         }
 
@@ -28,20 +21,20 @@ namespace MCDA.Model
 
         public Renderer Renderer
         {
-            get { return renderer; }
-            set { PropertyChanged.ChangeAndNotify(ref renderer, value, () => Renderer); }
+            get { return _renderer; }
+            set { PropertyChanged.ChangeAndNotify(ref _renderer, value, () => Renderer); }
         }
 
         public ClassBreaksRendererContainer ClassBreaksRendererContainer
         {
-            get { return classBreaksRendererContainer; }
-            set { PropertyChanged.ChangeAndNotify(ref classBreaksRendererContainer, value, () => ClassBreaksRendererContainer); }
+            get { return _classBreaksRendererContainer; }
+            set { PropertyChanged.ChangeAndNotify(ref _classBreaksRendererContainer, value, () => ClassBreaksRendererContainer); }
         }
 
         public BiPolarRendererContainer BiPolarRendererContainer
         {
-            get { return biPolarRendererContainer; }
-            set { PropertyChanged.ChangeAndNotify(ref biPolarRendererContainer, value, () => BiPolarRendererContainer); }
+            get { return _biPolarRendererContainer; }
+            set { PropertyChanged.ChangeAndNotify(ref _biPolarRendererContainer, value, () => BiPolarRendererContainer); }
         }      
     }
 }

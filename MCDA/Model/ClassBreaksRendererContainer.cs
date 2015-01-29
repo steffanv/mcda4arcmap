@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Windows.Media;
 using ESRI.ArcGIS.esriSystem;
 using MCDA.Extensions;
@@ -67,9 +63,7 @@ namespace MCDA.Model
         /// <returns></returns>
         public bool IsComplete()
         {
-            return StartColor != null && EndColor != null && ClassificationMethod != null && Field != null && NumberOfClasses > 0;
+            return ClassificationMethod != null && Field != null && NumberOfClasses > 0;
         }
-
     }
-
 }

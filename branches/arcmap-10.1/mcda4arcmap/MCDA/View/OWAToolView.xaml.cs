@@ -1,16 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using MCDA.ViewModel;
 using MCDA.Model;
 
@@ -37,7 +28,7 @@ namespace MCDA
             if (userResult)
             {
                 base.OnClosing(e);
-                OWAToolViewModel viewmodel = (OWAToolViewModel)DataContext;
+                var viewmodel = (OWAToolViewModel)DataContext;
                 viewmodel.ClosingCommand.Execute(null);
             }
             else
@@ -49,7 +40,7 @@ namespace MCDA
 
         private void WeightSliderDragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
         {
-            OWAToolViewModel viewmodel = (OWAToolViewModel)DataContext;
+            var viewmodel = (OWAToolViewModel)DataContext;
             viewmodel.UpdateAllowedEvent();
         }
 
@@ -57,7 +48,7 @@ namespace MCDA
         {
             if (e.Key == System.Windows.Input.Key.Enter)
             {
-                TextBox weightSliderTextblock = sender as TextBox;
+                var weightSliderTextblock = sender as TextBox;
                 var bindingExpression = weightSliderTextblock.GetBindingExpression(TextBox.TextProperty);
 
 
@@ -67,9 +58,13 @@ namespace MCDA
                 if (Double.TryParse(weightSliderTextblock.Text, out w))
                 {
                     if (toolParameter.AcceptableWeightRange.ContainsValue(w))
+                    {
                         bindingExpression.UpdateSource();
+                    }
                     else
+                    {
                         bindingExpression.UpdateTarget();
+                    }
                 }
             }
         }
@@ -85,7 +80,7 @@ namespace MCDA
             double w;
             if (Double.TryParse(weightSliderTextblock.Text, out w))
             {
-                ToolTip toolTip = new System.Windows.Controls.ToolTip { Content = "Please enter a value in the following range: " + toolParameter.AcceptableWeightRange.ToString(3) + "." };
+                var toolTip = new System.Windows.Controls.ToolTip { Content = "Please enter a value in the following range: " + toolParameter.AcceptableWeightRange.ToString(3) + "." };
                 weightSliderTextblock.ToolTip = toolTip;
             }
         }

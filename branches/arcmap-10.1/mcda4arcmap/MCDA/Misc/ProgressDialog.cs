@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace MCDA.ViewModel
 {
@@ -15,12 +12,12 @@ namespace MCDA.ViewModel
             ESRI.ArcGIS.Framework.IProgressDialogFactory progressDialogFactory = new ESRI.ArcGIS.Framework.ProgressDialogFactoryClass();
 
             // Set the properties of the Step Progressor
-            System.Int32 int32_hWnd = ArcMap.Application.hWnd;
-            ESRI.ArcGIS.esriSystem.IStepProgressor stepProgressor = progressDialogFactory.Create(trackCancel, int32_hWnd);
+            var int32_hWnd = ArcMap.Application.hWnd;
+            var stepProgressor = progressDialogFactory.Create(trackCancel, int32_hWnd);
             stepProgressor.Hide();
 
             // Create the ProgressDialog. This automatically displays the dialog
-            ESRI.ArcGIS.Framework.IProgressDialog2 progressDialog2 = (ESRI.ArcGIS.Framework.IProgressDialog2)stepProgressor;
+            var progressDialog2 = (ESRI.ArcGIS.Framework.IProgressDialog2)stepProgressor;
 
             // Set the properties of the ProgressDialog
             progressDialog2.CancelEnabled = false;

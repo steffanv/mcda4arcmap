@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Data;
-using MCDA.Extensions;
 
 namespace MCDA.Model
 {
@@ -49,9 +48,10 @@ namespace MCDA.Model
         {
             IList<Tuple<IToolParameter, double>> listOfRangeTuple = new List<Tuple<IToolParameter, double>>();
 
-            foreach (IToolParameter currentToolParameter in toolParameterContainer.ToolParameter)
+            foreach (var currentToolParameter in toolParameterContainer.ToolParameter)
             {
-                IList<double> data = _dataTable.AsEnumerable().Select(x => x.Field<double>(currentToolParameter.ColumnName)).ToList();
+                var parameter = currentToolParameter;
+                IList<double> data = _dataTable.AsEnumerable().Select(x => x.Field<double>(parameter.ColumnName)).ToList();
 
                 listOfRangeTuple.Add(Tuple.Create(currentToolParameter, data.Max() - data.Min()));
             }
@@ -65,9 +65,10 @@ namespace MCDA.Model
 
             IList<Tuple<IToolParameter, double>> listOfRangeTuple = new List<Tuple<IToolParameter, double>>();
 
-            foreach (IToolParameter currentToolParameter in toolParameterContainer.ToolParameter)
+            foreach (var currentToolParameter in toolParameterContainer.ToolParameter)
             {
-                IList<double> data = _dataTable.AsEnumerable().Where(x => _clusterIDs.Contains(x.Field<FieldTypeOID>(oidColumnIndex).OID)).Select(x => x.Field<double>(currentToolParameter.ColumnName)).ToList();
+                var parameter = currentToolParameter;
+                IList<double> data = _dataTable.AsEnumerable().Where(x => _clusterIDs.Contains(x.Field<FieldTypeOID>(oidColumnIndex).OID)).Select(x => x.Field<double>(parameter.ColumnName)).ToList();
 
                 listOfRangeTuple.Add(Tuple.Create(currentToolParameter, data.Max() - data.Min()));
             }
@@ -79,17 +80,19 @@ namespace MCDA.Model
         {
             IList<Tuple<IToolParameter, double?>> listOfScaledTuple = new List<Tuple<IToolParameter, double?>>();
 
-            foreach (IToolParameter currentToolParameter in toolParameterContainer.ToolParameter)
+            foreach (var currentToolParameter in toolParameterContainer.ToolParameter)
             {
-                Tuple<IToolParameter, double> currentLocalRange = localRangeList.FirstOrDefault(x => x.Item1 == currentToolParameter);
+                var currentLocalRange = localRangeList.FirstOrDefault(x => x.Item1 == currentToolParameter);
 
-                int oidColumnIndex = GetOIDColumnIndex();
+                var oidColumnIndex = GetOIDColumnIndex();
 
-                IList<double> data = _dataTable.AsEnumerable().Where(x => _clusterIDs.Contains(x.Field<FieldTypeOID>(oidColumnIndex).OID)).Select(x => x.Field<double>(currentToolParameter.ColumnName)).Distinct().ToList();
+                var parameter = currentToolParameter;
+                IList<double> data = _dataTable.AsEnumerable().Where(x => _clusterIDs.Contains(x.Field<FieldTypeOID>(oidColumnIndex).OID)).Select(x => x.Field<double>(parameter.ColumnName)).Distinct().ToList();
 
-                double actualValue = _dataTable.AsEnumerable().Where(x => x.Field<FieldTypeOID>(oidColumnIndex).OID == _featureId).Select(x => x.Field<double>(currentToolParameter.ColumnName)).FirstOrDefault();
+                var toolParameter = currentToolParameter;
+                var actualValue = _dataTable.AsEnumerable().Where(x => x.Field<FieldTypeOID>(oidColumnIndex).OID == _featureId).Select(x => x.Field<double>(toolParameter.ColumnName)).FirstOrDefault();
 
-                double? result = NormalizationStrategyFactory.GetStrategy(_transformationStrategy).Transform(data, actualValue, currentToolParameter.IsBenefitCriterion);
+                var result = NormalizationStrategyFactory.GetStrategy(_transformationStrategy).Transform(data, actualValue, currentToolParameter.IsBenefitCriterion);
 
                 listOfScaledTuple.Add(Tuple.Create(currentToolParameter, result));
             }
@@ -97,16 +100,16 @@ namespace MCDA.Model
             return listOfScaledTuple;
         }
 
-        private IList<Tuple<IToolParameter, double?>> LocalWeights(ToolParameterContainer toolParameterContainer, IList<Tuple<IToolParameter, double>> localRangeList, IList<Tuple<IToolParameter, double>> globalRangeList)
+        private static IList<Tuple<IToolParameter, double?>> LocalWeights(ToolParameterContainer toolParameterContainer, IList<Tuple<IToolParameter, double>> localRangeList, IList<Tuple<IToolParameter, double>> globalRangeList)
         {
             IList<Tuple<IToolParameter, double?>> listOfLocalWeightTupel = new List<Tuple<IToolParameter, double?>>();
 
             double? divisor = 0;
 
-            foreach (IToolParameter currentToolParameter2 in toolParameterContainer.ToolParameter)
+            foreach (var currentToolParameter2 in toolParameterContainer.ToolParameter)
             {
-                double localRange2 = localRangeList.First(x => x.Item1 == currentToolParameter2).Item2;
-                double globalRange2 = globalRangeList.First(x => x.Item1 == currentToolParameter2).Item2;
+                var localRange2 = localRangeList.First(x => x.Item1 == currentToolParameter2).Item2;
+                var globalRange2 = globalRangeList.First(x => x.Item1 == currentToolParameter2).Item2;
 
                 if (globalRange2 == 0)
                 {
@@ -122,10 +125,10 @@ namespace MCDA.Model
                 divisor = null;
             }
 
-            foreach (IToolParameter currentToolParameter in toolParameterContainer.ToolParameter)
+            foreach (var currentToolParameter in toolParameterContainer.ToolParameter)
             {
-                double localRange = localRangeList.FirstOrDefault(x => x.Item1 == currentToolParameter).Item2;
-                double globalRange = globalRangeList.FirstOrDefault(x => x.Item1 == currentToolParameter).Item2;
+                var localRange = localRangeList.FirstOrDefault(x => x.Item1 == currentToolParameter).Item2;
+                var globalRange = globalRangeList.FirstOrDefault(x => x.Item1 == currentToolParameter).Item2;
 
                 double? dividend;
                 if (globalRange == 0)
@@ -164,11 +167,13 @@ namespace MCDA.Model
 
             foreach (IToolParameter currentToolParameter in _toolParameterContainer.ToolParameter)
             {
-                double? scaledValue = _scaledValues.FirstOrDefault(x => x.Item1 == currentToolParameter).Item2;
-                double? weight = _weights.FirstOrDefault(x => x.Item1 == currentToolParameter).Item2;
+                var scaledValue = _scaledValues.FirstOrDefault(x => x.Item1 == currentToolParameter).Item2;
+                var weight = _weights.FirstOrDefault(x => x.Item1 == currentToolParameter).Item2;
 
                 if (!scaledValue.HasValue || !weight.HasValue)
+                {
                     return true;
+                }
             }
             return false;
         }
@@ -178,7 +183,7 @@ namespace MCDA.Model
         {
             row[0] = new FieldTypeOID(){ OID = _featureId};
 
-            StringBuilder stringBuilder = new StringBuilder();
+            var stringBuilder = new StringBuilder();
 
             foreach(int currentId in _clusterIDs){
 
@@ -194,25 +199,33 @@ namespace MCDA.Model
 
             row[1] = stringBuilder.ToString();
 
-            int index = 2;
+            var index = 2;
             double? result = 0;
 
-            foreach (IToolParameter currentToolParameter in _toolParameterContainer.ToolParameter)
+            foreach (var currentToolParameter in _toolParameterContainer.ToolParameter)
             {
-                double? scaledValue = _scaledValues.First(x => x.Item1 == currentToolParameter).Item2;
-                double? weight = _weights.First(x => x.Item1 == currentToolParameter).Item2;
+                var scaledValue = _scaledValues.First(x => x.Item1 == currentToolParameter).Item2;
+                var weight = _weights.First(x => x.Item1 == currentToolParameter).Item2;
 
                 row[index] = _localRange.First(x => x.Item1 == currentToolParameter).Item2;
 
                 if (scaledValue.HasValue)
+                {
                     row[index + 1] = scaledValue;
+                }
                 else
+                {
                     row[index + 1] = DBNull.Value;
+                }
 
                 if (weight.HasValue)
+                {
                     row[index + 2] = weight;
+                }
                 else
+                {
                     row[index + 2] = DBNull.Value;
+                }
 
                 if (scaledValue.HasValue && weight.HasValue && result.HasValue)
                 {

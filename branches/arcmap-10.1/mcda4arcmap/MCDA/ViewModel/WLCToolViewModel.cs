@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.ComponentModel;
+using MCDA.Misc;
 using MCDA.Model;
 using MCDA.Extensions;
 using System.Data;
 using System.Windows.Input;
-using ESRI.ArcGIS.esriSystem;
-using ESRI.ArcGIS.Framework;
 using System.Windows.Interop;
 using Microsoft.Win32;
 
@@ -43,8 +41,6 @@ namespace MCDA.ViewModel
 
            _wlcResultDataTable = _wlcTool.Data;
 
-           //_mcdaExtension.RegisterPropertyHandler(x => x.AvailableFeatures, SelectedFeaturePropertyChanged);
-           //_mcdaExtension.AvailableFeatures.CollectionChanged += SelectedFeaturePropertyChanged;
           _selectedFeaturePropertyChangedEventHandler =  _mcdaExtension.RegisterPropertyHandler(x => x.SelectedFeature, SelectedFeaturePropertyChanged);
 
            //we have to call our own update method to make sure we have a result column
@@ -70,10 +66,12 @@ namespace MCDA.ViewModel
 
         private void FieldPropertyChanged(object sender, PropertyChangedEventArgs e)
        {
-           if (_isLocked)
-               return;
+            if (_isLocked)
+            {
+                return;
+            }
 
-           _wlcTool = ToolFactory.NewWLCTool();
+            _wlcTool = ToolFactory.NewWLCTool();
 
            _toolParameter = new BindingList<IToolParameter>(_wlcTool.ToolParameterContainer.ToolParameter);
 
@@ -113,7 +111,9 @@ namespace MCDA.ViewModel
         private void SelectedFeaturePropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (_isLocked)
+            {
                 return;
+            }
 
             _wlcTool = ToolFactory.NewWLCTool();
 
@@ -129,8 +129,10 @@ namespace MCDA.ViewModel
             if (_selectedFeature != null)
             {
                 foreach (var currentField in _selectedFeature.Fields)
+                {
                     _listOfpropertyChangedEventHandlersForFieldIsSelected.Add(
                         currentField.RegisterPropertyHandler(f => f.IsSelected, FieldPropertyChanged));
+                }
 
                 if (_selectedFeature.Fields.Count(f => f.IsSelected) >= 1)
                 {
@@ -138,7 +140,6 @@ namespace MCDA.ViewModel
 
                     _wlcResultDataTable = _wlcTool.Data;
                 }
-
             }
 
            RegisterToolParameterEvents();
@@ -154,21 +155,24 @@ namespace MCDA.ViewModel
        {
            _isUpdateAllowed = true;
            base.Update();
-
        }
 
        protected override void UpdateDrag()
        {
            if (!_isUpdateAllowed)
+           {
                return;
+           }
 
-          _wlcTool.Run();
+           _wlcTool.Run();
           _wlcResultDataTable = _wlcTool.Data;
 
-          if (_isSendToInMemoryWorkspaceCommand)
-              _mcdaExtension.JoinToolResultByOID(_wlcTool, _wlcTool.Data);
+           if (_isSendToInMemoryWorkspaceCommand)
+           {
+               _mcdaExtension.JoinToolResultByOID(_wlcTool, _wlcTool.Data);
+           }
 
-          _isUpdateAllowed = false;
+           _isUpdateAllowed = false;
            
        }
 
@@ -178,7 +182,9 @@ namespace MCDA.ViewModel
            _wlcResultDataTable = _wlcTool.Data;
 
            if (_isSendToInMemoryWorkspaceCommand)
+           {
                _mcdaExtension.JoinToolResultByOID(_wlcTool, _wlcTool.Data);
+           }
        }
 
        protected override void UpdateAnimation()
@@ -192,7 +198,7 @@ namespace MCDA.ViewModel
 
            else
            {
-               BindingList<IToolParameter> latestToolParameter = _toolParameter;
+               var latestToolParameter = _toolParameter;
 
                if (_toolParameterStorageForAnimationLikeUpdate.Count > 0)
                {
@@ -205,7 +211,9 @@ namespace MCDA.ViewModel
                        _wlcResultDataTable = _wlcTool.Data;
 
                        if (_isSendToInMemoryWorkspaceCommand)
+                       {
                            _mcdaExtension.JoinToolResultByOID(_wlcTool, _wlcTool.Data);
+                       }
                    }
                }
 
@@ -215,8 +223,10 @@ namespace MCDA.ViewModel
                _wlcResultDataTable = _wlcTool.Data;
 
                if (_isSendToInMemoryWorkspaceCommand)
+               {
                    _mcdaExtension.JoinToolResultByOID(_wlcTool, _wlcTool.Data);
-  
+               }
+
                _isUpdateAllowed = false;
 
                _toolParameterStorageForAnimationLikeUpdate.Clear();
@@ -257,10 +267,13 @@ namespace MCDA.ViewModel
            saveFileDialog.DefaultExt = ".csv";
            saveFileDialog.Filter = "Comma Separated Values (.csv)|*.csv";
 
-           bool? result = saveFileDialog.ShowDialog();
+           var result = saveFileDialog.ShowDialog();
 
-           if(result == true)
-               Export.ToCSV<IToolParameter>(_wlcTool.Data,_wlcTool.ToolParameterContainer.ToolParameter, saveFileDialog.FileName);
+           if (result == true)
+           {
+               Export.ToCSV<IToolParameter>(_wlcTool.Data, _wlcTool.ToolParameterContainer.ToolParameter,
+                   saveFileDialog.FileName);
+           }
        }
 
        protected override void DoLockCommand()
@@ -289,7 +302,10 @@ namespace MCDA.ViewModel
            }
 
            if (_isLocked)
-               ProgressDialog.ShowProgressDialog("Creating In Memory Representation", (Action<AbstractToolTemplate>)_mcdaExtension.EstablishLink, _wlcTool);
+           {
+               ProgressDialog.ShowProgressDialog("Creating In Memory Representation",
+                   (Action<AbstractToolTemplate>) _mcdaExtension.EstablishLink, _wlcTool);
+           }
 
            if (!_isLocked && !_isSendToInMemoryWorkspaceCommand)
            {
@@ -305,7 +321,9 @@ namespace MCDA.ViewModel
            _isSendToInMemoryWorkspaceCommand = !_isSendToInMemoryWorkspaceCommand;
 
            if (_isSendToInMemoryWorkspaceCommand && !_isLocked)
+           {
                DoLockCommand();
+           }
 
            if (_isSendToInMemoryWorkspaceCommand)
            {
@@ -314,8 +332,9 @@ namespace MCDA.ViewModel
            }
 
            if (!_isSendToInMemoryWorkspaceCommand)
-               //mcdaExtension.RemoveLink(_wlcTool);
+           {
                DoLockCommand();
+           }
 
            PropertyChanged.Notify(() => IsSendToInMemoryWorkspaceCommand);
        }
@@ -359,7 +378,9 @@ namespace MCDA.ViewModel
        protected override void DoOkayNormalizationCommand()
        {
            if (_wlcTool.TransformationStrategy != NormalizationViewModel.SelectedTransformationStrategy)
+           {
                DoApplyNormalizationCommand();
+           }
 
            NormalizationView.Closing -= NormalizationViewClosing;
            NormalizationView.Close();
@@ -380,13 +401,19 @@ namespace MCDA.ViewModel
        protected override void DoClosingCommand()
        {
            if (_isLocked || _isSendToInMemoryWorkspaceCommand)
+           {
                _mcdaExtension.RemoveLink(_wlcTool);
+           }
 
            _mcdaExtension.UnRegisterPropertyHandler(_selectedFeaturePropertyChangedEventHandler);
 
            if (_selectedFeature != null)
-             foreach (var currentField in _selectedFeature.Fields)
-               currentField.UnRegisterPropertyHandler(_listOfpropertyChangedEventHandlersForFieldIsSelected);
+           {
+               foreach (var currentField in _selectedFeature.Fields)
+               {
+                   currentField.UnRegisterPropertyHandler(_listOfpropertyChangedEventHandlersForFieldIsSelected);
+               }
+           }
 
            foreach (var currentToolParameter in _toolParameter)
            {

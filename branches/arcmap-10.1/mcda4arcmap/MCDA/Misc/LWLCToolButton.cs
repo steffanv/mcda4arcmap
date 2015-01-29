@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.IO;
 using System.Windows.Interop;
-
 
 namespace MCDA
 {
@@ -15,9 +11,7 @@ namespace MCDA
 
             var wpfWindow = new LWLCToolView();
 
-            var helper = new WindowInteropHelper(wpfWindow);
-
-            helper.Owner = parentHandle;
+            var helper = new WindowInteropHelper(wpfWindow) {Owner = parentHandle};
 
             wpfWindow.Show();
         }

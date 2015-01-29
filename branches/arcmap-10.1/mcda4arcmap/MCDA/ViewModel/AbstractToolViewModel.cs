@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Windows.Input;
 using MCDA.Model;
-using System.Windows.Input;
 
 namespace MCDA.ViewModel
 {
@@ -50,12 +46,12 @@ namespace MCDA.ViewModel
    
         }
 
-        protected ICommand _NormalizationSelectionCommand;
-        protected ICommand _sendToInMemoryWorkspaceCommand;
-        protected ICommand _lockCommand;
-        protected ICommand _exportAsCSVCommand;
-        protected ICommand _distributionCommand;
-        protected ICommand _closingCommand;
+        private ICommand _normalizationSelectionCommand;
+        private ICommand _sendToInMemoryWorkspaceCommand;
+        private ICommand _lockCommand;
+        private ICommand _exportAsCSVCommand;
+        private ICommand _distributionCommand;
+        private ICommand _closingCommand;
 
         protected abstract bool HasCriteriaSelected();
 
@@ -71,7 +67,7 @@ namespace MCDA.ViewModel
         {
             get
             {
-                return _NormalizationSelectionCommand ?? (_NormalizationSelectionCommand = new RelayCommand( param => this.DoNormalizationSelectionCommand(), param => HasCriteriaSelected()));
+                return _normalizationSelectionCommand ?? (_normalizationSelectionCommand = new RelayCommand( param => this.DoNormalizationSelectionCommand(), param => HasCriteriaSelected()));
             }
         }
 
@@ -123,7 +119,7 @@ namespace MCDA.ViewModel
        #region Normalization
 
        protected NormalizationSelectionView NormalizationView = new NormalizationSelectionView();
-       protected NormalizationSelectionViewModel NormalizationViewModel = new NormalizationSelectionViewModel();
+       protected readonly NormalizationSelectionViewModel NormalizationViewModel = new NormalizationSelectionViewModel();
 
        private ICommand _applyNormalizationCommand;
        private ICommand _okayNormalizationCommand;

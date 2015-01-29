@@ -1,15 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using ESRI.ArcGIS.Carto;
 using ESRI.ArcGIS.Geodatabase;
-using ESRI.ArcGIS.esriSystem;
 using ESRI.ArcGIS.Display;
 using System.Windows.Media;
-using System.ComponentModel;
-using MCDA.Extensions;
-using System.Threading.Tasks;
 using ESRI.ArcGIS.ADF;
 
 namespace MCDA.Model
@@ -30,7 +25,7 @@ namespace MCDA.Model
             return (IFeatureRenderer)simpleRenderer;
         }
 
-        public static IFeatureRenderer NewAllMissingValuesRenderer()
+        private static IFeatureRenderer NewAllMissingValuesRenderer()
         {
             ISimpleRenderer simpleRenderer = new SimpleRendererClass();
 
@@ -69,7 +64,7 @@ namespace MCDA.Model
             simpleFillSymbol.Style = esriSimpleFillStyle.esriSFSSolid;
             simpleFillSymbol.Outline.Width = 0.4;
 
-            string fieldName = biPolarRendererContainer.Field.Name;
+            var fieldName = biPolarRendererContainer.Field.Name;
          
             uniqueValueRenderer.FieldCount = 1;
             uniqueValueRenderer.Field[0] = fieldName;
@@ -77,10 +72,10 @@ namespace MCDA.Model
             int fieldIndex;
 
             ISet<double> setOfFeatures = new HashSet<double>();
-            bool containsDbNullValue = false;
+            var containsDbNullValue = false;
             using (var comReleaser = new ComReleaser())
             {
-                IFeatureCursor featureCursor =  renderContainer.Field.Feature.FeatureClass.Search(null, true);
+                var featureCursor =  renderContainer.Field.Feature.FeatureClass.Search(null, true);
                
                 comReleaser.ManageLifetime(featureCursor);
 
@@ -90,7 +85,7 @@ namespace MCDA.Model
                 
                 while ((currentFeature = featureCursor.NextFeature()) != null)
                 {
-                    object value = currentFeature.Value[fieldIndex];
+                    var value = currentFeature.Value[fieldIndex];
 
                     if (Convert.IsDBNull(value))
                     {
@@ -102,15 +97,19 @@ namespace MCDA.Model
                 }
             }
 
-            if (containsDbNullValue && setOfFeatures.Count == 0 )
+            if (containsDbNullValue && setOfFeatures.Count == 0)
+            {
                 return NewAllMissingValuesRenderer();
+            }
 
             if (setOfFeatures.Count == 0)
-               return NewSimpleRenderer();
+            {
+                return NewSimpleRenderer();
+            }
 
             IEnumerable<double> orderedSet = setOfFeatures.OrderBy(d => d);
 
-            foreach (double currentClassValue in orderedSet)
+            foreach (var currentClassValue in orderedSet)
              {
                 ISimpleFillSymbol pClassSymbol = new SimpleFillSymbolClass();
                 pClassSymbol.Style = esriSimpleFillStyle.esriSFSSolid;
@@ -120,9 +119,9 @@ namespace MCDA.Model
                 // the result are mismatches between the renderer value and the column value
                 //string classValue = currentClassValue.ToString("N20"); does not really work
 
-                decimal dirtyTrick = (decimal) currentClassValue;
+                var dirtyTrick = (decimal) currentClassValue;
 
-                string classValue = dirtyTrick.ToString();
+                var classValue = dirtyTrick.ToString();
 
                 uniqueValueRenderer.AddValue(classValue, fieldName, (ISymbol)pClassSymbol);
                 uniqueValueRenderer.set_Label(classValue, classValue);
@@ -130,17 +129,21 @@ namespace MCDA.Model
              }
 
             //figure out how many colors belong to which side from the neutral color
-            int size = uniqueValueRenderer.ValueCount;
+            var size = uniqueValueRenderer.ValueCount;
 
-            int left = (int) (size * biPolarRendererContainer.NeutralColorPosition);
-            int right = size - left;
+            var left = (int) (size * biPolarRendererContainer.NeutralColorPosition);
+            var right = size - left;
 
             // for the case one or both are zero -> create color ramp crashes, the magic value seems to be 2
-            if(left < 2)
+            if (left < 2)
+            {
                 left = 2;
+            }
 
-            if(right < 2)
+            if (right < 2)
+            {
                 right = 2;
+            }
 
             IAlgorithmicColorRamp firstColorRamp = new AlgorithmicColorRampClass();
            
@@ -160,19 +163,19 @@ namespace MCDA.Model
             firstColorRamp.CreateRamp(out bOk);
             secondColorRamp.CreateRamp(out bOk);
 
-            IEnumColors firstEnumColors = firstColorRamp.Colors;
-            IEnumColors secondEnumColors = secondColorRamp.Colors;
+            var firstEnumColors = firstColorRamp.Colors;
+            var secondEnumColors = secondColorRamp.Colors;
 
             firstEnumColors.Reset();
             secondEnumColors.Reset();
 
-            for (int j = 0; j <= uniqueValueRenderer.ValueCount - 1; j++)
+            for (var j = 0; j <= uniqueValueRenderer.ValueCount - 1; j++)
             {
-                string label = uniqueValueRenderer.Value[j];
+                var label = uniqueValueRenderer.Value[j];
 
                 var pSimpleFillColor = (ISimpleFillSymbol)uniqueValueRenderer.Symbol[label];
 
-                    IColor color = firstEnumColors.Next();
+                    var color = firstEnumColors.Next();
 
                     //in case the first half colors is "empty" change to the second
                     if (color == null)
@@ -194,7 +197,7 @@ namespace MCDA.Model
             bool isString = renderContainer.Field.Feature.FeatureClass.Fields.Field[fieldIndex].Type == esriFieldType.esriFieldTypeString;
             uniqueValueRenderer.FieldType[0] = isString;
             //TODO geoFeatureLayer
-            IGeoFeatureLayer geoFeatureLayer = renderContainer.Field.Feature.FeatureLayer as IGeoFeatureLayer;
+            var geoFeatureLayer = renderContainer.Field.Feature.FeatureLayer as IGeoFeatureLayer;
             geoFeatureLayer.Renderer = uniqueValueRenderer as IFeatureRenderer;
 
             return (IFeatureRenderer) uniqueValueRenderer;
@@ -202,22 +205,28 @@ namespace MCDA.Model
 
         public static IFeatureRenderer NewClassBreaksRenderer(RendererContainer renderContainer)
         {
-            ClassBreaksRendererContainer classBreaksRendererContainer = renderContainer.ClassBreaksRendererContainer;
+            var classBreaksRendererContainer = renderContainer.ClassBreaksRendererContainer;
 
-            double[] classificationResult = Classification.Classify(classBreaksRendererContainer.ClassificationMethod, renderContainer.Field.Feature.FeatureClass, classBreaksRendererContainer.Field, classBreaksRendererContainer.NumberOfClasses);
+            var classificationResult = Classification.Classify(classBreaksRendererContainer.ClassificationMethod, renderContainer.Field.Feature.FeatureClass, classBreaksRendererContainer.Field, classBreaksRendererContainer.NumberOfClasses);
 
             IClassBreaksRenderer classBreaksRenderer = new ClassBreaksRendererClass();
             classBreaksRenderer.Field = classBreaksRendererContainer.Field.AliasName;
 
-            if (classificationResult.Count() > 0) classBreaksRenderer.BreakCount = classificationResult.Count() - 1;
+            if (classificationResult.Count() > 0)
+            {
+                classBreaksRenderer.BreakCount = classificationResult.Count() - 1;
+            }
 
-            if(classificationResult.Count() > 0) classBreaksRenderer.MinimumBreak = classificationResult[0];
+            if (classificationResult.Count() > 0)
+            {
+                classBreaksRenderer.MinimumBreak = classificationResult[0];
+            }
 
             //TODO normalization
             //classBreaksRenderer.NormField
 
-            Color startColor = classBreaksRendererContainer.StartColor;
-            Color endColor = classBreaksRendererContainer.EndColor;
+            var startColor = classBreaksRendererContainer.StartColor;
+            var endColor = classBreaksRendererContainer.EndColor;
 
             IAlgorithmicColorRamp algorithmicColorRamp = new AlgorithmicColorRampClass();
 
@@ -241,9 +250,9 @@ namespace MCDA.Model
             bool bOk;
             algorithmicColorRamp.CreateRamp(out bOk);
 
-            IEnumColors pEnumColors = algorithmicColorRamp.Colors;
+            var pEnumColors = algorithmicColorRamp.Colors;
 
-            for (int i = 0; i < classificationResult.Count()-1; i++)
+            for (var i = 0; i < classificationResult.Count()-1; i++)
             {
                 classBreaksRenderer.Break[i] = classificationResult[i+1];
                 //Create simple fill symbol and set color

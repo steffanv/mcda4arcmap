@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using MCDA.Extensions;
 using System.ComponentModel;
 using ESRI.ArcGIS.Geodatabase;
@@ -24,16 +23,19 @@ namespace MCDA.Model
 
         public Field(ESRI.ArcGIS.Geodatabase.IField field, Feature feature)
         {
-
             Feature = feature;
             this._field = field;
 
             _renderContainer = new RendererContainer(this);
-   
+
             if (field.Type <= ESRI.ArcGIS.Geodatabase.esriFieldType.esriFieldTypeDouble)
+            {
                 _isNumber = true;
+            }
             if (field.Type == ESRI.ArcGIS.Geodatabase.esriFieldType.esriFieldTypeOID)
+            {
                 _isOid = true;
+            }
         }
 
         public RendererContainer RenderContainer {
@@ -70,12 +72,14 @@ namespace MCDA.Model
             get { return IsToolField || (IsNumeric && !ContainsNullValues && HasDifferentNumericValues && !IsOID); }
         }
 
-        public bool ContainsNullValues
+        private bool ContainsNullValues
         {
             get
             {
                 if (_containsNullValue.HasValue)
+                {
                     return _containsNullValue.Value;
+                }
 
                 _containsNullValue = ContainsDBNullValueMethod();
 
@@ -83,12 +87,14 @@ namespace MCDA.Model
             }
         }
 
-        public bool HasDifferentNumericValues
+        private bool HasDifferentNumericValues
         {
             get
             {
                 if (_hasDifferentNumericValue.HasValue)
+                {
                     return _hasDifferentNumericValue.Value;
+                }
 
                 _hasDifferentNumericValue = HasDifferentNumericValuesMethod();
 
@@ -112,7 +118,7 @@ namespace MCDA.Model
             get { return _field.Name; }
         }
 
-        public bool IsNumeric
+        private bool IsNumeric
         {
             get { return _isNumber; }
         }
@@ -140,8 +146,10 @@ namespace MCDA.Model
 
                 while ((currentFeature = featureCursor.NextFeature()) != null)
                 {
-                    if(currentFeature.Value[fieldIndex] is DBNull)
+                    if (currentFeature.Value[fieldIndex] is DBNull)
+                    {
                         return true;
+                    }
                 }
 
                 return false;
@@ -154,8 +162,10 @@ namespace MCDA.Model
         /// <returns></returns>
         private bool HasDifferentNumericValuesMethod()
         {
-            if(!IsNumeric)
+            if (!IsNumeric)
+            {
                 return false;
+            }
 
             using (var comReleaser = new ComReleaser())
             {
@@ -170,16 +180,22 @@ namespace MCDA.Model
                 double value = 0;
 
                 if (currentFeature != null)
+                {
                     value = (Convert.ToDouble(currentFeature.Value[fieldIndex]));
+                }
                 else
+                {
                     return false;
+                }
 
                 while ((currentFeature = featureCursor.NextFeature()) != null)
                 {                   
-                    double t = (Convert.ToDouble(currentFeature.Value[fieldIndex]));
+                    var t = (Convert.ToDouble(currentFeature.Value[fieldIndex]));
 
                     if (t != value)
+                    {
                         return true;
+                    }
                 }
 
                 return false;
@@ -194,7 +210,9 @@ namespace MCDA.Model
         public IEnumerable<double> GetFieldData()
         {
             if (!IsNumeric && !IsOID)
+            {
                 return Enumerable.Empty<double>();
+            }
 
             IList<double> data = new List<double>();
 
@@ -210,13 +228,14 @@ namespace MCDA.Model
 
                 while ((currentFeature = featureCursor.NextFeature()) != null)
                 {
-                    if(currentFeature.Value[fieldIndex] is DBNull)
+                    if (currentFeature.Value[fieldIndex] is DBNull)
+                    {
                         continue;
+                    }
 
-                    double t = (Convert.ToDouble(currentFeature.Value[fieldIndex]));
+                    var t = (Convert.ToDouble(currentFeature.Value[fieldIndex]));
 
-                    data.Add(t);
-                   
+                    data.Add(t);  
                 }
             }
 
@@ -237,7 +256,9 @@ namespace MCDA.Model
         public void DemoteAsSelectedFieldForRendering()
         {
             if (Feature.SelectedFieldForRendering == this)
+            {
                 Feature.SelectedFieldForRendering = null;
+            }
         }
 
         public bool IsSelectedFieldForRendering

@@ -13,13 +13,15 @@ namespace MCDA.Model
         protected double _weight = 0;
         protected string _columnName;
         protected bool _isOID = false;
-        protected ToolParameterContainer _toolParameterContainer;
-       
-        protected virtual void OnPropertyChanged(PropertyChangedEventArgs e)
+
+       protected virtual void OnPropertyChanged(PropertyChangedEventArgs e)
         {
-            PropertyChangedEventHandler handler = PropertyChanged;
+            var handler = PropertyChanged;
+
             if (handler != null)
+            {
                 handler(this, e);
+            }
         }
 
         public abstract double Weight { get; set; }
@@ -59,14 +61,10 @@ namespace MCDA.Model
             set { _columnName = value; }
         }
 
-        public ToolParameterContainer ToolParameterContainer
-        {
-            get { return _toolParameterContainer; }
-            set { _toolParameterContainer = value; }
-        }
+       public ToolParameterContainer ToolParameterContainer { get; set; }
 
-        public abstract Range<double> AcceptableWeightRange { get; }
+       public abstract Range<double> AcceptableWeightRange { get; }
 
-        public abstract IToolParameter DeepClone();
+       public abstract IToolParameter DeepClone();
     }
 }

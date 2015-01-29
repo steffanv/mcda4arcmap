@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using MCDA.Extensions;
 using System.Windows.Input;
 
@@ -12,30 +8,14 @@ namespace MCDA.ViewModel
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private ICommand _applyCommand;
-        private ICommand _okayCommand;
-        private ICommand _cancelCommand;
-
         private double _alphaValue = 1;
         private int _alphaSliderValue = 4;
 
-        public ICommand ApplyCommand
-        {
-            get { return _applyCommand; }
-            set { _applyCommand = value; }
-        }
+        public ICommand ApplyCommand { get; set; }
 
-        public ICommand CancelCommand
-        {
-            get { return _cancelCommand; }
-            set { _cancelCommand = value; }
-        }
+        public ICommand CancelCommand { get; set; }
 
-        public ICommand OkayCommand
-        {
-            get { return _okayCommand; }
-            set { _okayCommand = value; }
-        }
+        public ICommand OkayCommand { get; set; }
 
         public double Alpha
         {

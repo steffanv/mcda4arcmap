@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace MCDA.Model
+﻿namespace MCDA.Model
 {
     internal static class WeightDistributionStrategyFactory
     {
-
-        public static IWeightDistributionStrategy NewProportionalDistributionStrategy()
+        private static IWeightDistributionStrategy NewProportionalDistributionStrategy()
         {
             return new ProportionalDistributionStrategy();
         }

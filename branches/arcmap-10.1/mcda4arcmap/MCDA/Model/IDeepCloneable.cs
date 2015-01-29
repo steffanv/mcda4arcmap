@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace MCDA.Model
+﻿namespace MCDA.Model
 {
-    public interface IDeepClonable<T> where T : class
+    public interface IDeepClonable<out T> where T : class
     {
         T DeepClone();
     }

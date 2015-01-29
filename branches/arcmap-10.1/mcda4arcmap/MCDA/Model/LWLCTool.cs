@@ -1,19 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using ESRI.ArcGIS.Carto;
 using ESRI.ArcGIS.Geodatabase;
 using ESRI.ArcGIS.Geometry;
 using System.Data;
-using System.Collections;
 using ESRI.ArcGIS.ADF;
 using MCDA.ViewModel;
-using MCDA.Extensions;
-using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Collections.Concurrent;
-using System.Threading;
 
 namespace MCDA.Model
 {
@@ -23,7 +17,8 @@ namespace MCDA.Model
        private ToolParameterContainer _toolParameterContainer;
        private NormalizationStrategy _tranformationStrategy;
        private IFeatureClass _featureClass;
-       private DataTable _dataTable, _resultDataTable;
+       private readonly DataTable _dataTable;
+       private DataTable _resultDataTable;
 
        private IDictionary<int, List<Tuple<int, double>>> _dictionaryOfDistances;
        private IDictionary<int, List<int>> _dictionaryOfQueenContiguity, _dictionaryOfRookContiguity;
@@ -44,10 +39,12 @@ namespace MCDA.Model
 
         protected override void PerformAlgorithm()
         {
-           if(_featureClass == null)
+            if (_featureClass == null)
+            {
                 return;
+            }
 
-           switch (_neighborhoodOption)
+            switch (_neighborhoodOption)
            {
                case NeighborhoodOptions.KNearestNeighbors: case NeighborhoodOptions.Threshold: case NeighborhoodOptions.Automatic:
                     if(_dictionaryOfDistances == null)
@@ -68,11 +65,11 @@ namespace MCDA.Model
             _resultDataTable.Columns.Add(_featureClass.OIDFieldName,typeof(FieldTypeOID));
             _resultDataTable.Columns.Add("cluster ids:", typeof(string));
 
-            foreach (IToolParameter _currentToolParameter in _toolParameterContainer.ToolParameter)
+            foreach (var currentToolParameter in _toolParameterContainer.ToolParameter)
             {
-                _resultDataTable.Columns.Add("local range: " +_currentToolParameter.ColumnName, typeof(double));
-                _resultDataTable.Columns.Add("nomralized value: " + _currentToolParameter.ColumnName, typeof(double));
-                _resultDataTable.Columns.Add("local weight: " + _currentToolParameter.ColumnName, typeof(double));
+                _resultDataTable.Columns.Add("local range: " +currentToolParameter.ColumnName, typeof(double));
+                _resultDataTable.Columns.Add("normalized value: " + currentToolParameter.ColumnName, typeof(double));
+                _resultDataTable.Columns.Add("local weight: " + currentToolParameter.ColumnName, typeof(double));
             }
 
             //result column
@@ -104,16 +101,16 @@ namespace MCDA.Model
 
         private void BuildAutomaticTable()
         {
-            object lockObject = new object();
+            var lockObject = new object();
 
             Parallel.ForEach(_dictionaryOfDistances.Keys, currentID =>
                 {
-                    List<Tuple<int, double>> list = new List<Tuple<int,double>>(_dictionaryOfDistances[currentID]);
+                    var list = new List<Tuple<int,double>>(_dictionaryOfDistances[currentID]);
 
                     int maxElements = list.Count();
                     int tryKNearestNeighbors = _numberOfKNearestNeighborsForAutomatic;
 
-                    Cluster c = new Cluster(currentID, list.OrderBy(t => t.Item2).Take(tryKNearestNeighbors).Select(t => t.Item1).ToList(), _dataTable, _toolParameterContainer, _tranformationStrategy);
+                    var c = new Cluster(currentID, list.OrderBy(t => t.Item2).Take(tryKNearestNeighbors).Select(t => t.Item1).ToList(), _dataTable, _toolParameterContainer, _tranformationStrategy);
 
                     // lets try another value - IsResultNull also calculates all required stuff for NewRow
                     while (c.IsResultNull() && tryKNearestNeighbors <= maxElements)
@@ -131,13 +128,13 @@ namespace MCDA.Model
 
         private void BuildRookContiguityTable()
         {
-            object lockObject = new object();
+            var lockObject = new object();
 
             Parallel.ForEach(_dictionaryOfRookContiguity.Keys, currentID =>
                 {
-                    List<int> list = new List<int>(_dictionaryOfRookContiguity[currentID]);
+                    var list = new List<int>(_dictionaryOfRookContiguity[currentID]);
 
-                    Cluster c = new Cluster(currentID, list, _dataTable, _toolParameterContainer, _tranformationStrategy);
+                    var c = new Cluster(currentID, list, _dataTable, _toolParameterContainer, _tranformationStrategy);
 
                     c.Calculate();
 
@@ -151,13 +148,13 @@ namespace MCDA.Model
 
         private void BuildQueenContiguityTable()
         {
-            object lockObject = new object();
+            var lockObject = new object();
 
             Parallel.ForEach(_dictionaryOfQueenContiguity.Keys, currentID =>
                 {
-                    List<int> list = new List<int>(_dictionaryOfQueenContiguity[currentID]);
+                    var list = new List<int>(_dictionaryOfQueenContiguity[currentID]);
 
-                    Cluster c = new Cluster(currentID, list, _dataTable, _toolParameterContainer, _tranformationStrategy);
+                    var c = new Cluster(currentID, list, _dataTable, _toolParameterContainer, _tranformationStrategy);
 
                     c.Calculate();
 
@@ -171,13 +168,13 @@ namespace MCDA.Model
 
         private void BuildKNearestNeighborTable()
         {
-            object lockObject = new object();
+            var lockObject = new object();
 
             Parallel.ForEach(_dictionaryOfDistances.Keys, currentID =>
                 {
-                    List<Tuple<int, double>> list = new List<Tuple<int,double>>(_dictionaryOfDistances[currentID]);
+                    var list = new List<Tuple<int,double>>(_dictionaryOfDistances[currentID]);
 
-                    Cluster c = new Cluster(currentID,
+                    var c = new Cluster(currentID,
                                             list.OrderBy(t => t.Item2)
                                                 .Take(_numberOfKNearestNeighbors)
                                                 .Select(t => t.Item1)
@@ -194,13 +191,13 @@ namespace MCDA.Model
 
         private void BuildThresholdTable()
         {  
-            object lockObject = new object();
+            var lockObject = new object();
 
             Parallel.ForEach(_dictionaryOfDistances.Keys, currentID =>
                 {
-                    List<Tuple<int, double>> list = new List<Tuple<int,double>>(_dictionaryOfDistances[currentID]);
+                    var list = new List<Tuple<int,double>>(_dictionaryOfDistances[currentID]);
 
-                    Cluster c = new Cluster(currentID, list.Where(t => t.Item2 <= _threshold).Select(t => t.Item1).ToList(), _dataTable, _toolParameterContainer, _tranformationStrategy);
+                    var c = new Cluster(currentID, list.Where(t => t.Item2 <= _threshold).Select(t => t.Item1).ToList(), _dataTable, _toolParameterContainer, _tranformationStrategy);
 
                     c.Calculate();
 
@@ -213,26 +210,26 @@ namespace MCDA.Model
 
         private IDictionary<int, List<Tuple<int, double>>> BuildDictionaryOfDistancesByCentroid()
         {
-            double[,] centroidArray = new double[_featureClass.FeatureCount(null), 3];
+            var centroidArray = new double[_featureClass.FeatureCount(null), 3];
 
-            using (ComReleaser comReleaser = new ComReleaser())
+            using (var comReleaser = new ComReleaser())
             {
-                IFeatureCursor featureCursor = (IFeatureCursor)_featureClass.Search(null, false);
+                var featureCursor = (IFeatureCursor)_featureClass.Search(null, false);
 
                 comReleaser.ManageLifetime(featureCursor);
 
-                int numberOfFeatures = _featureClass.FeatureCount(null);
+                var numberOfFeatures = _featureClass.FeatureCount(null);
 
-                int oidColumn = _featureClass.FindField(_featureClass.OIDFieldName);
+                var oidColumn = _featureClass.FindField(_featureClass.OIDFieldName);
                
-                bool zeroOIDExist = false;
+                var zeroOIDExist = false;
               
-                int centroidArrayIndex = 0;
+                var centroidArrayIndex = 0;
 
                 IFeature currentFeature;
                 while ((currentFeature = featureCursor.NextFeature()) != null)
                 {
-                    int oid = Convert.ToInt32(currentFeature.get_Value(oidColumn));
+                    var oid = Convert.ToInt32(currentFeature.Value[oidColumn]);
                     centroidArray[centroidArrayIndex, 0] = oid;
 
                     if (oid == 0)
@@ -240,7 +237,7 @@ namespace MCDA.Model
                         zeroOIDExist = true;
                     }
 
-                    IArea area = (IArea)currentFeature.Shape;
+                    var area = (IArea)currentFeature.Shape;
                     centroidArray[centroidArrayIndex, 1] = area.Centroid.X;
                     centroidArray[centroidArrayIndex, 2] = area.Centroid.Y;
 
@@ -261,7 +258,7 @@ namespace MCDA.Model
 
             Parallel.For(0, centroidArray.GetLength(0), i =>
             {
-                List<Tuple<int, double>> listOfDistances = new List<Tuple<int, double>>();
+                var listOfDistances = new List<Tuple<int, double>>();
 
                 for (int j = 0; j < centroidArray.GetLength(0); j++)
                 {
@@ -271,10 +268,10 @@ namespace MCDA.Model
                         continue;
                     }
                     //create a distance matrix for each polygon and store in the data table
-                    double distance = EuclidianDistance(centroidArray[i, 1], centroidArray[i, 2], centroidArray[j, 1], centroidArray[j, 2]);
-                    int id = Convert.ToInt32(centroidArray[j, 0]);
+                    var distance = EuclidianDistance(centroidArray[i, 1], centroidArray[i, 2], centroidArray[j, 1], centroidArray[j, 2]);
+                    var id = Convert.ToInt32(centroidArray[j, 0]);
 
-                    Tuple<int, double> temp = new Tuple<int, double>(id, distance);
+                    var temp = new Tuple<int, double>(id, distance);
 
                     listOfDistances.Add(temp);
                 }
@@ -289,11 +286,11 @@ namespace MCDA.Model
         {
             IDictionary<int, List<int>> neighborDictionary = new Dictionary<int, List<int>>();
 
-            bool zeroOIDExist = false;
+            var zeroOIDExist = false;
 
-            using (ComReleaser comReleaser = new ComReleaser())
+            using (var comReleaser = new ComReleaser())
             { 
-                IFeatureCursor featureCursor = (IFeatureCursor)_featureClass.Search(null, false);
+                var featureCursor = (IFeatureCursor)_featureClass.Search(null, false);
 
                 comReleaser.ManageLifetime(featureCursor);
 
@@ -307,15 +304,15 @@ namespace MCDA.Model
                     spatialFilter.Geometry = currentFeature.Shape;
                     spatialFilter.GeometryField = _featureClass.ShapeFieldName;
                     
-                    ISelectionSet selectionSet = _featureClass.Select(spatialFilter,
+                    var selectionSet = _featureClass.Select(spatialFilter,
                         esriSelectionType.esriSelectionTypeIDSet,
                         esriSelectionOption.esriSelectionOptionNormal, null);
 
                     ISet<int> neighborIDs = new HashSet<int>();
                   
-                    IEnumIDs enumIDs = selectionSet.IDs;
+                    var enumIDs = selectionSet.IDs;
 
-                    int ID = enumIDs.Next();
+                    var ID = enumIDs.Next();
                     
                     while(ID != -1)
                     {
@@ -350,11 +347,11 @@ namespace MCDA.Model
         {
             IDictionary<int, List<int>> neighborDictionary = new ConcurrentDictionary<int, List<int>>();
 
-            bool zeroOIDExist = false;
+            var zeroOIDExist = false;
 
-            using (ComReleaser comReleaser = new ComReleaser())
+            using (var comReleaser = new ComReleaser())
             {
-                IFeatureCursor featureCursor = (IFeatureCursor)_featureClass.Search(null, false);
+                var featureCursor = (IFeatureCursor)_featureClass.Search(null, false);
 
                 comReleaser.ManageLifetime(featureCursor);
 
@@ -372,24 +369,24 @@ namespace MCDA.Model
                     spatialFilter.Geometry = currentFeature.Shape;
                     spatialFilter.GeometryField = _featureClass.ShapeFieldName;
 
-                    ISelectionSet selectionSet = _featureClass.Select(spatialFilter,
+                    var selectionSet = _featureClass.Select(spatialFilter,
                         esriSelectionType.esriSelectionTypeIDSet,
                         esriSelectionOption.esriSelectionOptionNormal, null);
 
-                    ITopologicalOperator topologicalOperator = (ITopologicalOperator)currentFeature.Shape;
+                    var topologicalOperator = (ITopologicalOperator)currentFeature.Shape;
 
                     ISet<int> neighborIDs = new HashSet<int>();
 
-                    IEnumIDs enumIDs = selectionSet.IDs;
+                    var enumIDs = selectionSet.IDs;
 
-                    int ID = enumIDs.Next();
-                    // thats ridiculous - someone at ESRI does not understand the iterator pattern...
+                    var ID = enumIDs.Next();
+
                     while (ID != -1)
                     {
                         if (ID != currentFeature.OID)
                         {
                             // http://resources.arcgis.com/en/help/main/10.1/index.html#//00080000000z000000
-                            IGeometryCollection polylineCollection =
+                            var polylineCollection =
                                 (IGeometryCollection)
                                 topologicalOperator.Intersect(_featureClass.GetFeature(ID).Shape,
                                                               esriGeometryDimension.esriGeometry1Dimension);
@@ -404,7 +401,7 @@ namespace MCDA.Model
                                 continue;
                             }
 
-                            IGeometryCollection polygonCollection =
+                            var polygonCollection =
                                 (IGeometryCollection)
                                 topologicalOperator.Intersect(_featureClass.GetFeature(ID).Shape,
                                                               esriGeometryDimension.esriGeometry2Dimension);
@@ -447,11 +444,15 @@ namespace MCDA.Model
         {
             get
             {
-                if (_featureClass == null || _toolParameterContainer.ToolParameter.Count() == 0)
+                if (_featureClass == null || !_toolParameterContainer.ToolParameter.Any())
+                {
                     return 0;
+                }
 
                 if (_dictionaryOfDistances == null)
+                {
                     _dictionaryOfDistances = BuildDictionaryOfDistancesByCentroid();
+                }
 
                 return _dictionaryOfDistances.Values.Min(l => l.Min(t => t.Item2));
             }
@@ -461,11 +462,15 @@ namespace MCDA.Model
         {
             get
             {
-                if (_featureClass == null || _toolParameterContainer.ToolParameter.Count() == 0)
+                if (_featureClass == null || !_toolParameterContainer.ToolParameter.Any())
+                {
                     return 0;
+                }
 
                 if (_dictionaryOfDistances == null)
+                {
                     _dictionaryOfDistances = BuildDictionaryOfDistancesByCentroid();
+                }
 
                 return _dictionaryOfDistances.Values.Min(l => l.Max(t => t.Item2));
             }

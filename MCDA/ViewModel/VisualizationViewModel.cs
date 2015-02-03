@@ -375,7 +375,7 @@ namespace MCDA.ViewModel
                 return;
             }
 
-            if (SelectedFieldToRender.Field.IsSelectedFieldForRendering)
+            if (SelectedFieldToRender.Field.IsSelectedFieldForRendering && SelectedFieldToRender.Renderer == Renderer.BiPolarRenderer)
             {
                 SelectedFieldToRender.BiPolarRendererContainer = GetBiPolarContainer();
                 Render();
@@ -391,7 +391,7 @@ namespace MCDA.ViewModel
 
             UpdateHistogramControl();
 
-            if (SelectedFieldToRender.Field.IsSelectedFieldForRendering)
+            if (SelectedFieldToRender.Field.IsSelectedFieldForRendering && SelectedFieldToRender.Renderer == Renderer.ClassBreaksRenderer)
             {
                 SelectedFieldToRender.ClassBreaksRendererContainer = GetClassBreaksRendererContainer();
                 Render();

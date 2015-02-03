@@ -17,7 +17,7 @@
   <Image>Images\MCDA Add-in.png</Image>
   <Author>Steffan Voss</Author>
   <Company>Steffan Voss</Company>
-  <Date>1/13/2015</Date>
+  <Date>2/4/2015</Date>
   <Targets>
     <Target name="Desktop" version="10.2" />
   </Targets>

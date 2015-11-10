@@ -169,6 +169,8 @@ namespace MCDA
 
             _activeViewEvents.ItemAdded += ArcMapItemAdded;
             _activeViewEvents.ItemDeleted += ArcMapItemDeleted;
+
+            AddItemsOnStartup(ArcMap.Document.ActiveView);
         }
 
         private void AddItemsOnStartup(ESRI.ArcGIS.Carto.IActiveView activeView)
@@ -326,7 +328,7 @@ namespace MCDA
             }
 
             // add rows
-            // the table data list has the same order as the datatable columns!
+            // the table data list has the same order as the data table columns!
             for (var i = 0; i < expectedNumbersOfRow; i++)
             {
                 var row = dataTable.NewRow();
@@ -336,7 +338,7 @@ namespace MCDA
                     //we have the oid column
                     if (y == dataTableOIDOrdinal)
                     {
-                        //if the column is FID we have to change the ids 0...x to 1...x+1 because this change will be made after the featureclass is copied into the in memory workspace
+                        //if the column is FID we have to change the ids 0...x to 1...x+1 because this change will be made after the feature class is copied into the in memory workspace
                         if (isOIDFieldNameFID && isOIDFieldStartsByZero)
                         {
                             row[y] = new FieldTypeOID {OID = (int) tableData[y][i] + 1};

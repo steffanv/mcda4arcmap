@@ -505,6 +505,11 @@ namespace MCDA.ViewModel
                 }
             }
 
+            if (_neighborhoodSelectionViewModel.NumberOfNeighbors > _lwlcTool.NumberOfNeighbors)
+            {
+                changed = true;
+            }
+
             if (changed)
             {
                 DoApplyNeighborhoodSelectionCommand();
@@ -534,6 +539,7 @@ namespace MCDA.ViewModel
             _neighborhoodSelectionViewModel.SelectedNumberOfKNearestNeighbors = _lwlcTool.NumberOfKNearestNeighbors;
             _neighborhoodSelectionViewModel.SelectedNumberOfKNearestNeighborsForAutomatic = _lwlcTool.NumberOfKNearestNeighborsForAutomatic;
             _neighborhoodSelectionViewModel.Threshold = _lwlcTool.Threshold;
+            _neighborhoodSelectionViewModel.NumberOfNeighbors = _lwlcTool.NumberOfNeighbors;
 
             _neighborhoodSelectionView.Closing -= NeighborhoodSelectionViewClosing;
             _neighborhoodSelectionView.Close();
@@ -559,6 +565,7 @@ namespace MCDA.ViewModel
             _lwlcTool.NumberOfKNearestNeighbors = _neighborhoodSelectionViewModel.SelectedNumberOfKNearestNeighbors;
             _lwlcTool.Threshold = _neighborhoodSelectionViewModel.Threshold;
             _lwlcTool.NumberOfKNearestNeighborsForAutomatic = _neighborhoodSelectionViewModel.SelectedNumberOfKNearestNeighborsForAutomatic;
+            _lwlcTool.NumberOfNeighbors = _neighborhoodSelectionViewModel.NumberOfNeighbors;
 
             _isUpdateAllowed = true;
             base.Update();

@@ -11,31 +11,33 @@ using System.Collections.Concurrent;
 
 namespace MCDA.Model
 {
-   internal sealed class LWLCTool : AbstractToolTemplate
+    internal sealed class LWLCTool : AbstractToolTemplate
     {
-       private string _defaultResultColumnName = "LWLCResult";
-       private ToolParameterContainer _toolParameterContainer;
-       private NormalizationStrategy _tranformationStrategy;
-       private IFeatureClass _featureClass;
-       private readonly DataTable _dataTable;
-       private DataTable _resultDataTable;
+        private string _defaultResultColumnName = "LWLCResult";
+        private ToolParameterContainer _toolParameterContainer;
+        private NormalizationStrategy _tranformationStrategy;
+        private IFeatureClass _featureClass;
+        private readonly DataTable _dataTable;
+        private DataTable _resultDataTable;
 
-       private IDictionary<int, List<Tuple<int, double>>> _dictionaryOfDistances;
-       private IDictionary<int, List<int>> _dictionaryOfQueenContiguity, _dictionaryOfRookContiguity;
+        private IDictionary<int, List<Tuple<int, float>>> _dictionaryOfDistances;
+        private IDictionary<int, List<int>> _dictionaryOfQueenContiguity, _dictionaryOfRookContiguity;
 
-       private NeighborhoodOptions _neighborhoodOption = NeighborhoodOptions.KNearestNeighbors;
-       private int _numberOfKNearestNeighbors = 3;
-       private int _numberOfKNearestNeighborsForAutomatic = 3;
-       private double _threshold;
+        private NeighborhoodOptions _neighborhoodOption = NeighborhoodOptions.KNearestNeighbors;
+        private int _numberOfKNearestNeighbors = 3;
+        private int _numberOfKNearestNeighborsForAutomatic = 3;
+        private double _threshold;
+        private int _numberOfNeighbors = 20;
+        private int _numberOfNeighborsLastRun = 0;
 
-       public LWLCTool(DataTable dataTable, ToolParameterContainer toolParameterContainer, IFeatureClass featureClass)
-       {
-           _dataTable = dataTable;
-           _toolParameterContainer = toolParameterContainer;
-           _featureClass = featureClass;
+        public LWLCTool(DataTable dataTable, ToolParameterContainer toolParameterContainer, IFeatureClass featureClass)
+        {
+            _dataTable = dataTable;
+            _toolParameterContainer = toolParameterContainer;
+            _featureClass = featureClass;
 
-           _resultDataTable = new DataTable();
-       }
+            _resultDataTable = new DataTable();
+        }
 
         protected override void PerformAlgorithm()
         {
@@ -45,35 +47,37 @@ namespace MCDA.Model
             }
 
             switch (_neighborhoodOption)
-           {
-               case NeighborhoodOptions.KNearestNeighbors: case NeighborhoodOptions.Threshold: case NeighborhoodOptions.Automatic:
-                    if(_dictionaryOfDistances == null)
+            {
+                case NeighborhoodOptions.KNearestNeighbors:
+                case NeighborhoodOptions.Threshold:
+                case NeighborhoodOptions.Automatic:
+                    if (_dictionaryOfDistances == null || _numberOfNeighborsLastRun < _numberOfNeighbors)
                         _dictionaryOfDistances = BuildDictionaryOfDistancesByCentroid();
-                   break;
-               case NeighborhoodOptions.Queen:
-                   if (_dictionaryOfQueenContiguity == null)
-                       _dictionaryOfQueenContiguity = BuildDictionaryOfQueenContiguity();
-                   break;
-               case NeighborhoodOptions.Rook:
-                   if (_dictionaryOfRookContiguity == null)
-                       _dictionaryOfRookContiguity = BuildDictionaryOfRookContiguity();
-                   break;
-           }
-          
+                    break;
+                case NeighborhoodOptions.Queen:
+                    if (_dictionaryOfQueenContiguity == null)
+                        _dictionaryOfQueenContiguity = BuildDictionaryOfQueenContiguity();
+                    break;
+                case NeighborhoodOptions.Rook:
+                    if (_dictionaryOfRookContiguity == null)
+                        _dictionaryOfRookContiguity = BuildDictionaryOfRookContiguity();
+                    break;
+            }
+
             _resultDataTable = new DataTable();
 
-            _resultDataTable.Columns.Add(_featureClass.OIDFieldName,typeof(FieldTypeOID));
+            _resultDataTable.Columns.Add(_featureClass.OIDFieldName, typeof(FieldTypeOID));
             _resultDataTable.Columns.Add("cluster ids:", typeof(string));
 
             foreach (var currentToolParameter in _toolParameterContainer.ToolParameter)
             {
-                _resultDataTable.Columns.Add("local range: " +currentToolParameter.ColumnName, typeof(double));
+                _resultDataTable.Columns.Add("local range: " + currentToolParameter.ColumnName, typeof(double));
                 _resultDataTable.Columns.Add("normalized value: " + currentToolParameter.ColumnName, typeof(double));
                 _resultDataTable.Columns.Add("local weight: " + currentToolParameter.ColumnName, typeof(double));
             }
 
             //result column
-            _resultDataTable.Columns.Add(_defaultResultColumnName,typeof(double));
+            _resultDataTable.Columns.Add(_defaultResultColumnName, typeof(double));
 
             _resultDataTable.BeginLoadData();
 
@@ -105,7 +109,7 @@ namespace MCDA.Model
 
             Parallel.ForEach(_dictionaryOfDistances.Keys, currentID =>
                 {
-                    var list = new List<Tuple<int,double>>(_dictionaryOfDistances[currentID]);
+                    var list = _dictionaryOfDistances[currentID];
 
                     int maxElements = list.Count();
                     int tryKNearestNeighbors = _numberOfKNearestNeighborsForAutomatic;
@@ -172,7 +176,7 @@ namespace MCDA.Model
 
             Parallel.ForEach(_dictionaryOfDistances.Keys, currentID =>
                 {
-                    var list = new List<Tuple<int,double>>(_dictionaryOfDistances[currentID]);
+                    var list = _dictionaryOfDistances[currentID];
 
                     var c = new Cluster(currentID,
                                             list.OrderBy(t => t.Item2)
@@ -190,12 +194,12 @@ namespace MCDA.Model
         }
 
         private void BuildThresholdTable()
-        {  
+        {
             var lockObject = new object();
 
             Parallel.ForEach(_dictionaryOfDistances.Keys, currentID =>
                 {
-                    var list = new List<Tuple<int,double>>(_dictionaryOfDistances[currentID]);
+                    var list = new List<Tuple<int, float>>(_dictionaryOfDistances[currentID]);
 
                     var c = new Cluster(currentID, list.Where(t => t.Item2 <= _threshold).Select(t => t.Item1).ToList(), _dataTable, _toolParameterContainer, _tranformationStrategy);
 
@@ -206,9 +210,9 @@ namespace MCDA.Model
                         _resultDataTable.Rows.Add((c.FillRowWithResults(_resultDataTable.NewRow())));
                     }
                 });
-        } 
+        }
 
-        private IDictionary<int, List<Tuple<int, double>>> BuildDictionaryOfDistancesByCentroid()
+        private IDictionary<int, List<Tuple<int, float>>> BuildDictionaryOfDistancesByCentroid()
         {
             var centroidArray = new double[_featureClass.FeatureCount(null), 3];
 
@@ -221,9 +225,9 @@ namespace MCDA.Model
                 var numberOfFeatures = _featureClass.FeatureCount(null);
 
                 var oidColumn = _featureClass.FindField(_featureClass.OIDFieldName);
-               
+
                 var zeroOIDExist = false;
-              
+
                 var centroidArrayIndex = 0;
 
                 IFeature currentFeature;
@@ -245,7 +249,8 @@ namespace MCDA.Model
                 }
 
                 // it is possible that the oid column starts at zero and the other program parts expect it at 1, thus we have to check if the name is FID and one oid is zero
-                if(_featureClass.OIDFieldName.Equals("FID") && zeroOIDExist){
+                if (_featureClass.OIDFieldName.Equals("FID") && zeroOIDExist)
+                {
 
                     for (int i = 0; i < centroidArray.GetLength(0); i++)
                     {
@@ -254,11 +259,11 @@ namespace MCDA.Model
                 }
             }
 
-            IDictionary<int, List<Tuple<int, double>>> dictionaryOfDistances = new ConcurrentDictionary<int, List<Tuple<int, double>>>();
+            IDictionary<int, List<Tuple<int, float>>> dictionaryOfDistances = new ConcurrentDictionary<int, List<Tuple<int, float>>>();
 
             Parallel.For(0, centroidArray.GetLength(0), i =>
             {
-                var listOfDistances = new List<Tuple<int, double>>();
+                var setOfDistances = new SortedSet<Tuple<int, float>>(new TupleComparer());
 
                 for (int j = 0; j < centroidArray.GetLength(0); j++)
                 {
@@ -267,16 +272,21 @@ namespace MCDA.Model
                     {
                         continue;
                     }
-                    //create a distance matrix for each polygon and store in the data table
-                    var distance = EuclidianDistance(centroidArray[i, 1], centroidArray[i, 2], centroidArray[j, 1], centroidArray[j, 2]);
-                    var id = Convert.ToInt32(centroidArray[j, 0]);
+                    else
+                    {
+                        var distance = (float)EuclidianDistance(centroidArray[i, 1], centroidArray[i, 2], centroidArray[j, 1], centroidArray[j, 2]);
+                        var id = Convert.ToInt32(centroidArray[j, 0]);
 
-                    var temp = new Tuple<int, double>(id, distance);
+                        setOfDistances.Add(Tuple.Create(id, distance));
 
-                    listOfDistances.Add(temp);
+                        if (setOfDistances.Count == _numberOfNeighbors + 1)
+                        {
+                            setOfDistances.Remove(setOfDistances.Last());
+                        }
+                    }
                 }
 
-                dictionaryOfDistances.Add(Convert.ToInt32(centroidArray[i, 0]), listOfDistances);
+                dictionaryOfDistances.Add(Convert.ToInt32(centroidArray[i, 0]), setOfDistances.ToList());
             });
 
             return dictionaryOfDistances;
@@ -289,7 +299,7 @@ namespace MCDA.Model
             var zeroOIDExist = false;
 
             using (var comReleaser = new ComReleaser())
-            { 
+            {
                 var featureCursor = (IFeatureCursor)_featureClass.Search(null, false);
 
                 comReleaser.ManageLifetime(featureCursor);
@@ -299,22 +309,22 @@ namespace MCDA.Model
 
                 IFeature currentFeature;
                 while ((currentFeature = featureCursor.NextFeature()) != null)
-                {      
-                 
+                {
+
                     spatialFilter.Geometry = currentFeature.Shape;
                     spatialFilter.GeometryField = _featureClass.ShapeFieldName;
-                    
+
                     var selectionSet = _featureClass.Select(spatialFilter,
                         esriSelectionType.esriSelectionTypeIDSet,
                         esriSelectionOption.esriSelectionOptionNormal, null);
 
                     ISet<int> neighborIDs = new HashSet<int>();
-                  
+
                     var enumIDs = selectionSet.IDs;
 
                     var ID = enumIDs.Next();
-                    
-                    while(ID != -1)
+
+                    while (ID != -1)
                     {
                         if (ID != currentFeature.OID)
                         {
@@ -392,7 +402,8 @@ namespace MCDA.Model
                                                               esriGeometryDimension.esriGeometry1Dimension);
 
                             // we have one or more polylines in common => add
-                            if (polylineCollection.GeometryCount >= 1){
+                            if (polylineCollection.GeometryCount >= 1)
+                            {
                                 neighborIDs.Add(ID);
 
                                 //we can move on, no need to check for 2 dim intersect
@@ -424,7 +435,7 @@ namespace MCDA.Model
             if (_featureClass.OIDFieldName.Equals("FID") && zeroOIDExist)
             {
                 // the easiest way is to build a new dictionary
-                return neighborDictionary.ToDictionary(k => k.Key + 1, v => v.Value.Select(x => x+1).ToList());
+                return neighborDictionary.ToDictionary(k => k.Key + 1, v => v.Value.Select(x => x + 1).ToList());
             }
 
             return neighborDictionary;
@@ -494,6 +505,12 @@ namespace MCDA.Model
             set { _numberOfKNearestNeighbors = value; }
         }
 
+        public int NumberOfNeighbors
+        {
+            get { return _numberOfNeighbors; }
+            set { _numberOfNeighbors = value; }
+        }
+
         public double Threshold
         {
             get { return _threshold; }
@@ -519,19 +536,27 @@ namespace MCDA.Model
 
         public override ToolParameterContainer ToolParameterContainer
         {
-            get{ return _toolParameterContainer; }
-            set {  _toolParameterContainer = value; }
+            get { return _toolParameterContainer; }
+            set { _toolParameterContainer = value; }
         }
 
         public override NormalizationStrategy TransformationStrategy
         {
             get { return _tranformationStrategy; }
-            set {  _tranformationStrategy = value; }
+            set { _tranformationStrategy = value; }
         }
 
         public override string ToString()
         {
             return "LWLC Tool";
+        }
+    }
+
+    class TupleComparer : IComparer<Tuple<int, float>>
+    {
+        public int Compare(Tuple<int, float> x, Tuple<int, float> y)
+        {
+            return x.Item2.CompareTo(y.Item2);
         }
     }
 }

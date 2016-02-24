@@ -10,6 +10,7 @@ namespace MCDA.Model
     {
         private readonly ToolParameterContainer _toolParameterContainer;
         private readonly DataTable _dataTable;
+        private readonly EnumerableRowCollection<DataRow> _enumerableRowCollection;
         private readonly int _featureId;
         private readonly IList<int> _clusterIDs;
         private readonly NormalizationStrategy _transformationStrategy;
@@ -24,6 +25,7 @@ namespace MCDA.Model
             _featureId = featureId;
             _clusterIDs = clusterIDs;
             _dataTable = dt;
+            _enumerableRowCollection = _dataTable.AsEnumerable();
             _toolParameterContainer = toolParameterContainer;
             _transformationStrategy = transformationStrategy;
 
@@ -50,8 +52,7 @@ namespace MCDA.Model
 
             foreach (var currentToolParameter in toolParameterContainer.ToolParameter)
             {
-                var parameter = currentToolParameter;
-                IList<double> data = _dataTable.AsEnumerable().Select(x => x.Field<double>(parameter.ColumnName)).ToList();
+                IList<double> data = _enumerableRowCollection.Select(x => x.Field<double>(currentToolParameter.ColumnName)).ToList();
 
                 listOfRangeTuple.Add(Tuple.Create(currentToolParameter, data.Max() - data.Min()));
             }
@@ -59,16 +60,16 @@ namespace MCDA.Model
             return listOfRangeTuple;
         }
 
-        private IList<Tuple<IToolParameter, double>> LocalRange(IList<int> clusterIDs, ToolParameterContainer toolParameterContainer)
+        private IList<Tuple<IToolParameter, double>> LocalRange(ToolParameterContainer toolParameterContainer)
         {
             int oidColumnIndex = GetOIDColumnIndex();
 
             IList<Tuple<IToolParameter, double>> listOfRangeTuple = new List<Tuple<IToolParameter, double>>();
 
+            var rows = _enumerableRowCollection.Where(x => _clusterIDs.Contains(x.Field<FieldTypeOID>(oidColumnIndex).OID));
             foreach (var currentToolParameter in toolParameterContainer.ToolParameter)
             {
-                var parameter = currentToolParameter;
-                IList<double> data = _dataTable.AsEnumerable().Where(x => _clusterIDs.Contains(x.Field<FieldTypeOID>(oidColumnIndex).OID)).Select(x => x.Field<double>(parameter.ColumnName)).ToList();
+                IList<double> data = rows.Select(x => x.Field<double>(currentToolParameter.ColumnName)).ToList();
 
                 listOfRangeTuple.Add(Tuple.Create(currentToolParameter, data.Max() - data.Min()));
             }
@@ -80,17 +81,17 @@ namespace MCDA.Model
         {
             IList<Tuple<IToolParameter, double?>> listOfScaledTuple = new List<Tuple<IToolParameter, double?>>();
 
+            var oidColumnIndex = GetOIDColumnIndex();
+            var clusterIDsRows = _enumerableRowCollection.Where(x => _clusterIDs.Contains(x.Field<FieldTypeOID>(oidColumnIndex).OID));
+            var featureIDRow = _enumerableRowCollection.Where(x => x.Field<FieldTypeOID>(oidColumnIndex).OID == _featureId);
+
             foreach (var currentToolParameter in toolParameterContainer.ToolParameter)
             {
                 var currentLocalRange = localRangeList.FirstOrDefault(x => x.Item1 == currentToolParameter);
 
-                var oidColumnIndex = GetOIDColumnIndex();
+                IList<double> data = clusterIDsRows.Select(x => x.Field<double>(currentToolParameter.ColumnName)).Distinct().ToList();
 
-                var parameter = currentToolParameter;
-                IList<double> data = _dataTable.AsEnumerable().Where(x => _clusterIDs.Contains(x.Field<FieldTypeOID>(oidColumnIndex).OID)).Select(x => x.Field<double>(parameter.ColumnName)).Distinct().ToList();
-
-                var toolParameter = currentToolParameter;
-                var actualValue = _dataTable.AsEnumerable().Where(x => x.Field<FieldTypeOID>(oidColumnIndex).OID == _featureId).Select(x => x.Field<double>(toolParameter.ColumnName)).FirstOrDefault();
+                var actualValue = featureIDRow.Select(x => x.Field<double>(currentToolParameter.ColumnName)).FirstOrDefault();
 
                 var result = NormalizationStrategyFactory.GetStrategy(_transformationStrategy).Transform(data, actualValue, currentToolParameter.IsBenefitCriterion);
 
@@ -155,7 +156,7 @@ namespace MCDA.Model
         public void Calculate()
         {
              _globalRange = GlobalRange(_toolParameterContainer);
-             _localRange = LocalRange(_clusterIDs, _toolParameterContainer);
+             _localRange = LocalRange(_toolParameterContainer);
 
              _scaledValues = Scale(_toolParameterContainer, _localRange);
              _weights = LocalWeights(_toolParameterContainer, _localRange, _globalRange);

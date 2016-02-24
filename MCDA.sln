@@ -1,22 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Express 2012 for Windows Desktop
+# Visual Studio 14
+VisualStudioVersion = 14.0.24720.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MCDA", "MCDA\MCDA.csproj", "{6B4C0EC2-4865-4C29-8BBC-8A73FF9DCBA9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MCDA.Test", "MCDA.Test\MCDA.Test.csproj", "{18F1EB09-2E54-4B41-B54A-ADA5407F2F88}"
 EndProject
 Global
-	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 3
-		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
-		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs36
-		SccLocalPath0 = .
-		SccProjectUniqueName1 = MCDA\\MCDA.csproj
-		SccProjectName1 = MCDA
-		SccLocalPath1 = MCDA
-		SccProjectUniqueName2 = MCDA.Test\\MCDA.Test.csproj
-		SccProjectName2 = MCDA.Test
-		SccLocalPath2 = MCDA.Test
+	GlobalSection(Performance) = preSolution
+		HasPerformanceSessions = true
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -50,6 +43,21 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 2
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs36
+		SccProjectUniqueName0 = MCDA\\MCDA.csproj
+		SccProjectName0 = MCDA
+		SccAuxPath0 = https://tfs.codeplex.com/tfs/tfs36
+		SccLocalPath0 = MCDA
+		SccProvider0 = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccProjectUniqueName1 = MCDA.Test\\MCDA.Test.csproj
+		SccProjectName1 = MCDA.Test
+		SccAuxPath1 = https://tfs.codeplex.com/tfs/tfs36
+		SccLocalPath1 = MCDA.Test
+		SccProvider1 = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 	EndGlobalSection
 	GlobalSection(SubversionScc) = preSolution
 		Svn-Managed = True

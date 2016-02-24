@@ -26,7 +26,6 @@ namespace MCDA.ViewModel
 
             switch (ConfigSingleton.Instance.SelectedRenderoption)
             {
-
                 case RenderOption.AfterSliderDrag:
                     UpdateDrag();
                     break;
@@ -39,11 +38,9 @@ namespace MCDA.ViewModel
                 default:
                     UpdateDrag();
                     break;
-
             }
 
-            AfterUpdate();
-   
+            AfterUpdate();   
         }
 
         private ICommand _normalizationSelectionCommand;

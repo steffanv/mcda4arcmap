@@ -12,7 +12,7 @@ namespace MCDA.Model
         private IList<IToolParameter> _listOfParameter;
         private IWeightDistributionStrategy _weightDistributionStrategy = WeightDistributionStrategyFactory.DefaultWeightDistributionStrategy();
 
-        private readonly IList<PropertyChangedEventHandler> listOfpropertyChangedEventHandlersForToolParameterWeight = new List<PropertyChangedEventHandler>();
+        private readonly IList<PropertyChangedEventHandler> _listOfpropertyChangedEventHandlersForToolParameterWeight = new List<PropertyChangedEventHandler>();
 
         private static bool _isLocked = false;
 
@@ -119,14 +119,14 @@ namespace MCDA.Model
 
                 foreach (var currentParameter in _listOfParameter)
                 {
-                    currentParameter.UnRegisterPropertyHandler(listOfpropertyChangedEventHandlersForToolParameterWeight);
+                    currentParameter.UnRegisterPropertyHandler(_listOfpropertyChangedEventHandlersForToolParameterWeight);
                 }
 
                 PropertyChanged.ChangeAndNotify(ref _listOfParameter, value, () => ToolParameter);
 
                 foreach (var currentParameter in _listOfParameter)
                 {
-                    listOfpropertyChangedEventHandlersForToolParameterWeight.Add(
+                    _listOfpropertyChangedEventHandlersForToolParameterWeight.Add(
                         currentParameter.RegisterPropertyHandler(w => w.Weight, WeightPropertyChanged));
                 }
             }

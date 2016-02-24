@@ -11,6 +11,7 @@ namespace MCDA.Extensions
 {
     public static class ExtensionMethods
     {
+
         public static bool IsNumeric(this DataColumn column)
         {
             if (column == null)
@@ -213,7 +214,7 @@ namespace MCDA.Extensions
             yield return new ReadOnlyCollection<T>(array);
         }
 
-        #region OberseableCollection extensions
+        #region ObserveableCollection extensions
 
         public static void SortBy<TSource, TKey>(this ObservableCollection<TSource> source, Func<TSource, TKey> keySelector)
         {

@@ -7,7 +7,7 @@ namespace MCDA.Model
    internal sealed class WLCTool : AbstractToolTemplate
     {
         private DataTable _workingDataTable;
-        private readonly DataTable backupDataTable;
+        private readonly DataTable _backupDataTable;
         private ToolParameterContainer _toolParameterContainer;
         private NormalizationStrategy _transformationStrategy;
 
@@ -16,9 +16,9 @@ namespace MCDA.Model
         public WLCTool(DataTable dataTable, ToolParameterContainer toolParameterContainer)
         {
 
-            backupDataTable = dataTable.Copy();
+            _backupDataTable = dataTable.Copy();
 
-            _workingDataTable = backupDataTable;
+            _workingDataTable = _backupDataTable;
 
             this._toolParameterContainer = toolParameterContainer;
 
@@ -44,7 +44,7 @@ namespace MCDA.Model
 
         protected override void PerformScaling()
         {
-            _workingDataTable = backupDataTable.Copy();
+            _workingDataTable = _backupDataTable.Copy();
 
             foreach (var currentToolParameter in _toolParameterContainer.ToolParameter)
             {

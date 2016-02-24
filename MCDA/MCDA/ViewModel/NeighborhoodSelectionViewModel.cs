@@ -25,6 +25,8 @@ namespace MCDA.ViewModel
 
         public double ThresholdMax { get; set; }
 
+        public int NumberOfNeighbors { get; set; }
+
         public NeighborhoodOptions NeighborhoodOption { get; set; }
 
         public ICommand ApplyCommand { get; set; }

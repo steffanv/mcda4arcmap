@@ -97,7 +97,9 @@ namespace MCDA.ViewModel
             {
                 _toolParameter = new BindingList<IToolParameter>(_lwlcTool.ToolParameterContainer.ToolParameter);
 
-                ProgressDialog.ShowProgressDialog("Running LWLC Tool", (Action) _lwlcTool.Run);
+                //ProgressDialog.ShowProgressDialog("Running LWLC Tool", (Action) _lwlcTool.Run);
+                ProgressDialogBuilder progressDialogBuilder = new ProgressDialogBuilder((Action<ProgressHandler>)_lwlcTool.Run);
+                progressDialogBuilder.SetTitle("Running LWLC Tool").Build().Show();
             }
             else
             {
@@ -151,7 +153,10 @@ namespace MCDA.ViewModel
 
                 if (_selectedFeature.Fields.Count(f => f.IsSelected) >= 1)
                 {
-                    ProgressDialog.ShowProgressDialog("Running LWLC Tool", (Action)_lwlcTool.Run);
+                    //ProgressDialog.ShowProgressDialog("Running LWLC Tool", (Action)_lwlcTool.Run);
+
+                    ProgressDialogBuilder progressDialogBuilder = new ProgressDialogBuilder((Action<ProgressHandler>)_lwlcTool.Run);
+                    progressDialogBuilder.SetTitle("Running LWLC Tool").Build().Show();
 
                     _lwlcResultDataTable = _lwlcTool.Data;
 
@@ -179,7 +184,11 @@ namespace MCDA.ViewModel
                 return;
             }
 
-            ProgressDialog.ShowProgressDialog("Running LWLC Tool", (Action)_lwlcTool.Run);
+            //ProgressDialog.ShowProgressDialog("Running LWLC Tool", _lwlcTool.Run);
+
+            ProgressDialogBuilder progressDialogBuilder = new ProgressDialogBuilder((Action<ProgressHandler>)_lwlcTool.Run);
+            progressDialogBuilder.SetTitle("Running LWLC Tool").Build().Show();
+
             _lwlcResultDataTable = _lwlcTool.Data;
 
             if (_isSendToInMemoryWorkspaceCommand)

@@ -4,10 +4,12 @@ using System.Linq;
 using ESRI.ArcGIS.Geodatabase;
 using ESRI.ArcGIS.Geometry;
 using System.Data;
-using ESRI.ArcGIS.ADF;
 using MCDA.ViewModel;
 using System.Threading.Tasks;
 using System.Collections.Concurrent;
+using System.Threading;
+using ESRI.ArcGIS.ADF;
+using MCDA.Misc;
 
 namespace MCDA.Model
 {
@@ -39,8 +41,9 @@ namespace MCDA.Model
             _resultDataTable = new DataTable();
         }
 
-        protected override void PerformAlgorithm()
+        protected override void PerformAlgorithm(ProgressHandler childHandler = null)
         {
+            ProgressHandler dictionaryHandler = childHandler?.ProvideChildProgressHandler(30);
             if (_featureClass == null)
             {
                 return;
@@ -52,15 +55,15 @@ namespace MCDA.Model
                 case NeighborhoodOptions.Threshold:
                 case NeighborhoodOptions.Automatic:
                     if (_dictionaryOfDistances == null || _numberOfNeighborsLastRun < _numberOfNeighbors)
-                        _dictionaryOfDistances = BuildDictionaryOfDistancesByCentroid();
+                        _dictionaryOfDistances = BuildDictionaryOfDistancesByCentroid(dictionaryHandler);
                     break;
                 case NeighborhoodOptions.Queen:
                     if (_dictionaryOfQueenContiguity == null)
-                        _dictionaryOfQueenContiguity = BuildDictionaryOfQueenContiguity();
+                        _dictionaryOfQueenContiguity = BuildDictionaryOfQueenContiguity(dictionaryHandler);
                     break;
                 case NeighborhoodOptions.Rook:
                     if (_dictionaryOfRookContiguity == null)
-                        _dictionaryOfRookContiguity = BuildDictionaryOfRookContiguity();
+                        _dictionaryOfRookContiguity = BuildDictionaryOfRookContiguity(dictionaryHandler);
                     break;
             }
 
@@ -81,104 +84,108 @@ namespace MCDA.Model
 
             _resultDataTable.BeginLoadData();
 
+            ProgressHandler tableHandler = childHandler?.ProvideChildProgressHandler(50);
             switch (_neighborhoodOption)
             {
                 case NeighborhoodOptions.KNearestNeighbors:
-                    BuildKNearestNeighborTable();
+                    BuildKNearestNeighborTable(tableHandler);
                     break;
                 case NeighborhoodOptions.Threshold:
-                    BuildThresholdTable();
+                    BuildThresholdTable(tableHandler);
                     break;
                 case NeighborhoodOptions.Queen:
-                    BuildQueenContiguityTable();
+                    BuildQueenContiguityTable(tableHandler);
                     break;
                 case NeighborhoodOptions.Rook:
-                    BuildRookContiguityTable();
+                    BuildRookContiguityTable(tableHandler);
                     break;
                 case NeighborhoodOptions.Automatic:
-                    BuildAutomaticTable();
+                    BuildAutomaticTable(tableHandler);
                     break;
             }
 
             _resultDataTable.EndLoadData();
         }
 
-        private void BuildAutomaticTable()
+        private void BuildAutomaticTable(ProgressHandler childHandler = null)
         {
             var lockObject = new object();
 
-            Parallel.ForEach(_dictionaryOfDistances.Keys, currentID =>
+            Parallel.ForEach(_dictionaryOfDistances.Keys, currentId =>
                 {
-                    var list = _dictionaryOfDistances[currentID];
+                    var list = _dictionaryOfDistances[currentId];
 
-                    int maxElements = list.Count();
+                    int maxElements = list.Count;
                     int tryKNearestNeighbors = _numberOfKNearestNeighborsForAutomatic;
 
-                    var c = new Cluster(currentID, list.OrderBy(t => t.Item2).Take(tryKNearestNeighbors).Select(t => t.Item1).ToList(), _dataTable, _toolParameterContainer, _tranformationStrategy);
+                    var c = new Cluster(currentId, list.OrderBy(t => t.Item2).Take(tryKNearestNeighbors).Select(t => t.Item1).ToList(), _dataTable, _toolParameterContainer, _tranformationStrategy);
 
                     // lets try another value - IsResultNull also calculates all required stuff for NewRow
                     while (c.IsResultNull() && tryKNearestNeighbors <= maxElements)
                     {
                         tryKNearestNeighbors++;
-                        c = new Cluster(currentID, list.OrderBy(t => t.Item2).Take(tryKNearestNeighbors).Select(t => t.Item1).ToList(), _dataTable, _toolParameterContainer, _tranformationStrategy);
+                        c = new Cluster(currentId, list.OrderBy(t => t.Item2).Take(tryKNearestNeighbors).Select(t => t.Item1).ToList(), _dataTable, _toolParameterContainer, _tranformationStrategy);
                     }
 
                     lock (lockObject)
                     {
-                        _resultDataTable.Rows.Add((c.FillRowWithResults(_resultDataTable.NewRow())));
+                        childHandler?.OnProgress(_resultDataTable.Rows.Count+1, _dictionaryOfDistances.Keys.Count+1, $"Creating Automatic table\n Calculating row {_resultDataTable.Rows.Count} from {_dictionaryOfDistances.Keys.Count}");
+                        _resultDataTable.Rows.Add(c.FillRowWithResults(_resultDataTable.NewRow()));
                     }
                 });
         }
 
-        private void BuildRookContiguityTable()
+        private void BuildRookContiguityTable(ProgressHandler childHandler = null)
         {
             var lockObject = new object();
 
-            Parallel.ForEach(_dictionaryOfRookContiguity.Keys, currentID =>
+            Parallel.ForEach(_dictionaryOfRookContiguity.Keys, currentId =>
                 {
-                    var list = new List<int>(_dictionaryOfRookContiguity[currentID]);
+                    var list = new List<int>(_dictionaryOfRookContiguity[currentId]);
 
-                    var c = new Cluster(currentID, list, _dataTable, _toolParameterContainer, _tranformationStrategy);
+                    var c = new Cluster(currentId, list, _dataTable, _toolParameterContainer, _tranformationStrategy);
 
                     c.Calculate();
 
                     lock (lockObject)
                     {
-                        _resultDataTable.Rows.Add((c.FillRowWithResults(_resultDataTable.NewRow())));
+                        childHandler?.OnProgress(_resultDataTable.Rows.Count+1, _dictionaryOfDistances.Keys.Count+1, $"Creating Rook Contiguity table\n Calculating row {_resultDataTable.Rows.Count} from {_dictionaryOfDistances.Keys.Count}");
+                        _resultDataTable.Rows.Add(c.FillRowWithResults(_resultDataTable.NewRow()));
                     }
 
                 });
         }
 
-        private void BuildQueenContiguityTable()
+        private void BuildQueenContiguityTable(ProgressHandler childHandler = null)
         {
             var lockObject = new object();
 
-            Parallel.ForEach(_dictionaryOfQueenContiguity.Keys, currentID =>
+            Parallel.ForEach(_dictionaryOfQueenContiguity.Keys, currentId =>
                 {
-                    var list = new List<int>(_dictionaryOfQueenContiguity[currentID]);
+                    var list = new List<int>(_dictionaryOfQueenContiguity[currentId]);
 
-                    var c = new Cluster(currentID, list, _dataTable, _toolParameterContainer, _tranformationStrategy);
+                    var c = new Cluster(currentId, list, _dataTable, _toolParameterContainer, _tranformationStrategy);
 
                     c.Calculate();
 
                     lock (lockObject)
                     {
-                        _resultDataTable.Rows.Add((c.FillRowWithResults(_resultDataTable.NewRow())));
+                        childHandler?.OnProgress(_resultDataTable.Rows.Count+1, _dictionaryOfDistances.Keys.Count+1, $"Creating Queen Contiguity table\nCalculating row {_resultDataTable.Rows.Count} from {_dictionaryOfDistances.Keys.Count}");
+                        _resultDataTable.Rows.Add(c.FillRowWithResults(_resultDataTable.NewRow()));
                     }
 
                 });
         }
 
-        private void BuildKNearestNeighborTable()
+        private void BuildKNearestNeighborTable(ProgressHandler childHandler = null)
         {
             var lockObject = new object();
 
-            Parallel.ForEach(_dictionaryOfDistances.Keys, currentID =>
+            Parallel.ForEach(_dictionaryOfDistances.Keys, currentId =>
                 {
-                    var list = _dictionaryOfDistances[currentID];
+                    var list = _dictionaryOfDistances[currentId];
 
-                    var c = new Cluster(currentID,
+                    var c = new Cluster(currentId,
                                             list.OrderBy(t => t.Item2)
                                                 .Take(_numberOfKNearestNeighbors)
                                                 .Select(t => t.Item1)
@@ -188,57 +195,61 @@ namespace MCDA.Model
 
                     lock (lockObject)
                     {
-                        _resultDataTable.Rows.Add((c.FillRowWithResults(_resultDataTable.NewRow())));
+                        childHandler?.OnProgress(_resultDataTable.Rows.Count+1, _dictionaryOfDistances.Keys.Count+1, $"Creating KNearest neighboor table\nCalculating row {_resultDataTable.Rows.Count} from {_dictionaryOfDistances.Keys.Count}");
+                        _resultDataTable.Rows.Add(c.FillRowWithResults(_resultDataTable.NewRow()));
                     }
                 });
         }
 
-        private void BuildThresholdTable()
+        private void BuildThresholdTable(ProgressHandler childHandler = null)
         {
             var lockObject = new object();
 
-            Parallel.ForEach(_dictionaryOfDistances.Keys, currentID =>
+            Parallel.ForEach(_dictionaryOfDistances.Keys, currentId =>
                 {
-                    var list = new List<Tuple<int, float>>(_dictionaryOfDistances[currentID]);
+                    var list = new List<Tuple<int, float>>(_dictionaryOfDistances[currentId]);
 
-                    var c = new Cluster(currentID, list.Where(t => t.Item2 <= _threshold).Select(t => t.Item1).ToList(), _dataTable, _toolParameterContainer, _tranformationStrategy);
+                    var c = new Cluster(currentId, list.Where(t => t.Item2 <= _threshold).Select(t => t.Item1).ToList(), _dataTable, _toolParameterContainer, _tranformationStrategy);
 
                     c.Calculate();
 
                     lock (lockObject)
                     {
-                        _resultDataTable.Rows.Add((c.FillRowWithResults(_resultDataTable.NewRow())));
+                        childHandler?.OnProgress(_resultDataTable.Rows.Count+1, _dictionaryOfDistances.Keys.Count+1, $"Creating Threshold table\nCalculating row {_resultDataTable.Rows.Count} from {_dictionaryOfDistances.Keys.Count}");
+                        _resultDataTable.Rows.Add(c.FillRowWithResults(_resultDataTable.NewRow()));
                     }
                 });
         }
 
-        private IDictionary<int, List<Tuple<int, float>>> BuildDictionaryOfDistancesByCentroid()
+        private IDictionary<int, List<Tuple<int, float>>> BuildDictionaryOfDistancesByCentroid(ProgressHandler childHandler = null)
         {
             var centroidArray = new double[_featureClass.FeatureCount(null), 3];
 
+            ProgressHandler centroidHandler = childHandler?.ProvideChildProgressHandler(70);
             using (var comReleaser = new ComReleaser())
             {
-                var featureCursor = (IFeatureCursor)_featureClass.Search(null, false);
+                var featureCursor = _featureClass.Search(null, false);
 
                 comReleaser.ManageLifetime(featureCursor);
 
-                var numberOfFeatures = _featureClass.FeatureCount(null);
-
                 var oidColumn = _featureClass.FindField(_featureClass.OIDFieldName);
 
-                var zeroOIDExist = false;
+                var zeroOidExist = false;
 
                 var centroidArrayIndex = 0;
 
+                int numberOfFields = _featureClass.FeatureCount(null);
                 IFeature currentFeature;
                 while ((currentFeature = featureCursor.NextFeature()) != null)
                 {
+                    centroidHandler?.OnProgress(centroidArrayIndex+1, numberOfFields+1, $"Creating neighborhood\nCalculating centroid {centroidArrayIndex} from {numberOfFields}");
+
                     var oid = Convert.ToInt32(currentFeature.Value[oidColumn]);
                     centroidArray[centroidArrayIndex, 0] = oid;
 
                     if (oid == 0)
                     {
-                        zeroOIDExist = true;
+                        zeroOidExist = true;
                     }
 
                     var area = (IArea)currentFeature.Shape;
@@ -249,9 +260,8 @@ namespace MCDA.Model
                 }
 
                 // it is possible that the oid column starts at zero and the other program parts expect it at 1, thus we have to check if the name is FID and one oid is zero
-                if (_featureClass.OIDFieldName.Equals("FID") && zeroOIDExist)
+                if ("FID".Equals(_featureClass.OIDFieldName) && zeroOidExist)
                 {
-
                     for (int i = 0; i < centroidArray.GetLength(0); i++)
                     {
                         centroidArray[i, 0]++;
@@ -261,8 +271,12 @@ namespace MCDA.Model
 
             IDictionary<int, List<Tuple<int, float>>> dictionaryOfDistances = new ConcurrentDictionary<int, List<Tuple<int, float>>>();
 
+            ProgressHandler distanceHandler = childHandler?.ProvideChildProgressHandler(30);
+            int numberOfCalculatedCentroid = 0;
             Parallel.For(0, centroidArray.GetLength(0), i =>
             {
+                Interlocked.Increment(ref numberOfCalculatedCentroid);
+                distanceHandler?.OnProgress(numberOfCalculatedCentroid + 1, centroidArray.GetLength(0)+1, $"Creating neighborhood\nCalculating centroid distance {numberOfCalculatedCentroid} from {centroidArray.GetLength(0)}");
                 var setOfDistances = new SortedSet<Tuple<int, float>>(new TupleComparer());
 
                 for (int j = 0; j < centroidArray.GetLength(0); j++)
@@ -270,7 +284,6 @@ namespace MCDA.Model
                     //do not add the distance too itself
                     if (i == j)
                     {
-                        continue;
                     }
                     else
                     {
@@ -291,12 +304,12 @@ namespace MCDA.Model
 
             return dictionaryOfDistances;
         }
-
-        private IDictionary<int, List<int>> BuildDictionaryOfQueenContiguity()
+        
+        private IDictionary<int, List<int>> BuildDictionaryOfQueenContiguity(ProgressHandler childHandler = null)
         {
             IDictionary<int, List<int>> neighborDictionary = new Dictionary<int, List<int>>();
 
-            var zeroOIDExist = false;
+            var zeroOidExist = false;
 
             using (var comReleaser = new ComReleaser())
             {
@@ -307,10 +320,11 @@ namespace MCDA.Model
                 ISpatialFilter spatialFilter = new SpatialFilterClass();
                 spatialFilter.SpatialRel = esriSpatialRelEnum.esriSpatialRelIntersects;
 
+                int numberOfFields = _featureClass.FeatureCount(null);
                 IFeature currentFeature;
                 while ((currentFeature = featureCursor.NextFeature()) != null)
                 {
-
+                    childHandler?.OnProgress(neighborDictionary.Count+1, numberOfFields+1, $"Creating neighborhood\nCalculating Queen Contiguity {neighborDictionary.Count} from {numberOfFields}");
                     spatialFilter.Geometry = currentFeature.Shape;
                     spatialFilter.GeometryField = _featureClass.ShapeFieldName;
 
@@ -322,28 +336,28 @@ namespace MCDA.Model
 
                     var enumIDs = selectionSet.IDs;
 
-                    var ID = enumIDs.Next();
+                    var id = enumIDs.Next();
 
-                    while (ID != -1)
+                    while (id != -1)
                     {
-                        if (ID != currentFeature.OID)
+                        if (id != currentFeature.OID)
                         {
-                            neighborIDs.Add(ID);
+                            neighborIDs.Add(id);
                         }
 
-                        ID = enumIDs.Next();
+                        id = enumIDs.Next();
                     }
 
                     neighborDictionary.Add(currentFeature.OID, neighborIDs.ToList());
 
                     if (currentFeature.OID == 0)
                     {
-                        zeroOIDExist = true;
+                        zeroOidExist = true;
                     }
                 }
 
                 // it is possible that the oid column starts at zero and the other program parts expect it at 1, thus we have to check if the name is FID and one oid is zero
-                if (_featureClass.OIDFieldName.Equals("FID") && zeroOIDExist)
+                if ("FID".Equals(_featureClass.OIDFieldName) && zeroOidExist)
                 {
                     // the easiest way is to build a new dictionary
                     return neighborDictionary.ToDictionary(k => k.Key + 1, v => v.Value.Select(x => x + 1).ToList());
@@ -353,11 +367,11 @@ namespace MCDA.Model
             return neighborDictionary;
         }
 
-        private IDictionary<int, List<int>> BuildDictionaryOfRookContiguity()
+        private IDictionary<int, List<int>> BuildDictionaryOfRookContiguity(ProgressHandler childHandler = null)
         {
             IDictionary<int, List<int>> neighborDictionary = new ConcurrentDictionary<int, List<int>>();
 
-            var zeroOIDExist = false;
+            var zeroOidExist = false;
 
             using (var comReleaser = new ComReleaser())
             {
@@ -368,12 +382,14 @@ namespace MCDA.Model
                 ISpatialFilter spatialFilter = new SpatialFilterClass();
                 spatialFilter.SpatialRel = esriSpatialRelEnum.esriSpatialRelIntersects;
 
+                int numberOfFields = _featureClass.FeatureCount(null);
                 IFeature currentFeature;
                 while ((currentFeature = featureCursor.NextFeature()) != null)
                 {
+                    childHandler?.OnProgress(neighborDictionary.Count + 1, numberOfFields + 1, $"Creating neighborhood\nCalculating Queen Contiguity {neighborDictionary.Count} from {numberOfFields}");
                     if (currentFeature.OID == 0)
                     {
-                        zeroOIDExist = true;
+                        zeroOidExist = true;
                     }
 
                     spatialFilter.Geometry = currentFeature.Shape;
@@ -389,42 +405,42 @@ namespace MCDA.Model
 
                     var enumIDs = selectionSet.IDs;
 
-                    var ID = enumIDs.Next();
+                    var id = enumIDs.Next();
 
-                    while (ID != -1)
+                    while (id != -1)
                     {
-                        if (ID != currentFeature.OID)
+                        if (id != currentFeature.OID)
                         {
                             // http://resources.arcgis.com/en/help/main/10.1/index.html#//00080000000z000000
                             var polylineCollection =
                                 (IGeometryCollection)
-                                topologicalOperator.Intersect(_featureClass.GetFeature(ID).Shape,
+                                topologicalOperator.Intersect(_featureClass.GetFeature(id).Shape,
                                                               esriGeometryDimension.esriGeometry1Dimension);
 
                             // we have one or more polylines in common => add
                             if (polylineCollection.GeometryCount >= 1)
                             {
-                                neighborIDs.Add(ID);
+                                neighborIDs.Add(id);
 
                                 //we can move on, no need to check for 2 dim intersect
-                                ID = enumIDs.Next();
+                                id = enumIDs.Next();
 
                                 continue;
                             }
 
                             var polygonCollection =
                                 (IGeometryCollection)
-                                topologicalOperator.Intersect(_featureClass.GetFeature(ID).Shape,
+                                topologicalOperator.Intersect(_featureClass.GetFeature(id).Shape,
                                                               esriGeometryDimension.esriGeometry2Dimension);
 
                             // we have one or more polygons in common => add
                             if (polygonCollection.GeometryCount >= 1)
                             {
-                                neighborIDs.Add(ID);
+                                neighborIDs.Add(id);
                             }
                         }
 
-                        ID = enumIDs.Next();
+                        id = enumIDs.Next();
                     }
 
                     neighborDictionary.Add(currentFeature.OID, neighborIDs.ToList());
@@ -432,7 +448,7 @@ namespace MCDA.Model
             }
 
             // it is possible that the oid column starts at zero and the other program parts expect it at 1, thus we have to check if the name is FID and one oid is zero
-            if (_featureClass.OIDFieldName.Equals("FID") && zeroOIDExist)
+            if (_featureClass.OIDFieldName.Equals("FID") && zeroOidExist)
             {
                 // the easiest way is to build a new dictionary
                 return neighborDictionary.ToDictionary(k => k.Key + 1, v => v.Value.Select(x => x + 1).ToList());
@@ -529,10 +545,7 @@ namespace MCDA.Model
             set { _defaultResultColumnName = value; }
         }
 
-        public override System.Data.DataTable Data
-        {
-            get { return _resultDataTable; }
-        }
+        public override System.Data.DataTable Data => _resultDataTable;
 
         public override ToolParameterContainer ToolParameterContainer
         {
@@ -552,7 +565,7 @@ namespace MCDA.Model
         }
     }
 
-    class TupleComparer : IComparer<Tuple<int, float>>
+    internal class TupleComparer : IComparer<Tuple<int, float>>
     {
         public int Compare(Tuple<int, float> x, Tuple<int, float> y)
         {

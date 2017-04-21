@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Data;
+using MCDA.Misc;
 
 namespace MCDA.Model
 {
@@ -131,7 +132,7 @@ namespace MCDA.Model
             }
         }
 
-        protected override void PerformAlgorithm()
+        protected override void PerformAlgorithm(ProgressHandler childHandler = null)
         {
             //add result column
             _workingDataTable.Columns.Add(new DataColumn(DefaultResultColumnName, typeof(double)));

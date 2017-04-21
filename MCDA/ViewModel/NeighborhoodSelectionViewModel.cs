@@ -10,10 +10,7 @@ namespace MCDA.ViewModel
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public BindingList<int> NumberOfKNearestNeighbors
-        {
-            get { return new BindingList<int>(Enumerable.Range(1, 19).ToList()); }
-        }
+        public BindingList<int> NumberOfKNearestNeighbors => new BindingList<int>(Enumerable.Range(1, 19).ToList());
 
         public int SelectedNumberOfKNearestNeighbors { get; set; }
 

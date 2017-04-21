@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using MCDA.Extensions;
 using System.ComponentModel;
-using ESRI.ArcGIS.Geodatabase;
 using ESRI.ArcGIS.ADF;
+using ESRI.ArcGIS.Geodatabase;
 
 namespace MCDA.Model
 {

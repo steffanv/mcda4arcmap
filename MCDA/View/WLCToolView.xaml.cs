@@ -81,7 +81,7 @@ namespace MCDA
             double w;
             if (Double.TryParse(weightSliderTextblock.Text, out w))
             {
-                var toolTip = new System.Windows.Controls.ToolTip { Content = "Please enter a value in the following range: " + toolParameter.AcceptableWeightRange.ToString(3) + "." };
+                var toolTip = new ToolTip { Content = "Please enter a value in the following range: " + toolParameter.AcceptableWeightRange.ToString(3) + "." };
                 weightSliderTextblock.ToolTip = toolTip;
             }
         }

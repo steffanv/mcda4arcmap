@@ -3,18 +3,23 @@ using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;
 using MCDA.Extensions;
+using MCDA.Misc;
 
 namespace MCDA.Model
 {
    internal abstract class AbstractToolTemplate : ITool
     {  
-        protected abstract void PerformAlgorithm();
+        protected abstract void PerformAlgorithm(ProgressHandler handler = null);
         protected abstract void PerformScaling();
 
-        public void Run()
+        public void Run(ProgressHandler progressHandler = null)
         {
+            //progressHandler.ProvideTask()
+            progressHandler?.OnProgress(10, "Perform scaling");
             PerformScaling();
-            PerformAlgorithm();
+            progressHandler?.OnProgress(10, "Perform algorithm");
+            PerformAlgorithm(progressHandler);
+            progressHandler?.OnProgress(100, "ende");
         }
 
         protected static DataTable PerformAlgorithmInParallel(DataTable dataTable, Action<DataTable> mcdaAlgorithm, int chunkSize = 1000)

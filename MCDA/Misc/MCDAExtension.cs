@@ -4,19 +4,17 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Data;
 using System.Linq;
-using System.Reflection;
 using ESRI.ArcGIS.ADF;
 using ESRI.ArcGIS.Carto;
 using ESRI.ArcGIS.DataSourcesGDB;
 using ESRI.ArcGIS.Desktop.AddIns;
 using ESRI.ArcGIS.esriSystem;
-using ESRI.ArcGIS.Framework;
 using ESRI.ArcGIS.Geodatabase;
 using MCDA.Extensions;
+using MCDA.Misc;
 using MCDA.Model;
 using Feature = MCDA.Model.Feature;
 using Field = MCDA.Model.Field;
-using MCDA.ViewModel;
 
 namespace MCDA
 {

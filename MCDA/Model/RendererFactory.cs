@@ -195,7 +195,8 @@ namespace MCDA.Model
             uniqueValueRenderer.ColorScheme = "Custom";
             ////ITable pTable = pDisplayTable as ITable;
             bool isString = renderContainer.Field.Feature.FeatureClass.Fields.Field[fieldIndex].Type == esriFieldType.esriFieldTypeString;
-            uniqueValueRenderer.FieldType[0] = isString;
+            //uniqueValueRenderer.FieldType[0] = isString;
+            uniqueValueRenderer.set_FieldType(0, isString);
             //TODO geoFeatureLayer
             var geoFeatureLayer = renderContainer.Field.Feature.FeatureLayer as IGeoFeatureLayer;
             geoFeatureLayer.Renderer = uniqueValueRenderer as IFeatureRenderer;

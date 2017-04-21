@@ -21,7 +21,7 @@ namespace MCDA
         {
             //WORKAROUND to load the assembly's before XAML comes into play
             new OxyPlot.Wpf.BarSeries();
-            new OxyPlot.Xps.XpsExporter();
+            //new OxyPlot.Xps.XpsExporter();
             new OxyPlot.Series.BarItem();
 
             InitializeComponent();

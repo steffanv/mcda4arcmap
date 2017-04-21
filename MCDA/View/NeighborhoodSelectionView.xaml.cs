@@ -21,8 +21,8 @@ namespace MCDA
         {
             var context = (NeighborhoodSelectionViewModel) DataContext;
 
-            weightSlider.Minimum = context.ThresholdMin;
-            weightSlider.Maximum = context.ThresholdMax;
+            DistanceSlider.Minimum = context.ThresholdMin;
+            DistanceSlider.Maximum = context.ThresholdMax;
         }     
     }
 }

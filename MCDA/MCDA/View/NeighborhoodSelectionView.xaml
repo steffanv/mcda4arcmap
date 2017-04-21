@@ -1,8 +1,6 @@
 ﻿<Window x:Class="MCDA.NeighborhoodSelectionView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"  
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
              xmlns:viewModel="clr-namespace:MCDA.ViewModel"
              xmlns:local="clr-namespace:MCDA.Model"
         Title="Neighborhood Definition"
@@ -10,8 +8,12 @@
         ShowInTaskbar="False"
         ResizeMode="NoResize"
         WindowStartupLocation="CenterOwner"
-    Height="370" Width="330">
+    Height="400" Width="330">
     <Grid Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
         <TabControl VerticalAlignment="Stretch" Margin="5,5,5,40" >
             <TabItem Header="General" Height="22" VerticalAlignment="Bottom">
                 <Grid>
@@ -36,7 +38,7 @@
                                 <RowDefinition Height="20" />
                             </Grid.RowDefinitions>
                             <RadioButton Grid.Row="1" Grid.Column="1" GroupName="NeighborhoodOption" IsChecked="{Binding Path=NeighborhoodOption, Converter={StaticResource enumToBooleanConverter}, ConverterParameter={x:Static viewModel:NeighborhoodOptions.Rook}}" Content="Rook Contiguity" ToolTip="Include polygons that share a border of some length." />
-                            <RadioButton Grid.Row="2" Grid.Column="2" GroupName="NeighborhoodOption" IsChecked="{Binding Path=NeighborhoodOption, Converter={StaticResource enumToBooleanConverter}, ConverterParameter={x:Static viewModel:NeighborhoodOptions.Queen}}" Content="Queen Contiguity" ToolTip="Include polygons that share even a point lenght border." />
+                            <RadioButton Grid.Row="2" Grid.Column="1" GroupName="NeighborhoodOption" IsChecked="{Binding Path=NeighborhoodOption, Converter={StaticResource enumToBooleanConverter}, ConverterParameter={x:Static viewModel:NeighborhoodOptions.Queen}}" Content="Queen Contiguity" ToolTip="Include polygons that share even a point lenght border." />
                         </Grid>
                     </GroupBox>
                     <GroupBox Header="Distance" Grid.Row="1">
@@ -55,10 +57,10 @@
                                 <RowDefinition Height="25" />
                             </Grid.RowDefinitions>
                             <RadioButton Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" GroupName="NeighborhoodOption" Content="Threshold Distance (Unit from Projection)"  IsChecked="{Binding Path=NeighborhoodOption, Converter={StaticResource enumToBooleanConverter}, ConverterParameter={x:Static viewModel:NeighborhoodOptions.Threshold}}" ToolTip="Include polygons in a certain distance." />
-                            <Slider Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Name="weightSlider"  Value="{Binding Path=Threshold, Mode=TwoWay}"  HorizontalContentAlignment="Stretch" Minimum="0" Maximum="1000" TickFrequency="0.01" />
-                            <TextBox Grid.Row="3" Grid.Column="3" Name="weightSliderTextblock" Width="50" Text="{Binding ElementName=weightSlider, Path=Value, StringFormat={}{0:0.###} }" />
+                            <Slider Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Name="DistanceSlider"  Value="{Binding Path=Threshold, Mode=TwoWay}"  HorizontalContentAlignment="Stretch" Minimum="0" Maximum="1000" TickFrequency="0.01" />
+                            <TextBox Grid.Row="3" Grid.Column="2" Name="DistanceSliderTextblock" Width="50" Text="{Binding ElementName=weightSlider, Path=Value, StringFormat={}{0:0.###} }" />
                             <RadioButton Grid.Row="4" Grid.Column="1" GroupName="NeighborhoodOption" IsChecked="{Binding Path=NeighborhoodOption, Converter={StaticResource enumToBooleanConverter}, ConverterParameter={x:Static viewModel:NeighborhoodOptions.KNearestNeighbors}}" ToolTip="Include the k neareast neighboors.">K Nearest Neighbors</RadioButton>
-                            <ComboBox Grid.Row="5" Grid.Column="2" Height="23" HorizontalAlignment="Center"  Name="comboBox1"  Width="50" ItemsSource="{Binding Path=NumberOfKNearestNeighbors, Mode=OneWay}" SelectedValue="{Binding Path=SelectedNumberOfKNearestNeighbors, Mode=TwoWay}" />
+                            <ComboBox Grid.Row="5" Grid.Column="2" Height="23" HorizontalAlignment="Center"  Name="NumberOfKNearestNeighborsBox"  Width="50" ItemsSource="{Binding Path=NumberOfKNearestNeighbors, Mode=OneWay}" SelectedValue="{Binding Path=SelectedNumberOfKNearestNeighbors, Mode=TwoWay}" />
                         </Grid>
                     </GroupBox>
                     <GroupBox Header="Custom" Grid.Row="2" >
@@ -78,7 +80,7 @@
                 </Grid>
             </TabItem>
             <TabItem Header="Settings">
-                <GroupBox Header="Number of Neighbors" Grid.Row="4" ToolTip="Number of Neighbors considered for the distance matrix. Only an increased value will result in recalculation." >
+                <GroupBox Header="Number of Neighbors" ToolTip="Number of Neighbors considered for the distance matrix. Only an increased value will result in recalculation." >
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="10" />
@@ -90,15 +92,29 @@
                             <RowDefinition Height="20" />
                             <RowDefinition Height="20" />
                         </Grid.RowDefinitions>
-                        <Slider Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Name="neighborSlider"  Value="{Binding Path=NumberOfNeighbors, Mode=TwoWay}"  HorizontalContentAlignment="Stretch" Minimum="20" Maximum="1000" TickFrequency="1" />
-                        <TextBox Grid.Row="2" Grid.Column="3" Name="neighborSliderTextblock" Width="50" Text="{Binding ElementName=neighborSlider, Path=Value, StringFormat={}{0:0.###} }" />
+                        <Slider Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Name="NeighborSlider" Value="{Binding Path=NumberOfNeighbors, Mode=TwoWay}"  HorizontalContentAlignment="Stretch" Minimum="20" Maximum="1000" TickFrequency="1" />
+                        <TextBox Grid.Row="2" Grid.Column="2" Name="NeighborSliderTextblock" Width="50" Text="{Binding ElementName=NeighborSlider, Path=Value, StringFormat={}{0:0.###} }" />
                     </Grid>
                 </GroupBox>
             </TabItem>
         </TabControl>
-        <Button Content="Cancel"  Width="75"  HorizontalAlignment="Left" VerticalAlignment="Top" Command="{Binding Path=CancelCommand}" Margin="163,312,0,0" />
-        <Button Content="Apply"  Width="75"  HorizontalAlignment="Left" VerticalAlignment="Top" Command="{Binding Path=ApplyCommand}" Margin="243,312,0,0"  />
-        <Button Content="OK" Width="75" HorizontalAlignment="Left"  VerticalAlignment="Top"  Command="{Binding Path=OkayCommand}" Margin="83,312,0,0"/>
+        <Grid Grid.Column="0" Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="75" />
+                <ColumnDefinition Width="75" />
+                <ColumnDefinition Width="75" />
+                <ColumnDefinition Width="5" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="25" />
+                <RowDefinition Height="5" />
+            </Grid.RowDefinitions>
+            <Button Grid.Row="1" Grid.Column="1" Content="Cancel" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="1,1,1,1" Command="{Binding Path=CancelCommand}" />
+            <Button Grid.Row="1" Grid.Column="2" Content="Apply" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="1,1,1,1" Command="{Binding Path=ApplyCommand}" />
+            <Button Grid.Row="1" Grid.Column="3" Content="OK" HorizontalAlignment="Stretch"  VerticalAlignment="Top" Margin="1,1,1,1" Command="{Binding Path=OkayCommand}" />
+        </Grid>
     </Grid>
 </Window>
 

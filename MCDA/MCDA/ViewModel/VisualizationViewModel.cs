@@ -9,6 +9,7 @@ using ESRI.ArcGIS.esriSystem;
 using System.Windows.Media;
 using System.Windows.Input;
 using System.Collections.ObjectModel;
+using MCDA.Misc;
 using OxyPlot.Series;
 
 namespace MCDA.ViewModel

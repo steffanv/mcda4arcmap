@@ -4,7 +4,7 @@ using System.Windows.Input;
 
 namespace MCDA.ViewModel
 {
-    class AlphaSelectionViewModel : INotifyPropertyChanged
+    internal class AlphaSelectionViewModel : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 

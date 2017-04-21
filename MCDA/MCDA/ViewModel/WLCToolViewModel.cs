@@ -303,11 +303,14 @@ namespace MCDA.ViewModel
 
            if (_isLocked)
            {
-               ProgressDialog.ShowProgressDialog("Creating In Memory Representation",
-                   (Action<AbstractToolTemplate>) _mcdaExtension.EstablishLink, _wlcTool);
-           }
+                //ProgressDialog.ShowProgressDialog("Creating In Memory Representation",
+                //    (Action<AbstractToolTemplate>)_mcdaExtension.EstablishLink, _wlcTool);
 
-           if (!_isLocked && !_isSendToInMemoryWorkspaceCommand)
+                ProgressDialogBuilder progressDialogBuilder = new ProgressDialogBuilder((Action<AbstractToolTemplate>)_mcdaExtension.EstablishLink, _wlcTool);
+                progressDialogBuilder.SetTitle("Creating In Memory Representation").SetHideCancelButton(true).SetIsIndeterminate(true).Build().Show();
+            }
+
+            if (!_isLocked && !_isSendToInMemoryWorkspaceCommand)
            {
                _mcdaExtension.RemoveLink(_wlcTool);
                this.SelectedFeaturePropertyChanged(this, null);
@@ -328,8 +331,11 @@ namespace MCDA.ViewModel
            if (_isSendToInMemoryWorkspaceCommand)
            {
                _mcdaExtension.DisplayLink(_wlcTool);
-               ProgressDialog.ShowProgressDialog("Creating Symbology", (Action<AbstractToolTemplate, DataTable>)_mcdaExtension.JoinToolResultByOID, _wlcTool, _wlcTool.Data);
-           }
+               //ProgressDialog.ShowProgressDialog("Creating Symbology", (Action<AbstractToolTemplate, DataTable>)_mcdaExtension.JoinToolResultByOID, _wlcTool, _wlcTool.Data);
+
+                ProgressDialogBuilder progressDialogBuilder = new ProgressDialogBuilder((Action<AbstractToolTemplate, DataTable>)_mcdaExtension.JoinToolResultByOID, _wlcTool, _wlcTool.Data);
+                progressDialogBuilder.SetTitle("Creating Symbology").SetHideCancelButton(true).SetIsIndeterminate(true).Build().Show();
+            }
 
            if (!_isSendToInMemoryWorkspaceCommand)
            {

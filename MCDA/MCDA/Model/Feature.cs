@@ -52,7 +52,6 @@ namespace MCDA.Model
         /// </remarks>
         /// <param name="featureClass"></param>
         /// <param name="featureLayer"></param>
-        /// <exception cref="ArgumentNullExeption"> </exception>
         public Feature(IFeatureClass featureClass, IFeatureLayer2 featureLayer)
         {
             featureLayer.FeatureClass = featureClass;

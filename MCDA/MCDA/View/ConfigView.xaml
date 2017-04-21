@@ -9,7 +9,11 @@
         WindowStartupLocation="CenterOwner"
     Height="240" Width="330">
     <Grid Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
-        <TabControl Grid.Column="0" Grid.Row="1" VerticalAlignment="Stretch" Margin="5,5,5,40">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="170"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <TabControl Grid.Column="0" Grid.Row="0" VerticalAlignment="Stretch" Margin="5,5,5,40">
             <TabItem Header="Visualization" Name="renderingTabItem" VerticalAlignment="Bottom">
                 <Grid>
                     <Grid.RowDefinitions>
@@ -39,8 +43,22 @@
                 </Grid>
             </TabItem>
         </TabControl>
-        <Button Content="Cancel"  Width="75"  HorizontalAlignment="Left" VerticalAlignment="Top" Command="{Binding Path=CancelCommand}" Margin="164,182,0,0" />
-        <Button Content="Apply"  Width="75"  HorizontalAlignment="Left" VerticalAlignment="Top" Command="{Binding Path=ApplyCommand}" Margin="244,182,0,0"  />
-        <Button Content="OK" Width="75" HorizontalAlignment="Left"  VerticalAlignment="Top"  Command="{Binding Path=OkayCommand}" Margin="84,182,0,0"/>
+        <Grid Grid.Column="0" Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="75" />
+                <ColumnDefinition Width="75" />
+                <ColumnDefinition Width="75" />
+                <ColumnDefinition Width="5" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="25" />
+                <RowDefinition Height="5" />
+            </Grid.RowDefinitions>
+            <Button Grid.Row="1" Grid.Column="1" Content="Cancel" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="1,1,1,1" Command="{Binding Path=CancelCommand}" />
+            <Button Grid.Row="1" Grid.Column="2" Content="Apply" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="1,1,1,1" Command="{Binding Path=ApplyCommand}" />
+            <Button Grid.Row="1" Grid.Column="3" Content="OK" HorizontalAlignment="Stretch"  VerticalAlignment="Center"  Margin="1,1,1,1" Command="{Binding Path=OkayCommand}" />
+        </Grid>
     </Grid>
 </Window>

@@ -39,10 +39,10 @@ Additional add-in features include
 
 - Developed for ArcMap 10.1, ArcMap 10.2 or later and the .Net Framework 4.0 or later
 - Download should appear as "ESRI AddIn File" - if ArcMap runs, this add-in will also work!
- TOOLS:
 
-[JetBrains](https://www.jetbrains.com/) provides a Resharper licence for the development of MCDA4ArcMap 
-resharper 
+#### TOOLS
+
+- [JetBrains](https://www.jetbrains.com/) provides a Resharper licence for the development of MCDA4ArcMap resharper 
 
 #### CREDITS
 

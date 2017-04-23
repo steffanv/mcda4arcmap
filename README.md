@@ -2,6 +2,8 @@
 
 This add-in for the ArcMap geographic information system (GIS) offers multi-criteria decision analysis (MCDA) and visualization functions for vector data. The MCDA process is highly interactive and the results can be processed within ArcMap.
 
+[[https://github.com/steffanv/mcda4arcmap/blob/master/doc/overview.jpg|alt=octocat]]
+
 PLEASE NOTE THE DISCLAIMER BELOW AND THE STIPULATIONS UNDER THE LICENSE TAB.
 
 The add-in supports the following MCDA methods:

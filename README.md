@@ -39,7 +39,7 @@ Additional add-in features include:
 ## System Requirements
 
 - Developed for ArcMap 10.1, ArcMap 10.2 or later and the .Net Framework 4.0 or later
-- Download should appear as "ESRI AddIn File" - if ArcMap runs, this add-in will also work! Donwloads can be found in the [releases section](https://github.com/steffanv/mcda4arcmap/releases)
+- Download should appear as "ESRI AddIn File" - if ArcMap runs, this add-in will also work! Downloads can be found in the [releases section](https://github.com/steffanv/mcda4arcmap/releases)
 
 ## TOOLS
 
@@ -52,6 +52,8 @@ Additional add-in features include:
 - This project was initiated and supervised by [Dr. Claus Rinner](http://www.ryerson.ca/~crinner/), Dept. of Geography, Ryerson University.
 - Partial funding for Steffan's research from Dr. Rinner's NSERC Discovery Grant is gratefully acknowledged.
 - An earlier version of the LWLC tool for vector data in ArcMap was developed by Brad Carter for his [Master of Spatial Analysis (MSA)](http://www.ryerson.ca/graduate/programs/spatial/) degree at Ryerson University.
+
+- The project was moved from [codeplex](https://mcda4arcmap.codeplex.com/).
 
 ## DISCLAIMER
 

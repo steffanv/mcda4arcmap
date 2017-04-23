@@ -39,7 +39,7 @@ Additional add-in features include:
 ## System Requirements
 
 - Developed for ArcMap 10.1, ArcMap 10.2 or later and the .Net Framework 4.0 or later
-- Download should appear as "ESRI AddIn File" - if ArcMap runs, this add-in will also work!
+- Download should appear as "ESRI AddIn File" - if ArcMap runs, this add-in will also work! Donwloads can be found in the [releases section](https://github.com/steffanv/mcda4arcmap/releases)
 
 ## TOOLS
 

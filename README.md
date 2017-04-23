@@ -1,4 +1,4 @@
-# mcda4arcmap
+# MCDA4ArcMap
 
 This add-in for the ArcMap geographic information system (GIS) offers multi-criteria decision analysis (MCDA) and visualization functions for vector data. The MCDA process is highly interactive and the results can be processed within ArcMap.
 
@@ -40,16 +40,16 @@ System Requirements:
 - Download should appear as "ESRI AddIn File" - if ArcMap runs, this add-in will also work!
  TOOLS:
 
-JetBrains provides a Resharper licence for the development of MCDA4ArcMap 
+[JetBrains](https://www.jetbrains.com/) provides a Resharper licence for the development of MCDA4ArcMap 
 resharper 
 
 ###### CREDITS:
 
-The add-in (version 1.0) was developed by Steffan Voss, Institute for Geoinformatics, University of Muenster, Germany, during his research visit in the Department of Geography, Ryerson University, Toronto, Canada, from August 2012 to January 2013.
+The add-in (version 1.0) was developed by Steffan Voss, [Institute for Geoinformatics](https://www.uni-muenster.de/Geoinformatics/), University of Muenster, Germany, during his research visit in the [Department of Geography](http://www.ryerson.ca/geography/), Ryerson University, Toronto, Canada, from August 2012 to January 2013.
 The add-in is further developed by Steffan Voss.
-This project was initiated and supervised by Dr. Claus Rinner, Dept. of Geography, Ryerson University.
+This project was initiated and supervised by [Dr. Claus Rinner](http://www.ryerson.ca/~crinner/), Dept. of Geography, Ryerson University.
 Partial funding for Steffan's research from Dr. Rinner's NSERC Discovery Grant is gratefully acknowledged.
-An earlier version of the LWLC tool for vector data in ArcMap was developed by Brad Carter for his Master of Spatial Analysis (MSA) degree at Ryerson University.
+An earlier version of the LWLC tool for vector data in ArcMap was developed by Brad Carter for his [Master of Spatial Analysis (MSA)](http://www.ryerson.ca/graduate/programs/spatial/) degree at Ryerson University.
 
 ###### DISCLAIMER:
 

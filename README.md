@@ -43,7 +43,7 @@ Additional add-in features include:
 
 ## TOOLS
 
-- [JetBrains](https://www.jetbrains.com/) provides a Resharper licence for the development of MCDA4ArcMap resharper 
+- [JetBrains](https://www.jetbrains.com/) provides a Resharper licence for the development of MCDA4ArcMap
 
 ## CREDITS
 

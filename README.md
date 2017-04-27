@@ -41,10 +41,6 @@ Additional add-in features include:
 - Developed for ArcMap 10.1, ArcMap 10.2 or later and the .Net Framework 4.0 or later
 - Download should appear as "ESRI AddIn File" - if ArcMap runs, this add-in will also work! Downloads can be found in the [releases section](https://github.com/steffanv/mcda4arcmap/releases)
 
-## TOOLS
-
-- [JetBrains](https://www.jetbrains.com/) provides a Resharper licence for the development of MCDA4ArcMap
-
 ## CREDITS
 
 - The add-in (version 1.0) was developed by Steffan Voss, [Institute for Geoinformatics](https://www.uni-muenster.de/Geoinformatics/), University of Muenster, Germany, during his research visit in the [Department of Geography](http://www.ryerson.ca/geography/), Ryerson University, Toronto, Canada, from August 2012 to January 2013.
